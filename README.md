@@ -1,5 +1,4 @@
 # Projekt KUMA
 ## TODO list
-* funktsionaalne pool
-* graafikaline liides
-* pmst kõik
+* funktsionaalses pooles - lugeda .kpm failist cutscene algust
+* teha graafikaline liides ja ühendada see funktsionaalse poolega

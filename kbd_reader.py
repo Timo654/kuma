@@ -1,10 +1,70 @@
 from binary_reader import BinaryReader
 
 
+def read_note_type(note_type):
+    """Gets the note type ID and returns it as string."""
+    match note_type:
+        case 0:
+            return 'Regular'
+        case 1:
+            return 'Hold'
+        case 2:
+            return 'Rapid'
+        case _:
+            raise Exception(f'Invalid note type ID {note_type}')
+
+
+def write_note_type(note_type):
+    """Gets the note type string and returns it as ID."""
+    match note_type:
+        case 'Regular':
+            return 0
+        case 'Hold':
+            return 1
+        case 'Rapid':
+            return 2
+        case _:
+            raise Exception(f'Invalid note type {note_type}')
+
+
+def read_button(button):
+    """Gets the buttton ID and returns it as string."""
+    match button:
+        case 0:
+            return 'Circle'  # B on XBOX
+        case 1:
+            return 'Cross'  # A on XBOX
+        case 2:
+            return 'Square'  # X on XBOX
+        case 3:
+            return 'Triangle'  # Y on XBOX
+        case _:
+            raise Exception(f'Invalid button ID {button}')
+
+
+def write_button(button):
+    """Gets the button type string and returns it as ID."""
+    match button:
+        case 'Circle':  # B on XBOX
+            return 0
+        case 'Cross':  # A on XBOX
+            return 1
+        case 'Square':  # X on XBOX
+            return 2
+        case 'Triangle':  # Y on XBOX
+            return 3
+        case _:
+            raise Exception(f'Invalid button {button}')
+
+
 def write_file(data, filename, cutscene_start):
+    """Writes the kbd from dict to the specified filename.\n
+    The first parameter is a dict containin info read from kbd,\n
+    the second parameter is the filename and third is the cutscene start time from KPM"""
+
     # writing the notes
     max_score = 0  # counting the maximum possible score
-    max_cutscene_score = 0  #TODO - read cutscene start time from .kpm
+    max_cutscene_score = 0  # TODO - read cutscene start time from .kpm
     # this is where we will write the note data
     kbd_n = BinaryReader(bytearray())
     for note in data['Notes']:
@@ -46,59 +106,9 @@ def write_file(data, filename, cutscene_start):
         f.write(kbd_h.buffer())
 
 
-def write_note_type(note_type):
-    match note_type:
-        case 'Regular':
-            return 0
-        case 'Hold':
-            return 1
-        case 'Rapid':
-            return 2
-        case _:
-            raise Exception(f'Invalid note type {note_type}')
-
-
-def write_button(button):
-    match button:
-        case 'Circle':  # B on XBOX
-            return 0
-        case 'Cross':  # A on XBOX
-            return 1
-        case 'Square':  # X on XBOX
-            return 2
-        case 'Triangle':  # Y on XBOX
-            return 3
-        case _:
-            raise Exception(f'Invalid button {button}')
-
-
-def read_button(button):
-    match button:
-        case 0:
-            return 'Circle'  # B on XBOX
-        case 1:
-            return 'Cross'  # A on XBOX
-        case 2:
-            return 'Square'  # X on XBOX
-        case 3:
-            return 'Triangle'  # Y on XBOX
-        case _:
-            raise Exception(f'Invalid button ID {button}')
-
-
-def read_note_type(note_type):
-    match note_type:
-        case 0:
-            return 'Regular'
-        case 1:
-            return 'Hold'
-        case 2:
-            return 'Rapid'
-        case _:
-            raise Exception(f'Invalid note type ID {note_type}')
-
-
 def read_file(input_file):
+    """Reads the kbd file and returns a dict.\n
+    The first and only parameter is the filename"""
     # opening the file
     with open(input_file, 'rb') as file:
         kbd = BinaryReader(file.read())  # reading file as little endian

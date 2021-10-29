@@ -2,6 +2,8 @@
 ## Kuidas kasutada?
 KBD moodulit:
 `from kbd_reader import kbd`
+KPM moodulit:
+`from kpm_reader import kpm`
 
 Vaja on PyBinaryReader'it, saab installida kasutades `pip install binary-reader`
 
@@ -9,6 +11,8 @@ Katsetasin koodi kirjutades Python 3.10's toodud uusi asju. Vajadusel saab koodi
 ## TODO list
 * funktsionaalses pooles - lugeda .kpm failist cutscene algust
 * teha graafikaline liides ja ühendada see funktsionaalse poolega
+* kasutada kpm moodulit, et sealt saada cutscene start time
+* lisada reposse testfailid
 
 ## Viited
 https://github.com/SutandoTsukai181/PyBinaryReader

@@ -3,58 +3,54 @@ from binary_reader import BinaryReader
 
 def read_note_type(note_type):
     """Gets the note type ID and returns it as string."""
-    match note_type:
-        case 0:
-            return 'Regular'
-        case 1:
-            return 'Hold'
-        case 2:
-            return 'Rapid'
-        case _:
-            raise Exception(f'Invalid note type ID {note_type}')
+    if note_type == 0:
+        return 'Regular'
+    elif note_type == 1:
+        return 'Hold'
+    elif note_type == 2:
+        return 'Rapid'
+    else:
+        raise Exception(f'Invalid note type ID {note_type}')
 
 
 def write_note_type(note_type):
     """Gets the note type string and returns it as ID."""
-    match note_type:
-        case 'Regular':
-            return 0
-        case 'Hold':
-            return 1
-        case 'Rapid':
-            return 2
-        case _:
-            raise Exception(f'Invalid note type {note_type}')
+    if note_type == 'Regular':
+        return 0
+    elif note_type == 'Hold':
+        return 1
+    elif note_type == 'Rapid':
+        return 2
+    else:
+        raise Exception(f'Invalid note type {note_type}')
 
 
 def read_button(button):
     """Gets the buttton ID and returns it as string."""
-    match button:
-        case 0:
-            return 'Circle'  # B on XBOX
-        case 1:
-            return 'Cross'  # A on XBOX
-        case 2:
-            return 'Square'  # X on XBOX
-        case 3:
-            return 'Triangle'  # Y on XBOX
-        case _:
-            raise Exception(f'Invalid button ID {button}')
+    if button == 0:
+        return 'Circle'  # B on XBOX
+    elif button == 1:
+        return 'Cross'  # A on XBOX
+    elif button == 2:
+        return 'Square'  # X on XBOX
+    elif button == 3:
+        return 'Triangle'  # Y on XBOX
+    else:
+        raise Exception(f'Invalid button ID {button}')
 
 
 def write_button(button):
     """Gets the button type string and returns it as ID."""
-    match button:
-        case 'Circle':  # B on XBOX
-            return 0
-        case 'Cross':  # A on XBOX
-            return 1
-        case 'Square':  # X on XBOX
-            return 2
-        case 'Triangle':  # Y on XBOX
-            return 3
-        case _:
-            raise Exception(f'Invalid button {button}')
+    if button == 'Circle':  # B on XBOX
+        return 0
+    if button == 'Cross':  # A on XBOX
+        return 1
+    if button == 'Square':  # X on XBOX
+        return 2
+    if button == 'Triangle':  # Y on XBOX
+        return 3
+    if button == _:
+        raise Exception(f'Invalid button {button}')
 
 
 def write_file(data, filename, cutscene_start):
@@ -79,11 +75,10 @@ def write_file(data, filename, cutscene_start):
         kbd_n.write_uint32(0)  # Padding
 
         # counting score
-        match note['Note type']:
-            case 'Regular':
-                max_score += 10
-            case _:
-                max_score += 30
+        if note['Note type'] == 'Regular':
+            max_score += 10
+        else:
+            max_score += 30
         if note['Index'] > 19:
             max_score += 5  # combo bonus per note
         if cutscene_start > note['Start position']:

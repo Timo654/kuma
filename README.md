@@ -1,9 +1,10 @@
 # Projekt KUMA
 ## Kuidas kasutada?
 KBD moodulit:
-`from kbd_reader import kbd`
+`import kbd_reader as kbd`
+
 KPM moodulit:
-`from kpm_reader import kpm`
+`import kpm_reader as kpm`
 
 Vaja on PyBinaryReader'it, saab installida kasutades `pip install binary-reader`
 

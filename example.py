@@ -10,3 +10,4 @@ for note in andmed_kbd['Notes']:
 andmed_kpm = kpm.read_file(test_kpm)
 for param in andmed_kpm['Parameters']:
     print('Cutscene start time:', param['Cutscene start time'])
+kbd.write_file(andmed_kbd, './/test_output//tonight_resaved.kbd')

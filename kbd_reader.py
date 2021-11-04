@@ -53,14 +53,14 @@ def write_button(button):
         raise Exception(f'Invalid button {button}')
 
 
-def write_file(data, filename, cutscene_start):
+def write_file(data, filename, cutscene_start=0):
     """Writes the kbd from dict to the specified filename.\n
     The first parameter is a dict containin info read from kbd,\n
-    the second parameter is the filename and third is the cutscene start time from KPM"""
+    the second parameter is the filename and third is the cutscene start time (by default 0) from KPM"""
 
     # writing the notes
     max_score = 0  # counting the maximum possible score
-    max_cutscene_score = 0  # TODO - read cutscene start time from .kpm
+    max_cutscene_score = 0  
     # this is where we will write the note data
     kbd_n = BinaryReader(bytearray())
     for note in data['Notes']:

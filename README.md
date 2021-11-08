@@ -9,10 +9,10 @@ KPM moodulit:
 Vaja on PyBinaryReader'it, pygame'i ja pygame-menu'd, saab installida kasutades `pip install binary-reader`, `pip install pygame` ja `pip install pygame-menu`.
 
 ## TODO list
-* Välja mõelda, mis skaalat graafilises kasutajaliideses kasutada (võibolla teisendada sekunditeks ja teha 250ms kaupa), et 4 ruutu oleks 1 sekund
-* Ühendada graafikaline kasutajaliides kbd mooduliga, et faile lugeda ja salvestada
+* Välja mõelda, mis skaalat graafilises kasutajaliideses kasutada (võibolla teisendada sekunditeks ja jagada 250ms kaupa, et 4 ruutu oleks 1 sekund)
+* Ühendada graafikaline kasutajaliides kbd mooduliga, et faile lugeda ning salvestada
 * Tekitada nupp faili(de) avamiseks ja kast parameetrite muutmiseks (täpsem aeg, nupu tüüp jne)
-* Kasutada kpm moodulit, et sealt saada cutscene start time
+* Kasutada kpm moodulit, et sealt lugeda cutscene start time
 * Graafikalise kasutajaliidesele lisada moodus lisada  "Hold" ja "Rapid" noote
 
 ## Viited

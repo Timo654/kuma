@@ -10,7 +10,9 @@ Vaja on PyBinaryReader'it, saab installida kasutades `pip install binary-reader`
 
 Katsetasin koodi kirjutades Python 3.10's toodud uusi asju. Vajadusel saab koodi muuta, et töötaks ka vanematel versioonidel.
 ## TODO list
-* teha graafikaline liides ja ühendada see funktsionaalse poolega
+* Välja mõelda, mis skaalat graafilises kasutajaliideses kasutaja
+* Ühendada graafikaline kasutajaliides funktsionaalse poolega
+* Tekitada nupp faili avamiseks ja võibolla parameetrite muutmiseks
 * kasutada kpm moodulit, et sealt saada cutscene start time
 
 ## Viited

@@ -33,7 +33,7 @@ class Item:
 
 class Karaoke:
     def __init__(self):
-        self.rows = 7
+        self.rows = 8
         self.col = 1040
         self.items = [[None for _ in range(self.rows)]
                       for _ in range(self.col)]
@@ -155,13 +155,13 @@ def main():
     thick_h = 20
 
     manager = pygame_gui.UIManager(scr_size)
-    file_selection_button = pygame_gui.elements.UIButton(relative_rect=pygame.Rect((10, 220), (100, 50)),
+    file_selection_button = pygame_gui.elements.UIButton(relative_rect=pygame.Rect((10, 250), (100, 50)),
                                                          text='Open file',
                                                          manager=manager)
-    output_selection_button = pygame_gui.elements.UIButton(relative_rect=pygame.Rect((110, 220), (100, 50)),
+    output_selection_button = pygame_gui.elements.UIButton(relative_rect=pygame.Rect((110, 250), (100, 50)),
                                                            text='Save file',
                                                            manager=manager)
-    reset_button = pygame_gui.elements.UIButton(relative_rect=pygame.Rect((210, 220), (100, 50)),
+    reset_button = pygame_gui.elements.UIButton(relative_rect=pygame.Rect((210, 250), (100, 50)),
                                                            text='Reset',
                                                            manager=manager)
 
@@ -196,7 +196,7 @@ def main():
         # Clock tick
         time_delta = clock.tick(60)/1000.0
         # draw the screen
-        world.fill((255, 255, 255))  # clean the screen
+        world.fill((169, 149, 154))  # clean the screen
         karaoke.draw(world)
 
         mousex, mousey = pygame.mouse.get_pos()

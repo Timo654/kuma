@@ -1,9 +1,12 @@
 # based on https://github.com/TheBigKahuna353/Inventory_system and https://github.com/ppizarror/pygame-menu/blob/master/pygame_menu/examples/other/scrollbar.py
 import pygame
 import pygame_menu
-
-
+import pygame_gui
+from pygame_gui.windows.ui_file_dialog import UIFileDialog
+from pygame_gui.elements.ui_button import UIButton
+from pygame.rect import Rect
 from pygame_menu.widgets import ScrollBar
+import kbd_reader as kbd
 
 # these are the notes, colors are placeholder
 items = [pygame.Surface((50, 50), pygame.SRCALPHA) for _ in range(6)]
@@ -31,7 +34,7 @@ class Item:
 class Karaoke:
     def __init__(self):
         self.rows = 7
-        self.col = 500
+        self.col = 2000
         self.items = [[None for _ in range(self.rows)]
                       for _ in range(self.col)]
         self.box_size = 20
@@ -80,16 +83,46 @@ class Karaoke:
         return True
 
 
+def pos_convert(pos):
+    return int(((pos / 3000) * 5))  # changes scale to 250ms per square
+
+
+def load_kbd(file):
+    karaoke = Karaoke()  # reset
+    data = kbd.read_file(file)
+    for note in data['Notes']:
+        start_pos = pos_convert(note['Start position'])
+        karaoke.Add([Item(note['Button type'], note['Note type'])],
+                    (start_pos, note['Vertical position']))
+        if note['Note type'] != 'Regular':
+            end_pos = pos_convert(note['End position'])
+            if note['Note type'] == 'Hold':
+                note_id = 4
+            else:
+                note_id = 5
+            for i in range(start_pos + 1, end_pos):
+                karaoke.Add([Item(note_id, note['Note type'])],
+                            (i, note['Vertical position']))
+            karaoke.Add([Item(note['Button type'], note['Note type'])],
+                        (end_pos, note['Vertical position']))
+    return karaoke
+
+
 def main():
+    pygame.init()
     pygame.display.set_caption('KUMA')
     pygame.mixer.init()  # TODO - playing music
     scr_size = (1600, 480)
-    width_multiplier = 8
+    width_multiplier = 15
     screen = pygame.display.set_mode((scr_size))
     world = pygame.Surface(
         (int(scr_size[0] * width_multiplier), int(scr_size[1])), pygame.SRCALPHA, 32)
-    screen.fill((120, 90, 130))
     thick_h = 20
+
+    manager = pygame_gui.UIManager(scr_size)
+    file_selection_button = pygame_gui.elements.UIButton(relative_rect=pygame.Rect((10, 220), (100, 50)),
+                                                         text='Select file',
+                                                         manager=manager)
 
     # Horizontal ScrollBar
     sb_h = ScrollBar(
@@ -109,16 +142,6 @@ def main():
     clock = pygame.time.Clock()
     karaoke = Karaoke()
 
-    # PLACEHOLDER NOTES FOR TESTING PURPOSES
-    karaoke.Add([Item(3, 'Regular')], (0, 0))
-    karaoke.Add([Item(2, 'Regular')], (0, 2))
-    karaoke.Add([Item(0, 'Regular')], (0, 4))
-    karaoke.Add([Item(1, 'Regular')], (0, 6))
-    karaoke.Add([Item(4, 'Regular')], (0, 1))
-    karaoke.Add([Item(5, 'Regular')], (0, 3))
-    karaoke.Add([Item(1, 'Regular')], (49, 6))
-    # PLACEHOLDER NOTES FOR TESTING PURPOSES
-
     # what the player is holding
     selected = None
     note_id = -1  # note that you get when you want to add one, first is circle
@@ -129,9 +152,9 @@ def main():
     while True:
 
         # Clock tick
-        clock.tick(60)
+        time_delta = clock.tick(60)/1000.0
         # draw the screen
-        world.fill((255, 255, 255))
+        world.fill((255, 255, 255))  # clean the screen
         karaoke.draw(world)
 
         mousex, mousey = pygame.mouse.get_pos()
@@ -140,7 +163,7 @@ def main():
         # if holding something, draw it next to mouse
         if selected:
             world.blit(selected[0].resize(20), (mousex, mousey))
-        pygame.display.update()
+
         # Application events
         events = pygame.event.get()
         for event in events:
@@ -170,7 +193,7 @@ def main():
                             selected = karaoke.items[pos[0]][pos[1]]
                             print(selected[0].id)
                             karaoke.items[pos[0]][pos[1]] = None
-                # TODO - implement keybinds for making HOLD and RAPID notes
+
             if event.type == pygame.KEYDOWN:
                 if event.key == pygame.K_DELETE:
                     selected = None  # deletes selected note
@@ -181,11 +204,22 @@ def main():
                     note_id = 5
                     selected = [Item(note_id, 'Rapid')]  # add item
 
+            if event.type == pygame.USEREVENT:
+                if event.user_type == pygame_gui.UI_BUTTON_PRESSED:
+                    if event.ui_element == file_selection_button:
+                        file_selection = UIFileDialog(
+                            rect=Rect(0, 0, 300, 300), manager=manager, allow_picking_directories=True)
+
+                    if event.ui_element == file_selection.ok_button:
+                        karaoke = load_kbd(file_selection.current_file_path)
+            manager.process_events(event)
+
+        manager.update(time_delta)
         trunc_world_orig = (sb_h.get_value(), 0)
         trunc_world = (scr_size[0], scr_size[1] - thick_h)
 
-        # noinspection PyTypeChecker
         screen.blit(world, (0, 0), (trunc_world_orig, trunc_world))
+        manager.draw_ui(screen)
         pygame.display.update()
 
 

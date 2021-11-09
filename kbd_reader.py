@@ -24,35 +24,6 @@ def write_note_type(note_type):
     else:
         raise Exception(f'Invalid note type {note_type}')
 
-
-def read_button(button):
-    """Gets the buttton ID and returns it as string."""
-    if button == 0:
-        return 'Circle'  # B on XBOX
-    elif button == 1:
-        return 'Cross'  # A on XBOX
-    elif button == 2:
-        return 'Square'  # X on XBOX
-    elif button == 3:
-        return 'Triangle'  # Y on XBOX
-    else:
-        raise Exception(f'Invalid button ID {button}')
-
-
-def write_button(button):
-    """Gets the button type string and returns it as ID."""
-    if button == 'Circle':  # B on XBOX
-        return 0
-    if button == 'Cross':  # A on XBOX
-        return 1
-    if button == 'Square':  # X on XBOX
-        return 2
-    if button == 'Triangle':  # Y on XBOX
-        return 3
-    if button == _:
-        raise Exception(f'Invalid button {button}')
-
-
 def write_file(data, filename, cutscene_start=0):
     """Writes the kbd from dict to the specified filename.\n
     The first parameter is a dict containin info read from kbd,\n
@@ -68,7 +39,7 @@ def write_file(data, filename, cutscene_start=0):
         kbd_n.write_uint32(note['End position'])
         kbd_n.write_uint32(note['Vertical position'])
         kbd_n.write_uint32(0)  # Padding
-        kbd_n.write_uint32(write_button(note['Button type']))
+        kbd_n.write_uint32(note['Button type'])
         kbd_n.write_uint32(write_note_type(note['Note type']))
         kbd_n.write_uint16(note['Cue ID'])
         kbd_n.write_uint16(note['Cuesheet ID'])
@@ -132,7 +103,7 @@ def read_file(input_file):
         note['End position'] = kbd.read_uint32()
         note['Vertical position'] = kbd.read_uint32()
         kbd.seek(4, 1)  # unused, so we're skipping it
-        note['Button type'] = read_button(kbd.read_uint32())
+        note['Button type'] = kbd.read_uint32()
         note['Note type'] = read_note_type(kbd.read_uint32())
         note['Cue ID'] = kbd.read_uint16()  # Audio cheer ID
         note['Cuesheet ID'] = kbd.read_uint16()  # Audio cheer container ID

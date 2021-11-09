@@ -34,7 +34,7 @@ class Item:
 class Karaoke:
     def __init__(self):
         self.rows = 7
-        self.col = 2000
+        self.col = 1100
         self.items = [[None for _ in range(self.rows)]
                       for _ in range(self.col)]
         self.box_size = 20
@@ -84,7 +84,11 @@ class Karaoke:
 
 
 def pos_convert(pos):
-    return int(((pos / 3000) * 5))  # changes scale to 250ms per square
+    return int(((pos / 3000) * 5))  # changes scale to 200ms per square
+
+
+def pos_to_game(pos):
+    return int((pos / 5) * 3000)  # converts back to yakuza time
 
 
 def load_kbd(file):
@@ -108,6 +112,37 @@ def load_kbd(file):
     return karaoke
 
 
+def write_kbd(file, karaoke):
+    data = dict()
+    note_list = list()
+    x = 0
+    while x < len(karaoke.items):
+        y = 0
+        while y < len(karaoke.items[x]):
+            if karaoke.items[x][y] != None:
+                note = dict()
+                note['Start position'] = pos_to_game(x)
+                note['End position'] = 0
+                note['Vertical position'] = y
+                note['Button type'] = karaoke.items[x][y][0].id
+                note['Note type'] = karaoke.items[x][y][0].note_type
+                note['Cue ID'] = 0  # TODO - audio support
+                note['Cuesheet ID'] = 0  # TODO - audio support
+                if karaoke.items[x][y][0].note_type != 'Regular':
+                    x += 1
+                    while karaoke.items[x][y][0].id > 3:
+                        x += 1
+                    note['End position'] = pos_to_game(x)
+                note_list.append(note)
+            y += 1
+        x += 1
+    data['Notes'] = note_list
+    data['Header'] = dict()
+    data['Header']['Version'] = 2
+    kbd.write_file(data, file)
+    print('wrote file')
+
+
 def main():
     pygame.init()
     pygame.display.set_caption('KUMA')
@@ -121,8 +156,11 @@ def main():
 
     manager = pygame_gui.UIManager(scr_size)
     file_selection_button = pygame_gui.elements.UIButton(relative_rect=pygame.Rect((10, 220), (100, 50)),
-                                                         text='Select file',
+                                                         text='Open file',
                                                          manager=manager)
+    output_selection_button = pygame_gui.elements.UIButton(relative_rect=pygame.Rect((110, 220), (100, 50)),
+                                                           text='Save file',
+                                                           manager=manager)
 
     # Horizontal ScrollBar
     sb_h = ScrollBar(
@@ -144,6 +182,7 @@ def main():
 
     # what the player is holding
     selected = None
+    file_select_mode = None
     note_id = -1  # note that you get when you want to add one, first is circle
 
     # -------------------------------------------------------------------------
@@ -207,11 +246,25 @@ def main():
             if event.type == pygame.USEREVENT:
                 if event.user_type == pygame_gui.UI_BUTTON_PRESSED:
                     if event.ui_element == file_selection_button:
-                        file_selection = UIFileDialog(
+                        file_select_mode = 'Input'
+                        input_selection = UIFileDialog(
                             rect=Rect(0, 0, 300, 300), manager=manager, allow_picking_directories=True)
+                    if file_select_mode == 'Input':
+                        if event.ui_element == input_selection.ok_button:
+                            file_select_mode = None
+                            karaoke = load_kbd(
+                                input_selection.current_file_path)
 
-                    if event.ui_element == file_selection.ok_button:
-                        karaoke = load_kbd(file_selection.current_file_path)
+                    if event.ui_element == output_selection_button:
+                        file_select_mode = 'Output'
+                        output_selection = UIFileDialog(
+                            rect=Rect(0, 0, 300, 300), manager=manager, allow_picking_directories=True)
+                    if file_select_mode == 'Output':
+                        if event.ui_element == output_selection.ok_button:
+                            file_select_mode = None
+                            write_kbd(
+                                output_selection.current_file_path, karaoke)
+
             manager.process_events(event)
 
         manager.update(time_delta)

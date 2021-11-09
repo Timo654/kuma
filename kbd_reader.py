@@ -34,7 +34,8 @@ def write_file(data, filename, cutscene_start=0):
     max_cutscene_score = 0  
     # this is where we will write the note data
     kbd_n = BinaryReader(bytearray())
-    for note in data['Notes']:
+    for i in range(len(data['Notes'])):
+        note = data['Notes'][i]
         kbd_n.write_uint32(note['Start position'])
         kbd_n.write_uint32(note['End position'])
         kbd_n.write_uint32(note['Vertical position'])
@@ -50,7 +51,7 @@ def write_file(data, filename, cutscene_start=0):
             max_score += 10
         else:
             max_score += 30
-        if note['Index'] > 19:
+        if i > 19:
             max_score += 5  # combo bonus per note
         if cutscene_start > note['Start position']:
             max_cutscene_score = max_score

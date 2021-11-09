@@ -9,7 +9,7 @@ KPM moodulit:
 Vaja on PyBinaryReader'it, pygame'i ja pygame-menu'd, saab installida kasutades `pip install binary-reader`, `pip install pygame` ja `pip install pygame-menu`.
 
 
-1 ruut on 125 ms.
+1 ruut on 200 ms.
 
 Parema klõpsuga saab muuta käesolevat nooti. Noote saab üles korjata vasaku klõpsuga.
 
@@ -18,7 +18,6 @@ Parema klõpsuga saab muuta käesolevat nooti. Noote saab üles korjata vasaku k
 "Delete" kustutab käesoleva noodi.
 
 ## TODO list
-* Failide salvestamine
 * Tekitada nupp faili(de) avamiseks ja kast parameetrite muutmiseks (täpsem aeg, nupu tüüp jne)
 * Kasutada kpm moodulit, et sealt lugeda cutscene start time 
 

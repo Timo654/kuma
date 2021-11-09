@@ -2,7 +2,7 @@
 import pygame
 import pygame_menu
 import pygame_gui
-from pygame_gui.windows.ui_file_dialog import UIFileDialog
+from pygame_gui.windows.ui_file_dialog import UIFileDialog, UIConfirmationDialog
 from pygame_gui.elements.ui_button import UIButton
 from pygame.rect import Rect
 from pygame_menu.widgets import ScrollBar
@@ -34,7 +34,7 @@ class Item:
 class Karaoke:
     def __init__(self):
         self.rows = 7
-        self.col = 1100
+        self.col = 1040
         self.items = [[None for _ in range(self.rows)]
                       for _ in range(self.col)]
         self.box_size = 20
@@ -161,6 +161,9 @@ def main():
     output_selection_button = pygame_gui.elements.UIButton(relative_rect=pygame.Rect((110, 220), (100, 50)),
                                                            text='Save file',
                                                            manager=manager)
+    reset_button = pygame_gui.elements.UIButton(relative_rect=pygame.Rect((210, 220), (100, 50)),
+                                                           text='Reset',
+                                                           manager=manager)
 
     # Horizontal ScrollBar
     sb_h = ScrollBar(
@@ -182,8 +185,8 @@ def main():
 
     # what the player is holding
     selected = None
-    file_select_mode = None
-    note_id = -1  # note that you get when you want to add one, first is circle
+    gui_button_mode = None
+    note_id = 0  # note that you get when you want to add one, first is circle
 
     # -------------------------------------------------------------------------
     # Main loop
@@ -218,10 +221,13 @@ def main():
             if event.type == pygame.MOUSEBUTTONDOWN:
                 # if right clicked, get a note
                 if event.button == 3:
-                    if note_id < 3:
-                        note_id += 1
+                    if selected == None:
+                        pass
                     else:
-                        note_id = 0
+                        if note_id < 3:
+                            note_id += 1
+                        else:
+                            note_id = 0
                     selected = [Item(note_id, 'Regular')]  # add item
                 elif event.button == 1:
                     pos = karaoke.Get_pos(sb_h.get_value())
@@ -246,24 +252,34 @@ def main():
             if event.type == pygame.USEREVENT:
                 if event.user_type == pygame_gui.UI_BUTTON_PRESSED:
                     if event.ui_element == file_selection_button:
-                        file_select_mode = 'Input'
+                        gui_button_mode = 'Input'
                         input_selection = UIFileDialog(
                             rect=Rect(0, 0, 300, 300), manager=manager, allow_picking_directories=True)
-                    if file_select_mode == 'Input':
+                    if gui_button_mode == 'Input':
                         if event.ui_element == input_selection.ok_button:
-                            file_select_mode = None
+                            gui_button_mode = None
                             karaoke = load_kbd(
                                 input_selection.current_file_path)
 
                     if event.ui_element == output_selection_button:
-                        file_select_mode = 'Output'
+                        gui_button_mode = 'Output'
                         output_selection = UIFileDialog(
                             rect=Rect(0, 0, 300, 300), manager=manager, allow_picking_directories=True)
-                    if file_select_mode == 'Output':
+                    if gui_button_mode == 'Output':
                         if event.ui_element == output_selection.ok_button:
-                            file_select_mode = None
+                            gui_button_mode = None
                             write_kbd(
                                 output_selection.current_file_path, karaoke)
+                    
+                    if event.ui_element == reset_button:
+                        gui_button_mode = 'Reset'
+                        reset_all = UIConfirmationDialog(
+                            rect=Rect(0, 0, 300, 300), manager=manager, action_long_desc='Are you sure you want to reset? Any unsaved changes will be lost.')
+                
+                if event.user_type == pygame_gui.UI_CONFIRMATION_DIALOG_CONFIRMED: #reset event
+                    if gui_button_mode == 'Reset':                                                                
+                        gui_button_mode = None
+                        karaoke = Karaoke()   
 
             manager.process_events(event)
 

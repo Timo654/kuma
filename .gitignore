@@ -12,8 +12,9 @@ build/
 develop-eggs/
 dist/
 *.dist/
+*.exe
 *.build/
-*.onefile/
+*.onefile-build/
 downloads/
 eggs/
 .eggs/

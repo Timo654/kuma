@@ -2,6 +2,7 @@
 import pygame
 import pygame_menu
 
+
 from pygame_menu.widgets import ScrollBar
 
 # these are the notes, colors are placeholder
@@ -173,6 +174,13 @@ def main():
             if event.type == pygame.KEYDOWN:
                 if event.key == pygame.K_DELETE:
                     selected = None  # deletes selected note
+                if event.key == pygame.K_LCTRL:
+                    note_id = 4
+                    selected = [Item(note_id, 'Hold')]  # add item
+                if event.key == pygame.K_LSHIFT:
+                    note_id = 5
+                    selected = [Item(note_id, 'Rapid')]  # add item
+
         trunc_world_orig = (sb_h.get_value(), 0)
         trunc_world = (scr_size[0], scr_size[1] - thick_h)
 

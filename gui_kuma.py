@@ -59,7 +59,8 @@ class Karaoke:
 
         pygame.draw.rect(world, (100, 100, 100),
                          (self.x, self.y, (self.box_size + self.border)*self.col + self.border, (self.box_size + self.border)*self.rows + self.border))
-        for x in range(col_start, col_end): #drawing only the columns we can see, for performance reasons
+        # drawing only the columns we can see, for performance reasons
+        for x in range(col_start, col_end):
             for y in range(self.rows):
                 rect = (self.x + (self.box_size + self.border)*x + self.border, self.x +
                         (self.box_size + self.border)*y + self.border, self.box_size, self.box_size)
@@ -154,7 +155,7 @@ def write_kbd(file, karaoke):
                     if karaoke.items[x+1][y] != None:
                         if karaoke.items[x+1][y][0].id > 3:
                             o = x + 1
-                            note['Note type'] = karaoke.items[o][y][0].note_type 
+                            note['Note type'] = karaoke.items[o][y][0].note_type
                             while karaoke.items[o][y][0].id > 3:
                                 o += 1
                             print(o)
@@ -282,7 +283,7 @@ def main():
                     if event.ui_element == file_selection_button:
                         gui_button_mode = 'Input'
                         input_selection = UIFileDialog(
-                            rect=Rect(0, 0, 300, 300), manager=manager, allow_picking_directories=True)
+                            rect=Rect(0, 0, 300, 300), manager=manager, allow_picking_directories=True, allow_existing_files_only=True, window_title='Select an input file (kbd)')
                     if gui_button_mode == 'Input':
                         if event.ui_element == input_selection.ok_button:
                             gui_button_mode = None
@@ -292,7 +293,7 @@ def main():
                     if event.ui_element == output_selection_button:
                         gui_button_mode = 'Output'
                         output_selection = UIFileDialog(
-                            rect=Rect(0, 0, 300, 300), manager=manager, allow_picking_directories=True)
+                            rect=Rect(0, 0, 300, 300), manager=manager, allow_picking_directories=True, window_title='Select an output file (kbd)')
                     if gui_button_mode == 'Output':
                         if event.ui_element == output_selection.ok_button:
                             gui_button_mode = None
@@ -302,7 +303,7 @@ def main():
                     if event.ui_element == reset_button:
                         gui_button_mode = 'Reset'
                         reset_all = UIConfirmationDialog(
-                            rect=Rect(0, 0, 300, 300), manager=manager, action_long_desc='Are you sure you want to reset? Any unsaved changes will be lost.')
+                            rect=Rect(0, 0, 300, 300), manager=manager, action_long_desc='Are you sure you want to reset? Any unsaved changes will be lost.', window_title='Reset all')
                 if event.user_type == pygame_gui.UI_CONFIRMATION_DIALOG_CONFIRMED:  # reset event
                     if gui_button_mode == 'Reset':
                         gui_button_mode = None

@@ -8,7 +8,7 @@ from pygame.rect import Rect
 from pygame_menu.widgets import ScrollBar
 import kbd_reader as kbd
 
-#initialize pygame stuff
+# initialize pygame stuff
 pygame.init()
 font = pygame.font.SysFont("Comic-Sans", 18)
 clock = pygame.time.Clock()
@@ -41,7 +41,7 @@ class Item:
 class Karaoke:
     def __init__(self):
         self.rows = 8
-        self.col = 1040  # TODO - automatically changing this value to improve performance
+        self.col = 1040
         self.items = [[None for _ in range(self.rows)]
                       for _ in range(self.col)]
         self.box_size = 20
@@ -50,11 +50,16 @@ class Karaoke:
         self.border = 3
 
     # draw everything
-    def draw(self, world):
+    def draw(self, world, scroll):
         # draw background
+        col_start = scroll // (self.box_size + self.border) - 2
+        col_end = col_start + 70
+        if col_end > self.col:
+            col_end = self.col
+
         pygame.draw.rect(world, (100, 100, 100),
                          (self.x, self.y, (self.box_size + self.border)*self.col + self.border, (self.box_size + self.border)*self.rows + self.border))
-        for x in range(self.col):
+        for x in range(col_start, col_end): #drawing only the columns we can see, for performance reasons
             for y in range(self.rows):
                 rect = (self.x + (self.box_size + self.border)*x + self.border, self.x +
                         (self.box_size + self.border)*y + self.border, self.box_size, self.box_size)
@@ -105,9 +110,9 @@ def load_kbd(file, karaoke):
     try:
         data = kbd.read_file(file)
     except(ValueError):
-        print('bad file')
+        print('Unable to read file.')
     except(PermissionError):
-        print('Unable to open file')
+        print('Unable to open file.')
     else:
         karaoke = Karaoke()  # reset data
         for note in data['Notes']:
@@ -167,6 +172,7 @@ def update_fps():  # fps counter from https://pythonprogramming.altervista.org/p
 
 
 def main():
+
     scr_size = (1600, 480)
     width_multiplier = 15
     screen = pygame.display.set_mode((scr_size))
@@ -183,7 +189,6 @@ def main():
     reset_button = pygame_gui.elements.UIButton(relative_rect=pygame.Rect((210, 250), (100, 50)),
                                                 text='Reset',
                                                 manager=manager)
-
     # Horizontal ScrollBar
     thick_h = 20
     sb_h = ScrollBar(
@@ -211,15 +216,15 @@ def main():
     # Main loop
     # -------------------------------------------------------------------------
     while True:
-        # TODO - improve performance by rendering only the things we actually see
         # Clock tick
         time_delta = clock.tick(60)/1000.0
+        scrollbar_value = sb_h.get_value()
         # draw the screen
         world.fill((169, 149, 154))  # clean the screen
-        karaoke.draw(world)
+        karaoke.draw(world, scrollbar_value)
 
         mousex, mousey = pygame.mouse.get_pos()
-        mousex += sb_h.get_value()  # adjust for scrollbar
+        mousex += scrollbar_value  # adjust for scrollbar
 
         # if holding something, draw it next to mouse
         if selected:
@@ -249,14 +254,13 @@ def main():
                             note_id = 0
                     selected = [Item(note_id, 'Regular')]  # add item
                 elif event.button == 1:  # left click
-                    pos = karaoke.Get_pos(sb_h.get_value())
+                    pos = karaoke.Get_pos(scrollbar_value)
                     if karaoke.In_grid(pos[0], pos[1]):
                         if selected:
                             selected = karaoke.Add(selected, pos)
                         elif karaoke.items[pos[0]][pos[1]]:
                             selected = karaoke.items[pos[0]][pos[1]]
                             karaoke.items[pos[0]][pos[1]] = None
-                            print('oip')
 
             if event.type == pygame.KEYDOWN:
                 if event.key == pygame.K_DELETE:
@@ -302,7 +306,7 @@ def main():
             manager.process_events(event)
 
         manager.update(time_delta)
-        trunc_world_orig = (sb_h.get_value(), 0)
+        trunc_world_orig = (scrollbar_value, 0)
         trunc_world = (scr_size[0], scr_size[1] - thick_h)
         screen.blit(world, (0, 0), (trunc_world_orig, trunc_world))
         screen.blit(update_fps(), (10, 0))

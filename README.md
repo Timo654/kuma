@@ -22,6 +22,7 @@ Parema klõpsuga saab muuta käesolevat nooti. Noote saab üles korjata vasaku k
 * Näidata, mis aeg kuskil on
 * Muusika mängimine?
 * Kasutada kpm moodulit, et sealt lugeda cutscene start time 
+* Jõudlust parandada
 
 ## Viited
 https://github.com/SutandoTsukai181/PyBinaryReader

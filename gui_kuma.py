@@ -16,6 +16,7 @@ pygame.draw.circle(items[2], (247, 184, 241), (25, 25), 25)  # square
 pygame.draw.circle(items[3], (141, 213, 184), (25, 25), 25)  # triangle
 pygame.draw.line(items[4], (0, 109, 198), (0, 25), (50, 25), 25)  # hold
 pygame.draw.line(items[5], (198, 0, 99), (0, 25), (50, 25), 25)  # rapid
+
 # class for a item, just holds the surface and can resize it
 
 
@@ -34,7 +35,7 @@ class Item:
 class Karaoke:
     def __init__(self):
         self.rows = 8
-        self.col = 1040
+        self.col = 1040  # TODO - automatically changing this value to improve performance
         self.items = [[None for _ in range(self.rows)]
                       for _ in range(self.col)]
         self.box_size = 20
@@ -67,7 +68,6 @@ class Karaoke:
     # add an item
     def Add(self, Item, xy):
         x, y = xy
-        print(xy)
         self.items[x][y] = Item
 
     # check whether the mouse in in the grid
@@ -82,33 +82,39 @@ class Karaoke:
             return False
         return True
 
-
+# changes scale to 200ms per square
 def pos_convert(pos):
-    return int(((pos / 3000) * 5))  # changes scale to 200ms per square
+    return int(((pos / 3000) * 5))
 
-
+# converts pos back to yakuza time
 def pos_to_game(pos):
-    return int((pos / 5) * 3000)  # converts back to yakuza time
+    return int((pos / 5) * 3000)
 
 
-def load_kbd(file):
-    karaoke = Karaoke()  # reset
-    data = kbd.read_file(file)
-    for note in data['Notes']:
-        start_pos = pos_convert(note['Start position'])
-        karaoke.Add([Item(note['Button type'], note['Note type'])],
-                    (start_pos, note['Vertical position']))
-        if note['Note type'] != 'Regular':
-            end_pos = pos_convert(note['End position'])
-            if note['Note type'] == 'Hold':
-                note_id = 4
-            else:
-                note_id = 5
-            for i in range(start_pos + 1, end_pos):
-                karaoke.Add([Item(note_id, note['Note type'])],
-                            (i, note['Vertical position']))
+def load_kbd(file, karaoke):
+    try:
+        data = kbd.read_file(file)
+    except(ValueError):
+        print('bad file')
+    except(PermissionError):
+        print('Unable to open file')
+    else:
+        karaoke = Karaoke()  # reset data
+        for note in data['Notes']:
+            start_pos = pos_convert(note['Start position'])
             karaoke.Add([Item(note['Button type'], note['Note type'])],
-                        (end_pos, note['Vertical position']))
+                        (start_pos, note['Vertical position']))
+            if note['Note type'] != 'Regular':
+                end_pos = pos_convert(note['End position'])
+                if note['Note type'] == 'Hold':
+                    note_id = 4
+                else:
+                    note_id = 5
+                for i in range(start_pos + 1, end_pos):
+                    karaoke.Add([Item(note_id, note['Note type'])],
+                                (i, note['Vertical position']))
+                karaoke.Add([Item(note['Button type'], note['Note type'])],
+                            (end_pos, note['Vertical position']))
     return karaoke
 
 
@@ -128,6 +134,7 @@ def write_kbd(file, karaoke):
                 note['Note type'] = karaoke.items[x][y][0].note_type
                 note['Cue ID'] = 0  # TODO - audio support
                 note['Cuesheet ID'] = 0  # TODO - audio support
+                # add end position for holds/rapids
                 if karaoke.items[x][y][0].note_type != 'Regular':
                     x += 1
                     while karaoke.items[x][y][0].id > 3:
@@ -140,7 +147,7 @@ def write_kbd(file, karaoke):
     data['Header'] = dict()
     data['Header']['Version'] = 2
     kbd.write_file(data, file)
-    print('wrote file')
+    print('File written to', file)
 
 
 def main():
@@ -152,7 +159,6 @@ def main():
     screen = pygame.display.set_mode((scr_size))
     world = pygame.Surface(
         (int(scr_size[0] * width_multiplier), int(scr_size[1])), pygame.SRCALPHA, 32)
-    thick_h = 20
 
     manager = pygame_gui.UIManager(scr_size)
     file_selection_button = pygame_gui.elements.UIButton(relative_rect=pygame.Rect((10, 250), (100, 50)),
@@ -162,10 +168,11 @@ def main():
                                                            text='Save file',
                                                            manager=manager)
     reset_button = pygame_gui.elements.UIButton(relative_rect=pygame.Rect((210, 250), (100, 50)),
-                                                           text='Reset',
-                                                           manager=manager)
+                                                text='Reset',
+                                                manager=manager)
 
     # Horizontal ScrollBar
+    thick_h = 20
     sb_h = ScrollBar(
         length=scr_size[0],
         values_range=(50, world.get_width() - scr_size[0]),
@@ -192,7 +199,7 @@ def main():
     # Main loop
     # -------------------------------------------------------------------------
     while True:
-
+        # TODO - improve performance by rendering only the things we actually see
         # Clock tick
         time_delta = clock.tick(60)/1000.0
         # draw the screen
@@ -220,7 +227,7 @@ def main():
 
             if event.type == pygame.MOUSEBUTTONDOWN:
                 # if right clicked, get a note
-                if event.button == 3:
+                if event.button == 3:  # right click
                     if selected == None:
                         pass
                     else:
@@ -229,15 +236,15 @@ def main():
                         else:
                             note_id = 0
                     selected = [Item(note_id, 'Regular')]  # add item
-                elif event.button == 1:
+                elif event.button == 1:  # left click
                     pos = karaoke.Get_pos(sb_h.get_value())
                     if karaoke.In_grid(pos[0], pos[1]):
                         if selected:
                             selected = karaoke.Add(selected, pos)
                         elif karaoke.items[pos[0]][pos[1]]:
                             selected = karaoke.items[pos[0]][pos[1]]
-                            print(selected[0].id)
                             karaoke.items[pos[0]][pos[1]] = None
+                            print('oip')
 
             if event.type == pygame.KEYDOWN:
                 if event.key == pygame.K_DELETE:
@@ -259,7 +266,7 @@ def main():
                         if event.ui_element == input_selection.ok_button:
                             gui_button_mode = None
                             karaoke = load_kbd(
-                                input_selection.current_file_path)
+                                input_selection.current_file_path, karaoke)
 
                     if event.ui_element == output_selection_button:
                         gui_button_mode = 'Output'
@@ -270,23 +277,21 @@ def main():
                             gui_button_mode = None
                             write_kbd(
                                 output_selection.current_file_path, karaoke)
-                    
+
                     if event.ui_element == reset_button:
                         gui_button_mode = 'Reset'
                         reset_all = UIConfirmationDialog(
                             rect=Rect(0, 0, 300, 300), manager=manager, action_long_desc='Are you sure you want to reset? Any unsaved changes will be lost.')
-                
-                if event.user_type == pygame_gui.UI_CONFIRMATION_DIALOG_CONFIRMED: #reset event
-                    if gui_button_mode == 'Reset':                                                                
+                if event.user_type == pygame_gui.UI_CONFIRMATION_DIALOG_CONFIRMED:  # reset event
+                    if gui_button_mode == 'Reset':
                         gui_button_mode = None
-                        karaoke = Karaoke()   
+                        karaoke = Karaoke()
 
             manager.process_events(event)
 
         manager.update(time_delta)
         trunc_world_orig = (sb_h.get_value(), 0)
         trunc_world = (scr_size[0], scr_size[1] - thick_h)
-
         screen.blit(world, (0, 0), (trunc_world_orig, trunc_world))
         manager.draw_ui(screen)
         pygame.display.update()

@@ -141,21 +141,26 @@ def write_kbd(file, karaoke):
         y = 0
         while y < len(karaoke.items[x]):
             if karaoke.items[x][y] != None:
-                note = dict()
-                note['Start position'] = pos_to_game(x)
-                note['End position'] = 0
-                note['Vertical position'] = y
-                note['Button type'] = karaoke.items[x][y][0].id
-                note['Note type'] = karaoke.items[x][y][0].note_type
-                note['Cue ID'] = 0  # TODO - audio support
-                note['Cuesheet ID'] = 0  # TODO - audio support
-                # add end position for holds/rapids
-                if karaoke.items[x][y][0].note_type != 'Regular':
-                    x += 1
-                    while karaoke.items[x][y][0].id > 3:
-                        x += 1
-                    note['End position'] = pos_to_game(x)
-                note_list.append(note)
+                if karaoke.items[x][y][0].id <= 3 and karaoke.items[x][y][0].note_type != 'End':
+                    print(karaoke.items[x][y][0].id)
+                    note = dict()
+                    note['Start position'] = pos_to_game(x)
+                    note['End position'] = 0
+                    note['Vertical position'] = y
+                    note['Button type'] = karaoke.items[x][y][0].id
+                    note['Note type'] = karaoke.items[x][y][0].note_type
+                    note['Cue ID'] = 0  # TODO - audio support
+                    note['Cuesheet ID'] = 0  # TODO - audio support
+                    if karaoke.items[x+1][y] != None:
+                        if karaoke.items[x+1][y][0].id > 3:
+                            o = x + 1
+                            note['Note type'] = karaoke.items[o][y][0].note_type 
+                            while karaoke.items[o][y][0].id > 3:
+                                o += 1
+                            print(o)
+                            karaoke.items[o][y][0].note_type = 'End'
+                            note['End position'] = pos_to_game(o)
+                    note_list.append(note)
             y += 1
         x += 1
     data['Notes'] = note_list

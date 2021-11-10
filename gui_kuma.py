@@ -51,7 +51,7 @@ class Item:
 class Karaoke:
     def __init__(self):
         self.rows = 8
-        self.col = 1040
+        self.col = 2154
         self.items = [[None for _ in range(self.rows)]
                       for _ in range(self.col)]
         self.box_size = 20
@@ -104,17 +104,17 @@ class Karaoke:
             return False
         return True
 
-# changes scale to 200ms per square
+# changes scale to 100ms per square
 
 
 def pos_convert(pos):
-    return int(((pos / 3000) * 5))
+    return int(((pos / 3000) * 10))
 
 # converts pos back to yakuza time
 
 
 def pos_to_game(pos):
-    return int((pos / 5) * 3000)
+    return int((pos / 10) * 3000)
 
 
 def load_kbd(file, karaoke):
@@ -188,7 +188,7 @@ def update_fps():  # fps counter from https://pythonprogramming.altervista.org/p
 def main():
 
     scr_size = (1600, 480)
-    width_multiplier = 15
+    width_multiplier = 31
     screen = pygame.display.set_mode((scr_size))
     world = pygame.Surface(
         (int(scr_size[0] * width_multiplier), int(scr_size[1])), pygame.SRCALPHA, 32)

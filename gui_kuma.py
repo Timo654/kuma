@@ -8,6 +8,12 @@ from pygame.rect import Rect
 from pygame_menu.widgets import ScrollBar
 import kbd_reader as kbd
 
+#initialize pygame stuff
+pygame.init()
+font = pygame.font.SysFont("Comic-Sans", 18)
+clock = pygame.time.Clock()
+pygame.display.set_caption('KUMA')
+
 # these are the notes, colors are placeholder
 items = [pygame.Surface((50, 50), pygame.SRCALPHA) for _ in range(6)]
 pygame.draw.circle(items[0], (245, 97, 32), (25, 25), 25)  # circle
@@ -83,10 +89,14 @@ class Karaoke:
         return True
 
 # changes scale to 200ms per square
+
+
 def pos_convert(pos):
     return int(((pos / 3000) * 5))
 
 # converts pos back to yakuza time
+
+
 def pos_to_game(pos):
     return int((pos / 5) * 3000)
 
@@ -150,10 +160,13 @@ def write_kbd(file, karaoke):
     print('File written to', file)
 
 
+def update_fps():  # fps counter from https://pythonprogramming.altervista.org/pygame-how-to-display-the-frame-rate-fps-on-the-screen/
+    fps = str(int(clock.get_fps()))
+    fps_text = font.render(fps, 1, pygame.Color("black"))
+    return fps_text
+
+
 def main():
-    pygame.init()
-    pygame.display.set_caption('KUMA')
-    pygame.mixer.init()  # TODO - playing music
     scr_size = (1600, 480)
     width_multiplier = 15
     screen = pygame.display.set_mode((scr_size))
@@ -187,7 +200,6 @@ def main():
     sb_h.set_position(0, scr_size[1] - thick_h)
     sb_h.set_page_step(scr_size[0])
 
-    clock = pygame.time.Clock()
     karaoke = Karaoke()
 
     # what the player is holding
@@ -293,6 +305,7 @@ def main():
         trunc_world_orig = (sb_h.get_value(), 0)
         trunc_world = (scr_size[0], scr_size[1] - thick_h)
         screen.blit(world, (0, 0), (trunc_world_orig, trunc_world))
+        screen.blit(update_fps(), (10, 0))
         manager.draw_ui(screen)
         pygame.display.update()
 

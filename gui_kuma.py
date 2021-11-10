@@ -2,11 +2,21 @@
 import pygame
 import pygame_menu
 import pygame_gui
+from pathlib import Path
 from pygame_gui.windows.ui_file_dialog import UIFileDialog, UIConfirmationDialog
 from pygame_gui.elements.ui_button import UIButton
 from pygame.rect import Rect
 from pygame_menu.widgets import ScrollBar
 import kbd_reader as kbd
+import configparser
+settings_file = 'KUMA_settings.ini'
+config = configparser.ConfigParser()
+if Path(settings_file).is_file():
+    config.read(settings_file)
+if not config.has_section("PATHS"):
+    config.add_section("PATHS")
+    config.set("PATHS", "Input", str(Path().resolve()) + '/input_file.kbd')
+    config.set("PATHS", "Output", str(Path().resolve()) + '/output_file.kbd')
 
 # initialize pygame stuff
 pygame.init()
@@ -143,7 +153,6 @@ def write_kbd(file, karaoke):
         while y < len(karaoke.items[x]):
             if karaoke.items[x][y] != None:
                 if karaoke.items[x][y][0].id <= 3 and karaoke.items[x][y][0].note_type != 'End':
-                    print(karaoke.items[x][y][0].id)
                     note = dict()
                     note['Start position'] = pos_to_game(x)
                     note['End position'] = 0
@@ -158,7 +167,6 @@ def write_kbd(file, karaoke):
                             note['Note type'] = karaoke.items[o][y][0].note_type
                             while karaoke.items[o][y][0].id > 3:
                                 o += 1
-                            print(o)
                             karaoke.items[o][y][0].note_type = 'End'
                             note['End position'] = pos_to_game(o)
                     note_list.append(note)
@@ -240,6 +248,8 @@ def main():
         events = pygame.event.get()
         for event in events:
             if event.type == pygame.QUIT:
+                with open(settings_file, 'w') as configfile:  # save config
+                    config.write(configfile)
                 exit()
 
             if event.type == pygame.KEYDOWN and event.key == pygame.K_h:
@@ -283,20 +293,24 @@ def main():
                     if event.ui_element == file_selection_button:
                         gui_button_mode = 'Input'
                         input_selection = UIFileDialog(
-                            rect=Rect(0, 0, 300, 300), manager=manager, allow_picking_directories=True, allow_existing_files_only=True, window_title='Select an input file (kbd)')
+                            rect=Rect(0, 0, 300, 300), manager=manager, allow_picking_directories=True, allow_existing_files_only=True, window_title='Select an input file (kbd)', initial_file_path=Path(config['PATHS']['Input']))
                     if gui_button_mode == 'Input':
                         if event.ui_element == input_selection.ok_button:
                             gui_button_mode = None
+                            config.set("PATHS", "Input", str(
+                                input_selection.current_file_path))
                             karaoke = load_kbd(
                                 input_selection.current_file_path, karaoke)
 
                     if event.ui_element == output_selection_button:
                         gui_button_mode = 'Output'
                         output_selection = UIFileDialog(
-                            rect=Rect(0, 0, 300, 300), manager=manager, allow_picking_directories=True, window_title='Select an output file (kbd)')
+                            rect=Rect(0, 0, 300, 300), manager=manager, allow_picking_directories=True, window_title='Select an output file (kbd)', initial_file_path=Path(config['PATHS']['Output']))
                     if gui_button_mode == 'Output':
                         if event.ui_element == output_selection.ok_button:
                             gui_button_mode = None
+                            config.set("PATHS", "Output", str(
+                                output_selection.current_file_path))
                             write_kbd(
                                 output_selection.current_file_path, karaoke)
 

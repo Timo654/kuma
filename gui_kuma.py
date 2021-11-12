@@ -69,9 +69,7 @@ class Karaoke:
         col_end = col_start + 70
         if col_end > self.col:
             col_end = self.col
-        #TODO - only draw the visible part
-        pygame.draw.rect(world, (100, 100, 100),
-                         (self.x, self.y, (self.box_size + self.border)*self.col + self.border, (self.box_size + self.border)*self.rows + self.border))
+        pygame.draw.rect(world, (100, 100, 100), (scroll, self.y, (self.box_size + self.border)*col_end + self.border, (self.box_size + self.border)*self.rows + self.border))
         # drawing only the columns we can see, for performance reasons
         for x in range(col_start, col_end):
             for y in range(self.rows):
@@ -237,7 +235,7 @@ def main():
         time_delta = clock.tick(FPS) / 1000
         scrollbar_value = sb_h.get_value()
         # draw the screen
-        world.fill((169, 149, 154))  # TODO - only clean the visible part
+        world.fill((169, 149, 154), rect=pygame.Rect(scrollbar_value, 0, 1600, 480))
         karaoke.draw(world, scrollbar_value)
 
         mousex, mousey = pygame.mouse.get_pos()

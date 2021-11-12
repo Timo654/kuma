@@ -13,6 +13,9 @@ settings_file = 'KUMA_settings.ini'
 config = configparser.ConfigParser()
 if Path(settings_file).is_file():
     config.read(settings_file)
+if not config.has_section("CONFIG"):
+    config.add_section("CONFIG")
+    config.set("CONFIG", "FPS", str(60))
 if not config.has_section("PATHS"):
     config.add_section("PATHS")
     config.set("PATHS", "Input", str(Path().resolve()) + '/input_file.kbd')
@@ -225,13 +228,13 @@ def main():
     selected = None
     gui_button_mode = None
     note_id = 0  # note that you get when you want to add one, first is circle
-
+    FPS = int(config['CONFIG']['FPS'])
     # -------------------------------------------------------------------------
     # Main loop
     # -------------------------------------------------------------------------
     while True:
         # Clock tick
-        time_delta = clock.tick(60)/1000.0
+        time_delta = clock.tick(FPS) / 1000
         scrollbar_value = sb_h.get_value()
         # draw the screen
         world.fill((169, 149, 154))  # clean the screen
@@ -325,12 +328,12 @@ def main():
 
             manager.process_events(event)
 
-        manager.update(time_delta)
         trunc_world_orig = (scrollbar_value, 0)
         trunc_world = (scr_size[0], scr_size[1] - thick_h)
         screen.blit(world, (0, 0), (trunc_world_orig, trunc_world))
         screen.blit(update_fps(), (10, 0))
         manager.draw_ui(screen)
+        manager.update(time_delta)
         pygame.display.update()
 
 

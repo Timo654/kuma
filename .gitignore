@@ -133,5 +133,7 @@ dmypy.json
 .pyre/
 
 # Output files
-tonight_resaved.kbd
 *.ini
+test_output/*.kbd
+*.zip
+*.bat

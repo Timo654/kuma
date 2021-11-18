@@ -4,11 +4,13 @@ import pygame_menu
 import pygame_gui
 from pathlib import Path
 from pygame_gui.windows.ui_file_dialog import UIFileDialog, UIConfirmationDialog
-from pygame_gui.elements.ui_button import UIButton
+from pygame_gui.elements import UIDropDownMenu, UIButton
 from pygame.rect import Rect
 from pygame_menu.widgets import ScrollBar
 import kbd_reader as kbd
 import configparser
+
+# read/create settings
 settings_file = 'KUMA_settings.ini'
 config = configparser.ConfigParser()
 if Path(settings_file).is_file():
@@ -16,6 +18,7 @@ if Path(settings_file).is_file():
 if not config.has_section("CONFIG"):
     config.add_section("CONFIG")
     config.set("CONFIG", "FPS", str(60))
+    config.set("CONFIG", "BUTTONS", 'Dualshock 4')
 if not config.has_section("PATHS"):
     config.add_section("PATHS")
     config.set("PATHS", "Input", str(Path().resolve()) + '/input_file.kbd')
@@ -27,14 +30,7 @@ font = pygame.font.SysFont("Comic-Sans", 18)
 clock = pygame.time.Clock()
 pygame.display.set_caption('KUMA')
 
-# these are the notes, colors are placeholder
-items = [pygame.Surface((50, 50), pygame.SRCALPHA) for _ in range(6)]
-pygame.draw.circle(items[0], (245, 97, 32), (25, 25), 25)  # circle
-pygame.draw.circle(items[1], (54, 162, 248), (25, 25), 25)  # cross
-pygame.draw.circle(items[2], (247, 184, 241), (25, 25), 25)  # square
-pygame.draw.circle(items[3], (141, 213, 184), (25, 25), 25)  # triangle
-pygame.draw.line(items[4], (0, 109, 198), (0, 25), (50, 25), 25)  # hold
-pygame.draw.line(items[5], (198, 0, 99), (0, 25), (50, 25), 25)  # rapid
+
 
 # class for a item, just holds the surface and can resize it
 
@@ -54,10 +50,10 @@ class Item:
 class Karaoke:
     def __init__(self):
         self.rows = 8
-        self.col = 2154
+        self.col = 2100 #FIXME, notes above 1985 are broken.
         self.items = [[None for _ in range(self.rows)]
                       for _ in range(self.col)]
-        self.box_size = 20
+        self.box_size = 30
         self.x = 50
         self.y = 50
         self.border = 3
@@ -66,7 +62,7 @@ class Karaoke:
     def draw(self, world, scroll):
         # draw background
         col_start = scroll // (self.box_size + self.border) - 2
-        col_end = col_start + 70
+        col_end = col_start + 50
         if col_end > self.col:
             col_end = self.col
         pygame.draw.rect(world, (100, 100, 100), (scroll, self.y, (self.box_size + self.border)*col_end + self.border, (self.box_size + self.border)*self.rows + self.border))
@@ -104,6 +100,41 @@ class Karaoke:
         if y >= self.rows:
             return False
         return True
+
+def strip_from_sheet(sheet, start, size, columns, rows): #https://python-forum.io/thread-403.html
+    frames = []
+    for j in range(rows):
+        for i in range(columns):
+            location = (start[0]+size[0]*i, start[1]+size[1]*j)
+            frames.append(sheet.subsurface(pygame.Rect(location, size)))
+    return frames
+
+def load_item_tex(button_type, karaoke):
+    global items
+    #load note textures
+    if button_type == 'XBOX':
+        tex_name = 'assets/textures/buttons_xbox.png'
+    elif button_type == 'Dualshock 4':
+        tex_name = 'assets/textures/buttons_ds.png'
+    elif button_type == 'Nintendo Switch':
+        tex_name = 'assets/textures/buttons_nx.png'
+    else:
+        print('Invalid type', button_type)
+    image = pygame.image.load(tex_name).convert_alpha()
+    buttons = strip_from_sheet(image, (0,0), (122,122), 2, 2)
+    items = [pygame.Surface((122, 122), pygame.SRCALPHA) for _ in range(6)]
+    items[0].blit(buttons[1], (0, 0)) #circle
+    items[1].blit(buttons[3], (0, 0)) #cross
+    items[2].blit(buttons[2], (0, 0)) #square
+    items[3].blit(buttons[0], (0, 0)) #triangle
+    pygame.draw.line(items[4], (0, 109, 198), (0, 61), (144, 61), 61)  # hold
+    pygame.draw.line(items[5], (198, 0, 99), (0, 61), (144, 61), 61)  # rapid
+
+    for x in range(0, karaoke.col): #change existing button's texture
+            for y in range(karaoke.rows):
+                if karaoke.items[x][y]:
+                    button_id = karaoke.items[x][y][0].id
+                    karaoke.items[x][y][0].surface.blit(items[button_id], (0, 0))
 
 # changes scale to 100ms per square
 
@@ -187,23 +218,30 @@ def update_fps():  # fps counter from https://pythonprogramming.altervista.org/p
 
 
 def main():
-
+    controllers = ['Dualshock 4', 'XBOX', 'Nintendo Switch']
+    current_controller = config['CONFIG']['BUTTONS']
     scr_size = (1600, 480)
-    width_multiplier = 31 #TODO - optimize
+    width_multiplier = 41
     screen = pygame.display.set_mode((scr_size))
     world = pygame.Surface(
         (int(scr_size[0] * width_multiplier), int(scr_size[1])), pygame.SRCALPHA, 32)
-
+    karaoke = Karaoke()
+    load_item_tex(current_controller, karaoke) #load button textures
     manager = pygame_gui.UIManager(scr_size)
-    file_selection_button = pygame_gui.elements.UIButton(relative_rect=pygame.Rect((10, 250), (100, 50)),
+    file_selection_button = pygame_gui.elements.UIButton(relative_rect=pygame.Rect((10, 325), (100, 50)),
                                                          text='Open file',
                                                          manager=manager)
-    output_selection_button = pygame_gui.elements.UIButton(relative_rect=pygame.Rect((110, 250), (100, 50)),
+    output_selection_button = pygame_gui.elements.UIButton(relative_rect=pygame.Rect((110, 325), (100, 50)),
                                                            text='Save file',
                                                            manager=manager)
-    reset_button = pygame_gui.elements.UIButton(relative_rect=pygame.Rect((210, 250), (100, 50)),
+    reset_button = pygame_gui.elements.UIButton(relative_rect=pygame.Rect((210, 325), (100, 50)),
                                                 text='Reset',
                                                 manager=manager)
+    button_picker = UIDropDownMenu(options_list=controllers,
+                              starting_option=current_controller,
+                              relative_rect=pygame.Rect(10, 375, 200, 30),
+                              manager=manager)
+
     # Horizontal ScrollBar
     thick_h = 20
     sb_h = ScrollBar(
@@ -220,7 +258,6 @@ def main():
     sb_h.set_position(0, scr_size[1] - thick_h)
     sb_h.set_page_step(scr_size[0])
 
-    karaoke = Karaoke()
 
     # what the player is holding
     selected = None
@@ -290,6 +327,10 @@ def main():
                     selected = [Item(note_id, 'Rapid')]  # add item
 
             if event.type == pygame.USEREVENT:
+                if event.user_type == pygame_gui.UI_DROP_DOWN_MENU_CHANGED:
+                    config.set("CONFIG", "BUTTONS", str(
+                                button_picker.selected_option))
+                    load_item_tex(button_picker.selected_option, karaoke)
                 if event.user_type == pygame_gui.UI_BUTTON_PRESSED:
                     if event.ui_element == file_selection_button:
                         gui_button_mode = 'Input'

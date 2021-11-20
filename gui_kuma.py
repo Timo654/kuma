@@ -417,7 +417,7 @@ def main():
 
             manager.process_events(event)
 
-        trunc_world_orig = (scrollbar_value), 0)
+        trunc_world_orig = (scrollbar_value, 0)
         trunc_world = (scr_size[0], scr_size[1] - thick_h)
 
         if scrollbar_value + 1600 > world.get_width():

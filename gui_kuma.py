@@ -49,7 +49,7 @@ class Item:
 class Karaoke:
     def __init__(self):
         self.rows = 8
-        self.col = 3000
+        self.col = 3970
         self.items = [[None for _ in range(self.rows)]
                       for _ in range(self.col)]
         self.box_size = 30
@@ -77,10 +77,13 @@ class Karaoke:
             col_end = (self.col // 2)
 
         for i in range(col_start, col_end):
-            world.blit(sheet_bg, (x_coord + (33 * (i)), 50))
+            world.blit(sheet_bg, (x_coord + (33 * (i)), self.y))
             if i % 20 == 0:
+                current_time = str((i + surface2_offset) // 10) + ' s' # display current time, 100 ms each square
+                time_text = font.render(current_time, 1, pygame.Color("black"))
+                world.blit(time_text, (x_coord + (33 * (i)), 20))
                 world.blit(
-                    line_bg, (x_coord + (one_box // 2) + (33 * (i)), 50))
+                    line_bg, (x_coord + (one_box // 2) + (33 * (i)), self.y))
         for x in range(col_start, col_end):
             for y in range(self.rows):
                 rect = (x_coord + (self.box_size + self.border)*x + self.border, self.x +

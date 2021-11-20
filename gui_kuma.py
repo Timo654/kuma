@@ -31,7 +31,6 @@ clock = pygame.time.Clock()
 pygame.display.set_caption('KUMA')
 
 
-
 # class for a item, just holds the surface and can resize it
 
 
@@ -50,7 +49,7 @@ class Item:
 class Karaoke:
     def __init__(self):
         self.rows = 8
-        self.col = 2100 #FIXME, notes above 1985 are broken.
+        self.col = 3000
         self.items = [[None for _ in range(self.rows)]
                       for _ in range(self.col)]
         self.box_size = 30
@@ -59,27 +58,45 @@ class Karaoke:
         self.border = 3
 
     # draw everything
-    def draw(self, world, scroll):
+    def draw(self, world, surface_nr, scroll, screen_width, sheet_bg, line_bg):
         # draw background
-        col_start = scroll // (self.box_size + self.border) - 2
-        col_end = col_start + 50
-        if col_end > self.col:
-            col_end = self.col
-        pygame.draw.rect(world, (100, 100, 100), (scroll, self.y, (self.box_size + self.border)*col_end + self.border, (self.box_size + self.border)*self.rows + self.border))
-        # drawing only the columns we can see, for performance reasons
+        surface2_offset = 0
+        one_box = self.box_size + self.border
+        if surface_nr == 2:
+            x_coord = 0
+            scroll -= world.get_width() - 50
+            surface2_offset = int(self.col / 2)
+        else:
+            x_coord = self.x
+
+        col_start = (scroll // one_box - 2)
+        col_end = col_start + (screen_width // one_box) + 2
+        if surface_nr == 2:
+            col_end += 2
+        if col_end > (self.col // 2):
+            col_end = (self.col // 2)
+
+        for i in range(col_start, col_end):
+            world.blit(sheet_bg, (x_coord + (33 * (i)), 50))
+            if i % 20 == 0:
+                world.blit(
+                    line_bg, (x_coord + (one_box // 2) + (33 * (i)), 50))
         for x in range(col_start, col_end):
             for y in range(self.rows):
-                rect = (self.x + (self.box_size + self.border)*x + self.border, self.x +
+                rect = (x_coord + (self.box_size + self.border)*x + self.border, self.x +
                         (self.box_size + self.border)*y + self.border, self.box_size, self.box_size)
-                pygame.draw.rect(world, (180, 180, 180), rect)
-                if self.items[x][y]:
-                    world.blit(self.items[x][y][0].resize(self.box_size), rect)
+                if self.items[x + surface2_offset][y]:
+                    world.blit(self.items[x + surface2_offset]
+                               [y][0].resize(self.box_size), rect)
 
     # get the square that the mouse is over
     def Get_pos(self, scroll):
         mouse = pygame.mouse.get_pos()
         x = scroll + mouse[0] - self.x  # adjust for scrollbar
         y = mouse[1] - self.y
+        # 1000 comes from testing
+        if x > int(((self.col * self.box_size) + (self.col + self.border)) / 2) + 1000:
+            x -= 15
         x = x//(self.box_size + self.border)
         y = y//(self.box_size + self.border)
         return (x, y)
@@ -90,18 +107,14 @@ class Karaoke:
         self.items[x][y] = Item
 
     # check whether the mouse in in the grid
-    def In_grid(self, x, y):  # TODO - clean
-        if x < 0:
-            return False
-        if y < 0:
-            return False
-        if x >= self.col:
-            return False
-        if y >= self.rows:
+    def In_grid(self, x, y):
+        if (x < 0) or (y < 0) or (x >= self.col) or (y >= self.rows):
             return False
         return True
 
-def strip_from_sheet(sheet, start, size, columns, rows): #https://python-forum.io/thread-403.html
+
+# https://python-forum.io/thread-403.html
+def strip_from_sheet(sheet, start, size, columns, rows):
     frames = []
     for j in range(rows):
         for i in range(columns):
@@ -109,9 +122,10 @@ def strip_from_sheet(sheet, start, size, columns, rows): #https://python-forum.i
             frames.append(sheet.subsurface(pygame.Rect(location, size)))
     return frames
 
+
 def load_item_tex(button_type, karaoke):
     global items
-    #load note textures
+    # load note textures
     if button_type == 'XBOX':
         tex_name = 'assets/textures/buttons_xbox.png'
     elif button_type == 'Dualshock 4':
@@ -121,20 +135,20 @@ def load_item_tex(button_type, karaoke):
     else:
         print('Invalid type', button_type)
     image = pygame.image.load(tex_name).convert_alpha()
-    buttons = strip_from_sheet(image, (0,0), (122,122), 2, 2)
+    buttons = strip_from_sheet(image, (0, 0), (122, 122), 2, 2)
     items = [pygame.Surface((122, 122), pygame.SRCALPHA) for _ in range(6)]
-    items[0].blit(buttons[1], (0, 0)) #circle
-    items[1].blit(buttons[3], (0, 0)) #cross
-    items[2].blit(buttons[2], (0, 0)) #square
-    items[3].blit(buttons[0], (0, 0)) #triangle
+    items[0].blit(buttons[1], (0, 0))  # circle
+    items[1].blit(buttons[3], (0, 0))  # cross
+    items[2].blit(buttons[2], (0, 0))  # square
+    items[3].blit(buttons[0], (0, 0))  # triangle
     pygame.draw.line(items[4], (0, 109, 198), (0, 61), (144, 61), 61)  # hold
     pygame.draw.line(items[5], (198, 0, 99), (0, 61), (144, 61), 61)  # rapid
 
-    for x in range(0, karaoke.col): #change existing button's texture
-            for y in range(karaoke.rows):
-                if karaoke.items[x][y]:
-                    button_id = karaoke.items[x][y][0].id
-                    karaoke.items[x][y][0].surface.blit(items[button_id], (0, 0))
+    for x in range(0, karaoke.col):  # change existing button's texture
+        for y in range(karaoke.rows):
+            if karaoke.items[x][y]:
+                button_id = karaoke.items[x][y][0].id
+                karaoke.items[x][y][0].surface.blit(items[button_id], (0, 0))
 
 # changes scale to 100ms per square
 
@@ -221,12 +235,25 @@ def main():
     controllers = ['Dualshock 4', 'XBOX', 'Nintendo Switch']
     current_controller = config['CONFIG']['BUTTONS']
     scr_size = (1600, 480)
-    width_multiplier = 41
     screen = pygame.display.set_mode((scr_size))
-    world = pygame.Surface(
-        (int(scr_size[0] * width_multiplier), int(scr_size[1])), pygame.SRCALPHA, 32)
     karaoke = Karaoke()
-    load_item_tex(current_controller, karaoke) #load button textures
+    accurate_size = (karaoke.col + 4) * (karaoke.box_size + karaoke.border)
+    world = pygame.Surface(
+        (int(accurate_size / 2), int(scr_size[1])), pygame.SRCALPHA, 32)
+    world2 = pygame.Surface(
+        (accurate_size - world.get_width(), int(scr_size[1])), pygame.SRCALPHA, 32)
+    load_item_tex(current_controller, karaoke)  # load button textures
+    
+    #load sheet textures and scale them
+    sheet_tex = 'assets/textures/sheet.png'
+    line_tex = 'assets/textures/line.png'
+    sheet_bg = pygame.image.load(sheet_tex).convert()
+    line_bg = pygame.image.load(line_tex).convert()
+    line_bg = pygame.transform.scale(
+        line_bg, (2, (karaoke.box_size + karaoke.border) * karaoke.rows))
+    sheet_bg = pygame.transform.scale(
+        sheet_bg, (karaoke.box_size + karaoke.border, (karaoke.box_size + karaoke.border) * karaoke.rows))
+
     manager = pygame_gui.UIManager(scr_size)
     file_selection_button = pygame_gui.elements.UIButton(relative_rect=pygame.Rect((10, 325), (100, 50)),
                                                          text='Open file',
@@ -238,15 +265,15 @@ def main():
                                                 text='Reset',
                                                 manager=manager)
     button_picker = UIDropDownMenu(options_list=controllers,
-                              starting_option=current_controller,
-                              relative_rect=pygame.Rect(10, 375, 200, 30),
-                              manager=manager)
+                                   starting_option=current_controller,
+                                   relative_rect=pygame.Rect(10, 375, 200, 30),
+                                   manager=manager)
 
     # Horizontal ScrollBar
     thick_h = 20
     sb_h = ScrollBar(
         length=scr_size[0],
-        values_range=(50, world.get_width() - scr_size[0]),
+        values_range=(50, accurate_size - scr_size[0]),
         slider_pad=2,
         page_ctrl_thick=thick_h
     )
@@ -257,7 +284,6 @@ def main():
     )
     sb_h.set_position(0, scr_size[1] - thick_h)
     sb_h.set_page_step(scr_size[0])
-
 
     # what the player is holding
     selected = None
@@ -271,16 +297,40 @@ def main():
         # Clock tick
         time_delta = clock.tick(FPS) / 1000
         scrollbar_value = sb_h.get_value()
+
         # draw the screen
-        world.fill((169, 149, 154), rect=pygame.Rect(scrollbar_value, 0, 1600, 480))
-        karaoke.draw(world, scrollbar_value)
+        if scrollbar_value + 1600 > world.get_width():
+            world1_end = world.get_width() - scrollbar_value
+            if world1_end > 0:
+                world.fill((169, 149, 154), rect=pygame.Rect(
+                    scrollbar_value, 0, world1_end, 480))  # clean the screen
+                world2.fill((169, 149, 154), rect=pygame.Rect(
+                    scrollbar_value - world.get_width(), 0, 1600, 480))  # clean the screen
+                karaoke.draw(world, 1, scrollbar_value,
+                             scr_size[0], sheet_bg, line_bg)
+                karaoke.draw(world2, 2, scrollbar_value,
+                             scr_size[0], sheet_bg, line_bg)
+            else:
+                world2.fill((169, 149, 154), rect=pygame.Rect(
+                    scrollbar_value - world.get_width(), 0, 1600, 480))  # clean the screen
+                karaoke.draw(world2, 2, scrollbar_value,
+                             scr_size[0], sheet_bg, line_bg)
+        else:
+            world.fill((169, 149, 154), rect=pygame.Rect(
+                scrollbar_value, 0, 1600, 480))  # clean the screen
+            karaoke.draw(world, 1, scrollbar_value,
+                         scr_size[0], sheet_bg, line_bg)
 
         mousex, mousey = pygame.mouse.get_pos()
         mousex += scrollbar_value  # adjust for scrollbar
 
         # if holding something, draw it next to mouse
         if selected:
-            world.blit(selected[0].resize(20), (mousex, mousey))
+            if mousex > world.get_width():
+                world2.blit(selected[0].resize(20),
+                            (mousex - world.get_width(), mousey))
+            else:
+                world.blit(selected[0].resize(20), (mousex, mousey))
 
         # Application events
         events = pygame.event.get()
@@ -329,7 +379,7 @@ def main():
             if event.type == pygame.USEREVENT:
                 if event.user_type == pygame_gui.UI_DROP_DOWN_MENU_CHANGED:
                     config.set("CONFIG", "BUTTONS", str(
-                                button_picker.selected_option))
+                        button_picker.selected_option))
                     load_item_tex(button_picker.selected_option, karaoke)
                 if event.user_type == pygame_gui.UI_BUTTON_PRESSED:
                     if event.ui_element == file_selection_button:
@@ -367,9 +417,22 @@ def main():
 
             manager.process_events(event)
 
-        trunc_world_orig = (scrollbar_value, 0)
+        trunc_world_orig = (scrollbar_value), 0)
         trunc_world = (scr_size[0], scr_size[1] - thick_h)
-        screen.blit(world, (0, 0), (trunc_world_orig, trunc_world))
+
+        if scrollbar_value + 1600 > world.get_width():
+            trunc_world2_orig = (sb_h.get_value() - world.get_width(), 0)
+            world1_end = world.get_width() - trunc_world_orig[0]
+            if world1_end > 0:
+                screen.blit(world, (0, 0), (trunc_world_orig,
+                            (world1_end, trunc_world[1])))
+                screen.blit(world2, (world1_end, 0), ((0, 0),
+                            (trunc_world[0] - world1_end, trunc_world[1])))
+            else:
+                screen.blit(world2, (0, 0), (trunc_world2_orig, trunc_world))
+        else:
+            screen.blit(world, (0, 0), (trunc_world_orig, trunc_world))
+
         screen.blit(update_fps(), (10, 0))
         manager.draw_ui(screen)
         manager.update(time_delta)

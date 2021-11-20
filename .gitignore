@@ -137,3 +137,4 @@ dmypy.json
 test_output/*.kbd
 *.zip
 *.bat
+KUMA_settings.ini

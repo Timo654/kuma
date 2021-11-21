@@ -1,0 +1,10 @@
+{
+  "Texture folder": ".\\assets\\textures",
+  "Sheet texture": "sheet.png",
+  "Line texture": "line.png",
+  "Button prompts": {
+    "Dualshock 4": "buttons_ds.png",
+    "XBOX": "buttons_xbox.png",
+    "Nintendo Switch": "buttons_nx.png"
+  }
+}

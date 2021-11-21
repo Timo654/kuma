@@ -4,9 +4,7 @@ import pygame_menu
 import pygame_gui
 from pathlib import Path
 from pygame_gui.windows.ui_file_dialog import UIFileDialog, UIConfirmationDialog
-from pygame_gui.elements import UIDropDownMenu, UIButton
-from pygame_gui.elements.ui_text_entry_line import UITextEntryLine
-from pygame.rect import Rect  # TODO - clean imports
+from pygame_gui.elements import UIDropDownMenu, UILabel, UIButton, UITextEntryLine
 from pygame_menu.widgets import ScrollBar
 import kbd_reader as kbd
 from math import ceil, floor
@@ -158,7 +156,7 @@ def strip_from_sheet(sheet, start, size, columns, rows):
 def load_item_tex(button_type, karaoke):
     global items
     # load note textures
-    # TODO - maybe load possible asset list from a file
+    # TODO - load possible asset list from a file
     if button_type == 'XBOX':
         tex_name = 'assets/textures/buttons_xbox.png'
     elif button_type == 'Dualshock 4':
@@ -317,16 +315,16 @@ def main():
         sheet_bg, (karaoke.box_size + karaoke.border, (karaoke.box_size + karaoke.border) * karaoke.rows))
 
     manager = pygame_gui.UIManager(scr_size)
-    file_selection_button = pygame_gui.elements.UIButton(relative_rect=pygame.Rect((10, 325), (100, 50)),
+    file_selection_button = UIButton(relative_rect=pygame.Rect((10, 325), (100, 50)),
                                                          text='Open file',
                                                          manager=manager)
-    output_selection_button = pygame_gui.elements.UIButton(relative_rect=pygame.Rect((110, 325), (100, 50)),
+    output_selection_button = UIButton(relative_rect=pygame.Rect((110, 325), (100, 50)),
                                                            text='Save file',
                                                            manager=manager)
-    reset_button = pygame_gui.elements.UIButton(relative_rect=pygame.Rect((210, 325), (100, 50)),
+    reset_button = UIButton(relative_rect=pygame.Rect((210, 325), (100, 50)),
                                                 text='Reset',
                                                 manager=manager)
-    undo_button = pygame_gui.elements.UIButton(relative_rect=pygame.Rect((310, 375), (200, 50)),
+    undo_button = UIButton(relative_rect=pygame.Rect((315, 380), (200, 50)),
                                                text='Undo note changes',
                                                manager=manager)
     button_picker = UIDropDownMenu(options_list=controllers,
@@ -334,16 +332,29 @@ def main():
                                    relative_rect=pygame.Rect(10, 375, 200, 30),
                                    manager=manager)
 
-    # TODO - box labels
+
+    start_label = UILabel(pygame.Rect((315, 325),(150, 22)),
+                                   "Start position",
+                                   manager=manager)
+    end_label = UILabel(pygame.Rect((470, 325),(150, 22)),
+                                   "End position",
+                                   manager=manager)
+    cue_label = UILabel(pygame.Rect((625, 325),(150, 22)),
+                                   "Cue ID",
+                                   manager=manager)
+    cuesheet_label = UILabel(pygame.Rect((780, 325),(150, 22)),
+                                   "Cuesheet ID",
+                                   manager=manager)                                                              
+    
     valid_chars = [str(x) for x in range(0, 10)] + ['.']
     start_box = UITextEntryLine(relative_rect=pygame.Rect(
-        (310, 325), (100, 50)), manager=manager)
+        (315, 350), (150, 50)), manager=manager)
     end_box = UITextEntryLine(relative_rect=pygame.Rect(
-        (310, 350), (100, 50)), manager=manager)
+        (470, 350), (150, 50)), manager=manager)
     cue_box = UITextEntryLine(relative_rect=pygame.Rect(
-        (410, 325), (100, 50)), manager=manager)
+        (625, 350), (150, 50)), manager=manager)
     cuesheet_box = UITextEntryLine(relative_rect=pygame.Rect(
-        (410, 350), (100, 50)), manager=manager)
+        (780, 350), (150, 50)), manager=manager)
     boxes = [start_box, end_box, cue_box, cuesheet_box]
     for box in boxes:
         box.set_allowed_characters(valid_chars)
@@ -421,7 +432,7 @@ def main():
             y = 2 + karaoke.y + \
                 (currently_edited.y * (karaoke.box_size + karaoke.border))
             pygame.draw.rect(world, (0, 100, 255), (x, y, karaoke.box_size + karaoke.border,
-                             karaoke.box_size + karaoke.border), 3)  # TODO - make it update when changing pos
+                             karaoke.box_size + karaoke.border), 3)
 
         # Application events
         events = pygame.event.get()
@@ -506,7 +517,7 @@ def main():
                     if event.ui_element == file_selection_button:
                         gui_button_mode = 'Input'
                         input_selection = UIFileDialog(
-                            rect=Rect(0, 0, 300, 300), manager=manager, allow_picking_directories=True, allow_existing_files_only=True, window_title='Select an input file (kbd)', initial_file_path=Path(config['PATHS']['Input']))
+                            rect=pygame.Rect(0, 0, 300, 300), manager=manager, allow_picking_directories=True, allow_existing_files_only=True, window_title='Select an input file (kbd)', initial_file_path=Path(config['PATHS']['Input']))
                     if gui_button_mode == 'Input':
                         if event.ui_element == input_selection.ok_button:
                             gui_button_mode = None
@@ -519,7 +530,7 @@ def main():
                     if event.ui_element == output_selection_button:
                         gui_button_mode = 'Output'
                         output_selection = UIFileDialog(
-                            rect=Rect(0, 0, 300, 300), manager=manager, allow_picking_directories=True, window_title='Select an output file (kbd)', initial_file_path=Path(config['PATHS']['Output']))
+                            rect=pygame.Rect(0, 0, 300, 300), manager=manager, allow_picking_directories=True, window_title='Select an output file (kbd)', initial_file_path=Path(config['PATHS']['Output']))
                     if gui_button_mode == 'Output':
                         if event.ui_element == output_selection.ok_button:
                             gui_button_mode = None
@@ -531,11 +542,11 @@ def main():
                     if event.ui_element == reset_button:
                         gui_button_mode = 'Reset'
                         reset_all = UIConfirmationDialog(
-                            rect=Rect(0, 0, 300, 300), manager=manager, action_long_desc='Are you sure you want to reset? Any unsaved changes will be lost.', window_title='Reset all')
+                            rect=pygame.Rect(0, 0, 300, 300), manager=manager, action_long_desc='Are you sure you want to reset? Any unsaved changes will be lost.', window_title='Reset all')
                     if event.ui_element == undo_button:
                         gui_button_mode = 'Undo'
                         undo_note = UIConfirmationDialog(
-                            rect=Rect(0, 0, 300, 300), manager=manager, action_long_desc='Are you sure you want to undo changes made to this note?', window_title='Undo changes')
+                            rect=pygame.Rect(0, 0, 300, 300), manager=manager, action_long_desc='Are you sure you want to undo changes made to this note?', window_title='Undo changes')
                 if event.user_type == pygame_gui.UI_CONFIRMATION_DIALOG_CONFIRMED:  # reset event
                     if gui_button_mode == 'Reset':
                         gui_button_mode = None

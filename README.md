@@ -17,9 +17,10 @@ Parema klõpsuga saab muuta käesolevat nooti. Noote saab üles korjata vasaku k
 
 "Delete" kustutab käesoleva noodi.
 
+"E" vajutades saab muuta noodi parameetreid.
+
 ## TODO list
-* Tekitada kast parameetrite muutmiseks (täpsem aeg, nupu tüüp, cue ID jne)
-* Näidata, mis aeg kuskil on
+* Edasi arendada kaste parameetrite muutmiseks (täpsem aeg, nupu tüüp, cue ID jne)
 * Muusika mängimine?
 * Kasutada kpm moodulit, et sealt lugeda cutscene start time 
 

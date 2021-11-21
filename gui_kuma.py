@@ -5,9 +5,11 @@ import pygame_gui
 from pathlib import Path
 from pygame_gui.windows.ui_file_dialog import UIFileDialog, UIConfirmationDialog
 from pygame_gui.elements import UIDropDownMenu, UIButton
-from pygame.rect import Rect
+from pygame_gui.elements.ui_text_entry_line import UITextEntryLine
+from pygame.rect import Rect  # TODO - clean imports
 from pygame_menu.widgets import ScrollBar
 import kbd_reader as kbd
+from math import ceil, floor
 import configparser
 
 # read/create settings
@@ -35,9 +37,14 @@ pygame.display.set_caption('KUMA')
 
 
 class Item:
-    def __init__(self, id, note_type):
+    # default end pos, cue id and cuesheet id is 0
+    def __init__(self, id, note_type, start_pos, end_pos=0, cue_id=0, cuesheet_id=0):
         self.id = id
         self.note_type = note_type
+        self.start_pos = start_pos
+        self.end_pos = end_pos
+        self.cue_id = cue_id
+        self.cuesheet_id = cuesheet_id
         self.surface = items[id]
 
     def resize(self, size):
@@ -55,6 +62,7 @@ class Karaoke:
         self.box_size = 30
         self.x = 50
         self.y = 50
+        self.scale = 10 # 1/10 second, so 100 ms per square
         self.border = 3
 
     # draw everything
@@ -79,7 +87,7 @@ class Karaoke:
         for i in range(col_start, col_end):
             world.blit(sheet_bg, (x_coord + (33 * (i)), self.y))
             if i % 20 == 0:
-                current_time = str((i + surface2_offset) // 10) + ' s' # display current time, 100 ms each square
+                current_time = self.format_time(i, surface2_offset)
                 time_text = font.render(current_time, 1, pygame.Color("black"))
                 world.blit(time_text, (x_coord + (33 * (i)), 20))
                 world.blit(
@@ -90,7 +98,19 @@ class Karaoke:
                         (self.box_size + self.border)*y + self.border, self.box_size, self.box_size)
                 if self.items[x + surface2_offset][y]:
                     world.blit(self.items[x + surface2_offset]
-                               [y][0].resize(self.box_size), rect)
+                               [y].resize(self.box_size), rect)
+
+    def format_time(self, i, surface2_offset):
+        # display current time, 100 ms each square
+        seconds = (i + surface2_offset) // self.scale
+        minutes = seconds // 60
+        if minutes:
+            if seconds % 60 == 0:
+                return f'{minutes} min'
+            else:
+                return f'{minutes} min {seconds - (minutes * 60)} s'
+        else:
+            return f'{seconds} s'
 
     # get the square that the mouse is over
     def Get_pos(self, scroll):
@@ -103,6 +123,15 @@ class Karaoke:
         x = x//(self.box_size + self.border)
         y = y//(self.box_size + self.border)
         return (x, y)
+
+    def pos_convert(self, pos):
+        return normal_round(((pos / 3000) * self.scale))
+
+    # converts pos back to yakuza time
+
+
+    def pos_to_game(self, pos):
+        return normal_round((pos / self.scale) * 3000)
 
     # add an item
     def Add(self, Item, xy):
@@ -129,6 +158,7 @@ def strip_from_sheet(sheet, start, size, columns, rows):
 def load_item_tex(button_type, karaoke):
     global items
     # load note textures
+    # TODO - maybe load possible asset list from a file
     if button_type == 'XBOX':
         tex_name = 'assets/textures/buttons_xbox.png'
     elif button_type == 'Dualshock 4':
@@ -150,20 +180,21 @@ def load_item_tex(button_type, karaoke):
     for x in range(0, karaoke.col):  # change existing button's texture
         for y in range(karaoke.rows):
             if karaoke.items[x][y]:
-                button_id = karaoke.items[x][y][0].id
-                karaoke.items[x][y][0].surface.blit(items[button_id], (0, 0))
-
-# changes scale to 100ms per square
+                button_id = karaoke.items[x][y].id
+                karaoke.items[x][y].surface.blit(items[button_id], (0, 0))
 
 
-def pos_convert(pos):
-    return int(((pos / 3000) * 10))
+def normal_round(n):  # https://stackoverflow.com/questions/33019698/how-to-properly-round-up-half-float-numbers
+    if n - floor(n) < 0.5:
+        return floor(n)
+    return ceil(n)
 
-# converts pos back to yakuza time
+def game_to_ms(pos):
+    return float(pos / 3)
 
 
-def pos_to_game(pos):
-    return int((pos / 10) * 3000)
+def ms_to_game(pos):
+    return normal_round(pos * 3)
 
 
 def load_kbd(file, karaoke):
@@ -176,19 +207,21 @@ def load_kbd(file, karaoke):
     else:
         karaoke = Karaoke()  # reset data
         for note in data['Notes']:
-            start_pos = pos_convert(note['Start position'])
-            karaoke.Add([Item(note['Button type'], note['Note type'])],
+            start_pos = karaoke.pos_convert(note['Start position'])
+            karaoke.Add(Item(note['Button type'], note['Note type'], note['Start position'], end_pos=note['End position'], cue_id=note['Cue ID'], cuesheet_id=note['Cuesheet ID']),
                         (start_pos, note['Vertical position']))
             if note['Note type'] != 'Regular':
-                end_pos = pos_convert(note['End position'])
+                end_pos = karaoke.pos_convert(note['End position'])
                 if note['Note type'] == 'Hold':
                     note_id = 4
                 else:
                     note_id = 5
+                progress_value = 0
                 for i in range(start_pos + 1, end_pos):
-                    karaoke.Add([Item(note_id, note['Note type'])],
+                    progress_value += 300
+                    karaoke.Add(Item(note_id, note['Note type'], note['Start position'] + progress_value),
                                 (i, note['Vertical position']))
-                karaoke.Add([Item(note['Button type'], note['Note type'])],
+                karaoke.Add(Item(note['Button type'], 'End', note['End position']),
                             (end_pos, note['Vertical position']))
     return karaoke
 
@@ -201,23 +234,28 @@ def write_kbd(file, karaoke):
         y = 0
         while y < len(karaoke.items[x]):
             if karaoke.items[x][y] != None:
-                if karaoke.items[x][y][0].id <= 3 and karaoke.items[x][y][0].note_type != 'End':
+                if karaoke.items[x][y].id <= 3 and karaoke.items[x][y].note_type != 'End':
+                    current_note = karaoke.items[x][y]
                     note = dict()
-                    note['Start position'] = pos_to_game(x)
+                    note['Start position'] = current_note.start_pos
                     note['End position'] = 0
                     note['Vertical position'] = y
-                    note['Button type'] = karaoke.items[x][y][0].id
-                    note['Note type'] = karaoke.items[x][y][0].note_type
-                    note['Cue ID'] = 0  # TODO - audio support
-                    note['Cuesheet ID'] = 0  # TODO - audio support
-                    if karaoke.items[x+1][y] != None:
-                        if karaoke.items[x+1][y][0].id > 3:
-                            o = x + 1
-                            note['Note type'] = karaoke.items[o][y][0].note_type
-                            while karaoke.items[o][y][0].id > 3:
-                                o += 1
-                            karaoke.items[o][y][0].note_type = 'End'
-                            note['End position'] = pos_to_game(o)
+                    note['Button type'] = current_note.id
+                    note['Note type'] = current_note.note_type
+                    note['Cue ID'] = current_note.cue_id
+                    note['Cuesheet ID'] = current_note.cuesheet_id
+                    if current_note.end_pos > 0:
+                        note['End position'] = current_note.end_pos
+                    else:
+                        if karaoke.items[x+1][y] != None:
+                            if karaoke.items[x+1][y].id > 3:
+                                o = x + 1
+                                note['Note type'] = karaoke.items[o][y].note_type
+                                while karaoke.items[o][y].id > 3:
+                                    o += 1
+                                karaoke.items[o][y].note_type = 'End'
+                                note['End position'] = karaoke.pos_to_game(o)
+                                current_note.end_pos = note['End position']
                     note_list.append(note)
             y += 1
         x += 1
@@ -234,6 +272,26 @@ def update_fps():  # fps counter from https://pythonprogramming.altervista.org/p
     return fps_text
 
 
+def update_text_boxes(note, boxes):
+    # set values
+    boxes[0].set_text(str(game_to_ms(note.start_pos)))
+    boxes[1].set_text(str(game_to_ms(note.end_pos)))
+    boxes[2].set_text(str(note.cue_id))
+    boxes[3].set_text(str(note.cuesheet_id))
+
+
+def save_before_closing(note, boxes):
+    # TODO - clean
+    if len(boxes[0].get_text()) > 0:
+        note.start_pos = ms_to_game(float(boxes[0].get_text()))
+    if len(boxes[1].get_text()) > 0:
+        note.end_pos = ms_to_game(float(boxes[1].get_text()))
+    if len(boxes[2].get_text()) > 0:
+        note.cue_id = int(boxes[2].get_text())
+    if len(boxes[3].get_text()) > 0:
+        note.cuesheet_id = int(boxes[3].get_text())
+
+
 def main():
     controllers = ['Dualshock 4', 'XBOX', 'Nintendo Switch']
     current_controller = config['CONFIG']['BUTTONS']
@@ -246,8 +304,8 @@ def main():
     world2 = pygame.Surface(
         (accurate_size - world.get_width(), int(scr_size[1])), pygame.SRCALPHA, 32)
     load_item_tex(current_controller, karaoke)  # load button textures
-    
-    #load sheet textures and scale them
+
+    # load sheet textures and scale them
     sheet_tex = 'assets/textures/sheet.png'
     line_tex = 'assets/textures/line.png'
     sheet_bg = pygame.image.load(sheet_tex).convert()
@@ -272,6 +330,21 @@ def main():
                                    relative_rect=pygame.Rect(10, 375, 200, 30),
                                    manager=manager)
 
+    # TODO - box labels
+    valid_chars = [str(x) for x in range(0, 10)] + ['.']
+    start_box = UITextEntryLine(relative_rect=pygame.Rect(
+        (310, 325), (100, 50)), manager=manager)
+    end_box = UITextEntryLine(relative_rect=pygame.Rect(
+        (310, 350), (100, 50)), manager=manager)
+    cue_box = UITextEntryLine(relative_rect=pygame.Rect(
+        (410, 325), (100, 50)), manager=manager)
+    cuesheet_box = UITextEntryLine(relative_rect=pygame.Rect(
+        (410, 350), (100, 50)), manager=manager)
+    boxes = [start_box, end_box, cue_box, cuesheet_box]
+    for box in boxes:
+        box.set_allowed_characters(valid_chars)
+        # box.disable()
+
     # Horizontal ScrollBar
     thick_h = 20
     sb_h = ScrollBar(
@@ -290,6 +363,8 @@ def main():
 
     # what the player is holding
     selected = None
+    currently_edited = None
+    stopped_editing = False
     gui_button_mode = None
     note_id = 0  # note that you get when you want to add one, first is circle
     FPS = int(config['CONFIG']['FPS'])
@@ -330,10 +405,17 @@ def main():
         # if holding something, draw it next to mouse
         if selected:
             if mousex > world.get_width():
-                world2.blit(selected[0].resize(20),
+                world2.blit(selected.resize(20),
                             (mousex - world.get_width(), mousey))
             else:
-                world.blit(selected[0].resize(20), (mousex, mousey))
+                world.blit(selected.resize(20), (mousex, mousey))
+        if currently_edited:
+            x = 2 + karaoke.x + \
+                (currently_edited[1][0] * (karaoke.box_size + karaoke.border))
+            y = 2 + karaoke.y + \
+                (currently_edited[1][1] * (karaoke.box_size + karaoke.border))
+            pygame.draw.rect(world, (0, 100, 255), (x, y, karaoke.box_size + karaoke.border,
+                             karaoke.box_size + karaoke.border), 3)  # TODO - make it update when changing pos
 
         # Application events
         events = pygame.event.get()
@@ -359,11 +441,12 @@ def main():
                             note_id += 1
                         else:
                             note_id = 0
-                    selected = [Item(note_id, 'Regular')]  # add item
+                    selected = Item(note_id, 'Regular', 0)  # add item
                 elif event.button == 1:  # left click
                     pos = karaoke.Get_pos(scrollbar_value)
                     if karaoke.In_grid(pos[0], pos[1]):
                         if selected:
+                            selected.start_pos = karaoke.pos_to_game(pos[0])
                             selected = karaoke.Add(selected, pos)
                         elif karaoke.items[pos[0]][pos[1]]:
                             selected = karaoke.items[pos[0]][pos[1]]
@@ -374,10 +457,40 @@ def main():
                     selected = None  # deletes selected note
                 if event.key == pygame.K_LCTRL:
                     note_id = 4
-                    selected = [Item(note_id, 'Hold')]  # add item
+                    selected = Item(note_id, 'Hold', 0)  # add item
                 if event.key == pygame.K_LSHIFT:
                     note_id = 5
-                    selected = [Item(note_id, 'Rapid')]  # add item
+                    selected = Item(note_id, 'Rapid', 0)  # add item
+                if event.key == pygame.K_e:  # property editing mode
+                    pos = karaoke.Get_pos(scrollbar_value)
+                    if not currently_edited:
+                        if karaoke.In_grid(pos[0], pos[1]):
+                            if karaoke.items[pos[0]][pos[1]] != None:
+                                currently_edited = [
+                                    karaoke.items[pos[0]][pos[1]], pos]
+                                for box in boxes:
+                                    box.enable()
+                                # set values
+                                update_text_boxes(currently_edited[0], boxes)
+
+                    else:
+                        if karaoke.In_grid(pos[0], pos[1]):
+                            if karaoke.items[pos[0]][pos[1]] != currently_edited[0] and karaoke.items[pos[0]][pos[1]] != None:
+                                save_before_closing(currently_edited[0], boxes)
+                                currently_edited = [
+                                    karaoke.items[pos[0]][pos[1]], pos]
+                                update_text_boxes(currently_edited[0], boxes)
+                            else:
+                                stopped_editing = True
+                        else:
+                            stopped_editing = True
+                        if stopped_editing:
+                            save_before_closing(currently_edited[0], boxes)
+                            currently_edited = None  # deselect
+                            # for box in boxes:
+                            # TODO - add reset values button
+                            # box.disable()  # disable text boxes
+                            stopped_editing = False  # reset value
 
             if event.type == pygame.USEREVENT:
                 if event.user_type == pygame_gui.UI_DROP_DOWN_MENU_CHANGED:

@@ -64,7 +64,7 @@ class Karaoke:
         self.box_size = 30
         self.x = 50
         self.y = 50
-        self.scale = 10 # 1/10 second, so 100 ms per square
+        self.scale = 10  # 1/10 second, so 100 ms per square
         self.border = 3
 
     # draw everything
@@ -131,7 +131,6 @@ class Karaoke:
 
     # converts pos back to yakuza time
 
-
     def pos_to_game(self, pos):
         return normal_round((pos / self.scale) * 3000)
 
@@ -190,6 +189,7 @@ def normal_round(n):  # https://stackoverflow.com/questions/33019698/how-to-prop
         return floor(n)
     return ceil(n)
 
+
 def game_to_ms(pos):
     return float(pos / 3)
 
@@ -209,7 +209,8 @@ def load_kbd(file, karaoke):
         karaoke = Karaoke()  # reset data
         for note in data['Notes']:
             start_pos = karaoke.pos_convert(note['Start position'])
-            karaoke.Add(Item(start_pos, note['Vertical position'], note['Button type'], note['Note type'], note['Start position'], end_pos=note['End position'], cue_id=note['Cue ID'], cuesheet_id=note['Cuesheet ID']))
+            karaoke.Add(Item(start_pos, note['Vertical position'], note['Button type'], note['Note type'],
+                        note['Start position'], end_pos=note['End position'], cue_id=note['Cue ID'], cuesheet_id=note['Cuesheet ID']))
             if note['Note type'] != 'Regular':
                 end_pos = karaoke.pos_convert(note['End position'])
                 if note['Note type'] == 'Hold':
@@ -219,8 +220,10 @@ def load_kbd(file, karaoke):
                 progress_value = 0
                 for i in range(start_pos + 1, end_pos):
                     progress_value += 300
-                    karaoke.Add(Item(i, note['Vertical position'], note_id, note['Note type'], note['Start position'] + progress_value))
-                karaoke.Add(Item(end_pos, note['Vertical position'], note['Button type'], 'End', note['End position']))
+                    karaoke.Add(Item(i, note['Vertical position'], note_id,
+                                note['Note type'], note['Start position'] + progress_value))
+                karaoke.Add(Item(
+                    end_pos, note['Vertical position'], note['Button type'], 'End', note['End position']))
     return karaoke
 
 
@@ -323,6 +326,9 @@ def main():
     reset_button = pygame_gui.elements.UIButton(relative_rect=pygame.Rect((210, 325), (100, 50)),
                                                 text='Reset',
                                                 manager=manager)
+    undo_button = pygame_gui.elements.UIButton(relative_rect=pygame.Rect((310, 375), (200, 50)),
+                                               text='Undo note changes',
+                                               manager=manager)
     button_picker = UIDropDownMenu(options_list=controllers,
                                    starting_option=current_controller,
                                    relative_rect=pygame.Rect(10, 375, 200, 30),
@@ -488,7 +494,6 @@ def main():
                             save_before_closing(currently_edited, boxes)
                             currently_edited = None  # deselect
                             # for box in boxes:
-                            # TODO - add reset values button
                             # box.disable()  # disable text boxes
                             stopped_editing = False  # reset value
 
@@ -527,12 +532,18 @@ def main():
                         gui_button_mode = 'Reset'
                         reset_all = UIConfirmationDialog(
                             rect=Rect(0, 0, 300, 300), manager=manager, action_long_desc='Are you sure you want to reset? Any unsaved changes will be lost.', window_title='Reset all')
+                    if event.ui_element == undo_button:
+                        gui_button_mode = 'Undo'
+                        undo_note = UIConfirmationDialog(
+                            rect=Rect(0, 0, 300, 300), manager=manager, action_long_desc='Are you sure you want to undo changes made to this note?', window_title='Undo changes')
                 if event.user_type == pygame_gui.UI_CONFIRMATION_DIALOG_CONFIRMED:  # reset event
                     if gui_button_mode == 'Reset':
                         gui_button_mode = None
                         karaoke = Karaoke()
                         currently_edited = None
-
+                    if gui_button_mode == 'Undo':
+                        gui_button_mode = None
+                        update_text_boxes(currently_edited, boxes)
             manager.process_events(event)
 
         trunc_world_orig = (scrollbar_value, 0)

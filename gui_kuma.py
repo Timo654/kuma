@@ -19,6 +19,7 @@ else:
     raise Exception('Asset data missing')
 
 texture_path = assets['Texture folder']
+controllers = [key for key in assets['Button prompts']]
 
 # read/create settings
 settings_file = 'KUMA_settings.ini'
@@ -28,11 +29,11 @@ if Path(settings_file).is_file():
 if not config.has_section("CONFIG"):
     config.add_section("CONFIG")
     config.set("CONFIG", "FPS", str(60))
-    config.set("CONFIG", "BUTTONS", 'Dualshock 4')
+    config.set("CONFIG", "BUTTONS", controllers[0])
 if not config.has_section("PATHS"):
     config.add_section("PATHS")
-    config.set("PATHS", "Input", str(Path().resolve()) + '/input_file.kbd')
-    config.set("PATHS", "Output", str(Path().resolve()) + '/output_file.kbd')
+    config.set("PATHS", "Input", str(Path().resolve()) + '\\input_file.kbd')
+    config.set("PATHS", "Output", str(Path().resolve()) + '\\output_file.kbd')
 
 # initialize pygame stuff
 pygame.init()
@@ -166,7 +167,7 @@ def strip_from_sheet(sheet, start, size, columns, rows):
 def load_item_tex(button_type, karaoke):
     global items
     # load note textures
-    tex_name = texture_path + '/' + assets['Button prompts'][button_type]
+    tex_name = texture_path + '\\' + assets['Button prompts'][button_type]
     image = pygame.image.load(tex_name).convert_alpha()
     buttons = strip_from_sheet(image, (0, 0), (122, 122), 2, 2)
     items = [pygame.Surface((122, 122), pygame.SRCALPHA) for _ in range(6)]
@@ -294,7 +295,6 @@ def save_before_closing(note, boxes):
 
 
 def main():
-    controllers = [key for key in assets['Button prompts']]
     current_controller = config['CONFIG']['BUTTONS']
     if current_controller not in controllers:
         current_controller = controllers[0]
@@ -309,8 +309,8 @@ def main():
     load_item_tex(current_controller, karaoke)  # load button textures
 
     # load sheet textures and scale them
-    sheet_tex = texture_path + '/' + assets['Sheet texture']
-    line_tex = texture_path + '/' + assets['Line texture']
+    sheet_tex = texture_path + '\\' + assets['Sheet texture']
+    line_tex = texture_path + '\\' + assets['Line texture']
     sheet_bg = pygame.image.load(sheet_tex).convert()
     line_bg = pygame.image.load(line_tex).convert()
     line_bg = pygame.transform.scale(

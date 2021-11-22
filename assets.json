@@ -3,10 +3,50 @@
   "Sheet texture": "sheet.png",
   "Line texture": "line.png",
   "Button prompts": {
-    "Dualshock 4": "buttons_ds.png",
-    "XBOX": "buttons_xbox.png",
-    "Nintendo Switch": "buttons_nx.png",
-    "Dualshock (RGG test)": "buttons_dev_ds.png",
-    "XBOX (RGG inspired)": "buttons_dev_insp_xbox.png"
+    "Dualshock 4": [
+      "buttons_ds.png",
+      [
+        "Circle",
+        "Cross",
+        "Square",
+        "Triangle"
+      ]
+    ],
+    "XBOX": [
+      "buttons_xbox.png",
+      [
+        "B",
+        "A",
+        "X",
+        "Y"
+      ]
+    ],
+    "Nintendo Switch": [
+      "buttons_nx.png",
+      [
+        "A",
+        "B",
+        "Y",
+        "X"
+      ]
+    ],
+    "Dualshock (RGG test)": [
+      "buttons_dev_ds.png",
+      [
+        "Circle",
+        "Cross",
+        "Square",
+        "Triangle"
+      ]
+    ],
+    "XBOX (RGG inspired)": [
+      "buttons_dev_insp_xbox.png",
+      [
+        "B",
+        "A",
+        "X",
+        "Y"
+      ]
+    ]
   }
 }

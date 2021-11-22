@@ -164,10 +164,10 @@ def strip_from_sheet(sheet, start, size, columns, rows):
     return frames
 
 
-def load_item_tex(button_type, karaoke, selected):
+def load_item_tex(button_type, karaoke, selected, dropdown):
     global items
     # load note textures
-    tex_name = texture_path + '\\' + assets['Button prompts'][button_type]
+    tex_name = texture_path + '\\' + assets['Button prompts'][button_type][0]
     image = pygame.image.load(tex_name).convert_alpha()
     buttons = strip_from_sheet(image, (0, 0), (122, 122), 2, 2)
     items = [pygame.Surface((122, 122), pygame.SRCALPHA) for _ in range(6)]
@@ -186,6 +186,10 @@ def load_item_tex(button_type, karaoke, selected):
 
     if selected:
         selected.surface = items[selected.id]
+
+    update_dropdown(dropdown, mode='update all', new_list=assets['Button prompts']
+                    [button_type][1], index=dropdown.options_list.index(dropdown.selected_option))
+
 
 def normal_round(n):  # https://stackoverflow.com/questions/33019698/how-to-properly-round-up-half-float-numbers
     if n - floor(n) < 0.5:
@@ -276,15 +280,16 @@ def update_fps():  # fps counter from https://pythonprogramming.altervista.org/p
     return fps_text
 
 
-def update_text_boxes(note, boxes):
+def update_text_boxes(note, boxes, dropdown):
     # set values
     boxes[0].set_text(str(game_to_ms(note.start_pos)))
     boxes[1].set_text(str(game_to_ms(note.end_pos)))
     boxes[2].set_text(str(note.cue_id))
     boxes[3].set_text(str(note.cuesheet_id))
+    update_dropdown(dropdown, mode='update selection', index=note.id)
 
 
-def save_before_closing(note, boxes):
+def save_before_closing(note, boxes, dropdown):
     # TODO - clean
     if len(boxes[0].get_text()) > 0:
         note.start_pos = ms_to_game(float(boxes[0].get_text()))
@@ -294,6 +299,23 @@ def save_before_closing(note, boxes):
         note.cue_id = int(boxes[2].get_text())
     if len(boxes[3].get_text()) > 0:
         note.cuesheet_id = int(boxes[3].get_text())
+    note.id = dropdown.options_list.index(dropdown.selected_option)
+    note.surface = items[note.id]
+
+
+# new_list is a list and option is list index
+def update_dropdown(dropdown, mode, new_list=list(), index=0):
+    if mode == 'update all':
+        dropdown.options_list = new_list
+        dropdown.menu_states['expanded'].options_list = new_list
+        dropdown.menu_states['expanded'].rebuild()
+    if (mode == 'update selection') or (mode == 'update all'):
+        option = dropdown.options_list[index]
+        dropdown.selected_option = option
+        dropdown.menu_states['closed'].selected_option = option
+        dropdown.menu_states['closed'].finish()
+        dropdown.menu_states['closed'].start()
+    dropdown.rebuild()
 
 
 def main():
@@ -309,9 +331,58 @@ def main():
     world2 = pygame.Surface(
         (accurate_size - world.get_width(), int(scr_size[1])), pygame.SRCALPHA, 32)
 
+    manager = pygame_gui.UIManager(scr_size)
+    file_selection_button = UIButton(relative_rect=pygame.Rect((10, 325), (100, 50)),
+                                     text='Open file',
+                                     manager=manager)
+    output_selection_button = UIButton(relative_rect=pygame.Rect((110, 325), (100, 50)),
+                                       text='Save file',
+                                       manager=manager)
+    reset_button = UIButton(relative_rect=pygame.Rect((210, 325), (100, 50)),
+                            text='Reset',
+                            manager=manager)
+    undo_button = UIButton(relative_rect=pygame.Rect((315, 380), (200, 50)),
+                           text='Undo note changes',
+                           manager=manager)
+    button_picker = UIDropDownMenu(options_list=controllers,
+                                   starting_option=current_controller,
+                                   relative_rect=pygame.Rect(10, 375, 200, 30),
+                                   manager=manager)
+
+    start_label = UILabel(pygame.Rect((315, 325), (150, 22)),
+                          "Start position",
+                          manager=manager)
+    end_label = UILabel(pygame.Rect((470, 325), (150, 22)),
+                        "End position",
+                        manager=manager)
+    cue_label = UILabel(pygame.Rect((625, 325), (150, 22)),
+                        "Cue ID",
+                        manager=manager)
+    cuesheet_label = UILabel(pygame.Rect((780, 325), (150, 22)),
+                             "Cuesheet ID",
+                             manager=manager)
+    note_button_label = UILabel(pygame.Rect((935, 325), (150, 22)),
+                                "Note button",
+                                manager=manager)
+
+    valid_chars = [str(x) for x in range(0, 10)] + ['.']
+    start_box = UITextEntryLine(relative_rect=pygame.Rect(
+        (315, 350), (150, 50)), manager=manager)
+    end_box = UITextEntryLine(relative_rect=pygame.Rect(
+        (470, 350), (150, 50)), manager=manager)
+    cue_box = UITextEntryLine(relative_rect=pygame.Rect(
+        (625, 350), (150, 50)), manager=manager)
+    cuesheet_box = UITextEntryLine(relative_rect=pygame.Rect(
+        (780, 350), (150, 50)), manager=manager)
+    note_picker = UIDropDownMenu(options_list=assets['Button prompts'][current_controller][1],
+                                 starting_option=assets['Button prompts'][current_controller][1][0],
+                                 relative_rect=pygame.Rect(935, 350, 150, 30),
+                                 manager=manager, object_id='#note_picker')
+    # note_picker.disable()
     # what the player is holding
     selected = None
-    load_item_tex(current_controller, karaoke, selected)  # load button textures
+    load_item_tex(current_controller, karaoke,
+                  selected, note_picker)  # load button textures
 
     # load sheet textures and scale them
     sheet_tex = texture_path + '\\' + assets['Sheet texture']
@@ -323,47 +394,6 @@ def main():
     sheet_bg = pygame.transform.scale(
         sheet_bg, (karaoke.box_size + karaoke.border, (karaoke.box_size + karaoke.border) * karaoke.rows))
 
-    manager = pygame_gui.UIManager(scr_size)
-    file_selection_button = UIButton(relative_rect=pygame.Rect((10, 325), (100, 50)),
-                                                         text='Open file',
-                                                         manager=manager)
-    output_selection_button = UIButton(relative_rect=pygame.Rect((110, 325), (100, 50)),
-                                                           text='Save file',
-                                                           manager=manager)
-    reset_button = UIButton(relative_rect=pygame.Rect((210, 325), (100, 50)),
-                                                text='Reset',
-                                                manager=manager)
-    undo_button = UIButton(relative_rect=pygame.Rect((315, 380), (200, 50)),
-                                               text='Undo note changes',
-                                               manager=manager)
-    button_picker = UIDropDownMenu(options_list=controllers,
-                                   starting_option=current_controller,
-                                   relative_rect=pygame.Rect(10, 375, 200, 30),
-                                   manager=manager)
-
-
-    start_label = UILabel(pygame.Rect((315, 325),(150, 22)),
-                                   "Start position",
-                                   manager=manager)
-    end_label = UILabel(pygame.Rect((470, 325),(150, 22)),
-                                   "End position",
-                                   manager=manager)
-    cue_label = UILabel(pygame.Rect((625, 325),(150, 22)),
-                                   "Cue ID",
-                                   manager=manager)
-    cuesheet_label = UILabel(pygame.Rect((780, 325),(150, 22)),
-                                   "Cuesheet ID",
-                                   manager=manager)                                                              
-    
-    valid_chars = [str(x) for x in range(0, 10)] + ['.']
-    start_box = UITextEntryLine(relative_rect=pygame.Rect(
-        (315, 350), (150, 50)), manager=manager)
-    end_box = UITextEntryLine(relative_rect=pygame.Rect(
-        (470, 350), (150, 50)), manager=manager)
-    cue_box = UITextEntryLine(relative_rect=pygame.Rect(
-        (625, 350), (150, 50)), manager=manager)
-    cuesheet_box = UITextEntryLine(relative_rect=pygame.Rect(
-        (780, 350), (150, 50)), manager=manager)
     boxes = [start_box, end_box, cue_box, cuesheet_box]
     for box in boxes:
         box.set_allowed_characters(valid_chars)
@@ -385,8 +415,7 @@ def main():
     sb_h.set_position(0, scr_size[1] - thick_h)
     sb_h.set_page_step(scr_size[0])
 
-    
-    #what the player is currently editing
+    # what the player is currently editing
     currently_edited = None
     stopped_editing = False
     gui_button_mode = None
@@ -498,20 +527,24 @@ def main():
                                 for box in boxes:
                                     box.enable()
                                 # set values
-                                update_text_boxes(currently_edited, boxes)
+                                update_text_boxes(
+                                    currently_edited, boxes, note_picker)
 
                     else:
                         if karaoke.In_grid(pos[0], pos[1]):
                             if karaoke.items[pos[0]][pos[1]] != currently_edited and karaoke.items[pos[0]][pos[1]] != None:
-                                save_before_closing(currently_edited, boxes)
+                                save_before_closing(
+                                    currently_edited, boxes, note_picker)
                                 currently_edited = karaoke.items[pos[0]][pos[1]]
-                                update_text_boxes(currently_edited, boxes)
+                                update_text_boxes(
+                                    currently_edited, boxes, note_picker)
                             else:
                                 stopped_editing = True
                         else:
                             stopped_editing = True
                         if stopped_editing:
-                            save_before_closing(currently_edited, boxes)
+                            save_before_closing(
+                                currently_edited, boxes, note_picker)
                             currently_edited = None  # deselect
                             # for box in boxes:
                             # box.disable()  # disable text boxes
@@ -521,7 +554,8 @@ def main():
                 if event.user_type == pygame_gui.UI_DROP_DOWN_MENU_CHANGED:
                     config.set("CONFIG", "BUTTONS", str(
                         button_picker.selected_option))
-                    load_item_tex(button_picker.selected_option, karaoke, selected)
+                    load_item_tex(button_picker.selected_option,
+                                  karaoke, selected, note_picker)
                 if event.user_type == pygame_gui.UI_BUTTON_PRESSED:
                     if event.ui_element == file_selection_button:
                         gui_button_mode = 'Input'

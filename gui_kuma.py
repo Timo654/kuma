@@ -528,21 +528,25 @@ def main():
                     if not currently_edited:
                         if karaoke.In_grid(pos[0], pos[1]):
                             if karaoke.items[pos[0]][pos[1]] != None:
-                                currently_edited = karaoke.items[pos[0]][pos[1]]
-                                for box in boxes:
-                                    box.enable()
+                                if karaoke.items[pos[0]][pos[1]].id < 4:
+                                    currently_edited = karaoke.items[pos[0]][pos[1]]
+                                    #for box in boxes:
+                                    #    box.enable()
                                 # set values
-                                update_text_boxes(
-                                    currently_edited, boxes, note_picker)
+                                    update_text_boxes(
+                                        currently_edited, boxes, note_picker)
 
                     else:
                         if karaoke.In_grid(pos[0], pos[1]):
                             if karaoke.items[pos[0]][pos[1]] != currently_edited and karaoke.items[pos[0]][pos[1]] != None:
-                                save_before_closing(
-                                    currently_edited, boxes, note_picker, karaoke)
-                                currently_edited = karaoke.items[pos[0]][pos[1]]
-                                update_text_boxes(
-                                    currently_edited, boxes, note_picker)
+                                if karaoke.items[pos[0]][pos[1]].id < 4:
+                                    save_before_closing(
+                                        currently_edited, boxes, note_picker, karaoke)
+                                    currently_edited = karaoke.items[pos[0]][pos[1]]
+                                    update_text_boxes(
+                                        currently_edited, boxes, note_picker)
+                                else:
+                                    stopped_editing = True
                             else:
                                 stopped_editing = True
                         else:

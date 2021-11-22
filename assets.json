@@ -5,6 +5,8 @@
   "Button prompts": {
     "Dualshock 4": "buttons_ds.png",
     "XBOX": "buttons_xbox.png",
-    "Nintendo Switch": "buttons_nx.png"
+    "Nintendo Switch": "buttons_nx.png",
+    "Dualshock (RGG test)": "buttons_dev_ds.png",
+    "XBOX (RGG inspired)": "buttons_dev_insp_xbox.png"
   }
 }

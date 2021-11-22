@@ -164,7 +164,7 @@ def strip_from_sheet(sheet, start, size, columns, rows):
     return frames
 
 
-def load_item_tex(button_type, karaoke):
+def load_item_tex(button_type, karaoke, selected):
     global items
     # load note textures
     tex_name = texture_path + '\\' + assets['Button prompts'][button_type]
@@ -182,8 +182,10 @@ def load_item_tex(button_type, karaoke):
         for y in range(karaoke.rows):
             if karaoke.items[x][y]:
                 button_id = karaoke.items[x][y].id
-                karaoke.items[x][y].surface.blit(items[button_id], (0, 0))
+                karaoke.items[x][y].surface = items[button_id]
 
+    if selected:
+        selected.surface = items[selected.id]
 
 def normal_round(n):  # https://stackoverflow.com/questions/33019698/how-to-properly-round-up-half-float-numbers
     if n - floor(n) < 0.5:
@@ -306,7 +308,10 @@ def main():
         (int(accurate_size / 2), int(scr_size[1])), pygame.SRCALPHA, 32)
     world2 = pygame.Surface(
         (accurate_size - world.get_width(), int(scr_size[1])), pygame.SRCALPHA, 32)
-    load_item_tex(current_controller, karaoke)  # load button textures
+
+    # what the player is holding
+    selected = None
+    load_item_tex(current_controller, karaoke, selected)  # load button textures
 
     # load sheet textures and scale them
     sheet_tex = texture_path + '\\' + assets['Sheet texture']
@@ -380,8 +385,8 @@ def main():
     sb_h.set_position(0, scr_size[1] - thick_h)
     sb_h.set_page_step(scr_size[0])
 
-    # what the player is holding
-    selected = None
+    
+    #what the player is currently editing
     currently_edited = None
     stopped_editing = False
     gui_button_mode = None
@@ -516,7 +521,7 @@ def main():
                 if event.user_type == pygame_gui.UI_DROP_DOWN_MENU_CHANGED:
                     config.set("CONFIG", "BUTTONS", str(
                         button_picker.selected_option))
-                    load_item_tex(button_picker.selected_option, karaoke)
+                    load_item_tex(button_picker.selected_option, karaoke, selected)
                 if event.user_type == pygame_gui.UI_BUTTON_PRESSED:
                     if event.ui_element == file_selection_button:
                         gui_button_mode = 'Input'

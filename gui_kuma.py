@@ -289,10 +289,15 @@ def update_text_boxes(note, boxes, dropdown):
     update_dropdown(dropdown, mode='update selection', index=note.id)
 
 
-def save_before_closing(note, boxes, dropdown):
+def save_before_closing(note, boxes, dropdown, karaoke):
     # TODO - clean
     if len(boxes[0].get_text()) > 0:
         note.start_pos = ms_to_game(float(boxes[0].get_text()))
+        karaoke.items[note.x][note.y] = None
+        note.x = karaoke.pos_convert(note.start_pos)
+        karaoke.items[note.x][note.y] = note
+
+
     if len(boxes[1].get_text()) > 0:
         note.end_pos = ms_to_game(float(boxes[1].get_text()))
     if len(boxes[2].get_text()) > 0:
@@ -534,7 +539,7 @@ def main():
                         if karaoke.In_grid(pos[0], pos[1]):
                             if karaoke.items[pos[0]][pos[1]] != currently_edited and karaoke.items[pos[0]][pos[1]] != None:
                                 save_before_closing(
-                                    currently_edited, boxes, note_picker)
+                                    currently_edited, boxes, note_picker, karaoke)
                                 currently_edited = karaoke.items[pos[0]][pos[1]]
                                 update_text_boxes(
                                     currently_edited, boxes, note_picker)
@@ -544,7 +549,7 @@ def main():
                             stopped_editing = True
                         if stopped_editing:
                             save_before_closing(
-                                currently_edited, boxes, note_picker)
+                                currently_edited, boxes, note_picker, karaoke)
                             currently_edited = None  # deselect
                             # for box in boxes:
                             # box.disable()  # disable text boxes

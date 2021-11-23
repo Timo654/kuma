@@ -94,13 +94,13 @@ class Karaoke:
             col_end = (self.col // 2)
 
         for i in range(col_start, col_end):
-            world.blit(sheet_bg, (x_coord + (33 * (i)), self.y))
+            world.blit(sheet_bg, (x_coord + (33 * (i)), self.y + self.box_size / 2))
             if i % 20 == 0:
                 current_time = self.format_time(i, surface2_offset)
                 time_text = font.render(current_time, 1, pygame.Color("black"))
-                world.blit(time_text, (x_coord + (33 * (i)), 20))
+                world.blit(time_text, (x_coord + (33 * (i)), 30))
                 world.blit(
-                    line_bg, (x_coord + (one_box // 2) + (33 * (i)), self.y))
+                    line_bg, (x_coord + (one_box // 2) + (33 * (i)), self.y + self.box_size / 2))
         for x in range(col_start, col_end):
             for y in range(self.rows):
                 rect = (x_coord + (self.box_size + self.border)*x + self.border, self.x +
@@ -274,8 +274,7 @@ def write_kbd(file, karaoke):
 
 def update_fps():  # fps counter from https://pythonprogramming.altervista.org/pygame-how-to-display-the-frame-rate-fps-on-the-screen/
     fps = str(int(clock.get_fps()))
-    fps_text = font.render(fps, 1, pygame.Color("black"))
-    return fps_text
+    return fps
 
 
 def update_text_boxes(note, boxes, dropdown):
@@ -335,51 +334,54 @@ def main():
         (accurate_size - world.get_width(), int(scr_size[1])), pygame.SRCALPHA, 32)
 
     manager = pygame_gui.UIManager(scr_size)
-    file_selection_button = UIButton(relative_rect=pygame.Rect((10, 325), (100, 50)),
+    file_selection_button = UIButton(relative_rect=pygame.Rect((10, 340), (100, 50)),
                                      text='Open file',
                                      manager=manager)
-    output_selection_button = UIButton(relative_rect=pygame.Rect((110, 325), (100, 50)),
+    output_selection_button = UIButton(relative_rect=pygame.Rect((110, 340), (100, 50)),
                                        text='Save file',
                                        manager=manager)
-    reset_button = UIButton(relative_rect=pygame.Rect((210, 325), (100, 50)),
+    reset_button = UIButton(relative_rect=pygame.Rect((210, 340), (100, 50)),
                             text='Reset',
                             manager=manager)
-    undo_button = UIButton(relative_rect=pygame.Rect((315, 380), (200, 50)),
+    undo_button = UIButton(relative_rect=pygame.Rect((315, 395), (200, 50)),
                            text='Undo note changes',
                            manager=manager)
     button_picker = UIDropDownMenu(options_list=controllers,
                                    starting_option=current_controller,
-                                   relative_rect=pygame.Rect(10, 375, 200, 30),
+                                   relative_rect=pygame.Rect(10, 400, 200, 30),
                                    manager=manager)
 
-    start_label = UILabel(pygame.Rect((315, 325), (150, 22)),
+    start_label = UILabel(pygame.Rect((315, 340), (150, 22)),
                           "Start position",
                           manager=manager)
-    end_label = UILabel(pygame.Rect((470, 325), (150, 22)),
+    end_label = UILabel(pygame.Rect((470, 340), (150, 22)),
                         "End position",
                         manager=manager)
-    cue_label = UILabel(pygame.Rect((625, 325), (150, 22)),
+    cue_label = UILabel(pygame.Rect((625, 340), (150, 22)),
                         "Cue ID",
                         manager=manager)
-    cuesheet_label = UILabel(pygame.Rect((780, 325), (150, 22)),
+    cuesheet_label = UILabel(pygame.Rect((780, 340), (150, 22)),
                              "Cuesheet ID",
                              manager=manager)
-    note_button_label = UILabel(pygame.Rect((935, 325), (150, 22)),
+    note_button_label = UILabel(pygame.Rect((935, 340), (150, 22)),
                                 "Note button",
+                                manager=manager)
+    fps_label = UILabel(pygame.Rect((0, 0), (30, 30)),
+                                "0",
                                 manager=manager)
 
     valid_chars = [str(x) for x in range(0, 10)] + ['.']
     start_box = UITextEntryLine(relative_rect=pygame.Rect(
-        (315, 350), (150, 50)), manager=manager)
+        (315, 365), (150, 50)), manager=manager)
     end_box = UITextEntryLine(relative_rect=pygame.Rect(
-        (470, 350), (150, 50)), manager=manager)
+        (470, 365), (150, 50)), manager=manager)
     cue_box = UITextEntryLine(relative_rect=pygame.Rect(
-        (625, 350), (150, 50)), manager=manager)
+        (625, 365), (150, 50)), manager=manager)
     cuesheet_box = UITextEntryLine(relative_rect=pygame.Rect(
-        (780, 350), (150, 50)), manager=manager)
+        (780, 365), (150, 50)), manager=manager)
     note_picker = UIDropDownMenu(options_list=assets['Button prompts'][current_controller][1],
                                  starting_option=assets['Button prompts'][current_controller][1][0],
-                                 relative_rect=pygame.Rect(935, 350, 150, 30),
+                                 relative_rect=pygame.Rect(935, 365, 150, 30),
                                  manager=manager, object_id='#note_picker')
     # note_picker.disable()
     # what the player is holding
@@ -654,7 +656,7 @@ def main():
         else:
             screen.blit(world, (0, 0), (trunc_world_orig, trunc_world))
 
-        screen.blit(update_fps(), (10, 0))
+        fps_label.set_text(update_fps())
         manager.draw_ui(screen)
         manager.update(time_delta)
         pygame.display.update()

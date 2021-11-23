@@ -22,7 +22,6 @@ Parema klõpsuga saab muuta käesolevat nooti. Noote saab üles korjata vasaku k
 Nooltega saab liigutada scrollbari.
 
 ## TODO list
-* Edasi arendada kaste parameetrite muutmiseks (täpsem aeg, nupu tüüp, cue ID jne)
 * Muusika mängimine?
 * Kasutada kpm moodulit, et sealt lugeda cutscene start time 
 

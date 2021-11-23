@@ -94,7 +94,8 @@ class Karaoke:
             col_end = (self.col // 2)
 
         for i in range(col_start, col_end):
-            world.blit(sheet_bg, (x_coord + (33 * (i)), self.y + self.box_size / 2))
+            world.blit(sheet_bg, (x_coord + (33 * (i)),
+                                  self.y + self.box_size / 2))
             if (i + surface2_offset) % 20 == 0:
                 current_time = self.format_time(i + surface2_offset)
                 time_text = font.render(current_time, 1, pygame.Color("grey"))
@@ -108,7 +109,6 @@ class Karaoke:
                 if self.items[x + surface2_offset][y]:
                     world.blit(self.items[x + surface2_offset]
                                [y].resize(self.box_size), rect)
-
 
     def format_time(self, i):
         # display current time, 100 ms each square
@@ -216,7 +216,7 @@ def load_kbd(file, karaoke):
         for note in data['Notes']:
             start_pos = karaoke.pos_convert(note['Start position'])
             karaoke.Add(Item(start_pos, note['Vertical position'], note['Button type'], note['Note type'],
-                        note['Start position'], end_pos=note['End position'], cue_id=note['Cue ID'], cuesheet_id=note['Cuesheet ID']))
+                             note['Start position'], end_pos=note['End position'], cue_id=note['Cue ID'], cuesheet_id=note['Cuesheet ID']))
             if note['Note type'] != 'Regular':
                 end_pos = karaoke.pos_convert(note['End position'])
                 if note['Note type'] == 'Hold':
@@ -227,7 +227,7 @@ def load_kbd(file, karaoke):
                 for i in range(start_pos + 1, end_pos):
                     progress_value += 300
                     karaoke.Add(Item(i, note['Vertical position'], note_id,
-                                note['Note type'], note['Start position'] + progress_value))
+                                     note['Note type'], note['Start position'] + progress_value))
                 karaoke.Add(Item(
                     end_pos, note['Vertical position'], note['Button type'], 'End', note['End position']))
     return karaoke
@@ -282,8 +282,9 @@ def update_text_boxes(note, boxes, dropdown):
     # set values
     boxes[0].set_text(str(game_to_ms(note.start_pos)))
     boxes[1].set_text(str(game_to_ms(note.end_pos)))
-    boxes[2].set_text(str(note.cue_id))
-    boxes[3].set_text(str(note.cuesheet_id))
+    boxes[2].set_text(str(note.y))
+    boxes[3].set_text(str(note.cue_id))
+    boxes[4].set_text(str(note.cuesheet_id))
     update_dropdown(dropdown, mode='update selection', index=note.id)
 
 
@@ -294,14 +295,17 @@ def save_before_closing(note, boxes, dropdown, karaoke):
         karaoke.items[note.x][note.y] = None
         note.x = karaoke.pos_convert(note.start_pos)
         karaoke.items[note.x][note.y] = note
-
-
     if len(boxes[1].get_text()) > 0:
         note.end_pos = ms_to_game(float(boxes[1].get_text()))
     if len(boxes[2].get_text()) > 0:
-        note.cue_id = int(boxes[2].get_text())
+        if int(boxes[2].get_text()) < karaoke.rows:
+            karaoke.items[note.x][note.y] = None
+            note.y = int(boxes[2].get_text())
+            karaoke.items[note.x][note.y] = note
     if len(boxes[3].get_text()) > 0:
-        note.cuesheet_id = int(boxes[3].get_text())
+        note.cue_id = int(boxes[3].get_text())
+    if len(boxes[4].get_text()) > 0:
+        note.cuesheet_id = int(boxes[4].get_text())
     note.id = dropdown.options_list.index(dropdown.selected_option)
     note.surface = items[note.id]
 
@@ -349,7 +353,7 @@ def main():
                            manager=manager)
     button_picker = UIDropDownMenu(options_list=controllers,
                                    starting_option=current_controller,
-                                   relative_rect=pygame.Rect(10, 400, 200, 30),
+                                   relative_rect=pygame.Rect(10, 390, 200, 30),
                                    manager=manager)
 
     start_label = UILabel(pygame.Rect((315, 340), (150, 22)),
@@ -358,31 +362,36 @@ def main():
     end_label = UILabel(pygame.Rect((470, 340), (150, 22)),
                         "End position",
                         manager=manager)
-    cue_label = UILabel(pygame.Rect((625, 340), (150, 22)),
+    vert_label = UILabel(pygame.Rect((625, 340), (150, 22)),
+                         "Vertical position",
+                         manager=manager)
+    cue_label = UILabel(pygame.Rect((780, 340), (150, 22)),
                         "Cue ID",
                         manager=manager)
-    cuesheet_label = UILabel(pygame.Rect((780, 340), (150, 22)),
+    cuesheet_label = UILabel(pygame.Rect((935, 340), (150, 22)),
                              "Cuesheet ID",
                              manager=manager)
-    note_button_label = UILabel(pygame.Rect((935, 340), (150, 22)),
+    note_button_label = UILabel(pygame.Rect((1090, 340), (150, 22)),
                                 "Note button",
                                 manager=manager)
     fps_label = UILabel(pygame.Rect((0, 0), (30, 30)),
-                                "0",
-                                manager=manager)
+                        "0",
+                        manager=manager)
 
     valid_chars = [str(x) for x in range(0, 10)] + ['.']
     start_box = UITextEntryLine(relative_rect=pygame.Rect(
         (315, 365), (150, 50)), manager=manager)
     end_box = UITextEntryLine(relative_rect=pygame.Rect(
         (470, 365), (150, 50)), manager=manager)
-    cue_box = UITextEntryLine(relative_rect=pygame.Rect(
+    vert_box = UITextEntryLine(relative_rect=pygame.Rect(
         (625, 365), (150, 50)), manager=manager)
-    cuesheet_box = UITextEntryLine(relative_rect=pygame.Rect(
+    cue_box = UITextEntryLine(relative_rect=pygame.Rect(
         (780, 365), (150, 50)), manager=manager)
+    cuesheet_box = UITextEntryLine(relative_rect=pygame.Rect(
+        (935, 365), (150, 50)), manager=manager)
     note_picker = UIDropDownMenu(options_list=assets['Button prompts'][current_controller][1],
                                  starting_option=assets['Button prompts'][current_controller][1][0],
-                                 relative_rect=pygame.Rect(935, 365, 150, 30),
+                                 relative_rect=pygame.Rect(1090, 365, 150, 30),
                                  manager=manager, object_id='#note_picker')
     # note_picker.disable()
     # what the player is holding
@@ -400,26 +409,26 @@ def main():
     sheet_bg = pygame.transform.scale(
         sheet_bg, (karaoke.box_size + karaoke.border, (karaoke.box_size + karaoke.border) * karaoke.rows))
 
-    boxes = [start_box, end_box, cue_box, cuesheet_box]
-    for box in boxes:
-        box.set_allowed_characters(valid_chars)
+    boxes = [start_box, end_box, vert_box, cue_box, cuesheet_box]
+    for i in range(len(boxes)):
+        if i == 2:
+            valid_chars.pop()
+        boxes[i].set_allowed_characters(valid_chars)
         # box.disable()
-
 
     # Horizontal ScrollBar
     thick_h = 30
     scrollbar_size = accurate_size - scr_size[0]
     scrollbar = UIHorizontalSlider(relative_rect=pygame.Rect(-3, scr_size[1] - thick_h + 2, 1605, thick_h),
-                                                start_value=0,
-                                                value_range=(0, scrollbar_size),
-                                                manager=manager)
-
+                                   start_value=0,
+                                   value_range=(0, scrollbar_size),
+                                   manager=manager)
 
     # what the player is currently editing
     currently_edited = None
     stopped_editing = False
     gui_button_mode = None
-    key_pressed = None #none of the arrow keys are pressed right now
+    key_pressed = None  # none of the arrow keys are pressed right now
     note_id = 0  # note that you get when you want to add one, first is circle
     fill_colour = (44, 52, 58)
     FPS = int(config['CONFIG']['FPS'])
@@ -457,18 +466,19 @@ def main():
         mousex, mousey = pygame.mouse.get_pos()
         mousex += scrollbar_value  # adjust for scrollbar
 
-
         if key_pressed:
             diff = 10 + scrollbar_add
             scrollbar_add += 1
             if key_pressed == 'right':
                 if scrollbar.get_current_value() + diff <= scrollbar_size:
-                    scrollbar.set_current_value(scrollbar.get_current_value() + diff)
+                    scrollbar.set_current_value(
+                        scrollbar.get_current_value() + diff)
                 else:
                     scrollbar.set_current_value(scrollbar_size)
             elif key_pressed == 'left':
                 if scrollbar.get_current_value() - diff >= 0:
-                    scrollbar.set_current_value(scrollbar.get_current_value() - diff)
+                    scrollbar.set_current_value(
+                        scrollbar.get_current_value() - diff)
                 else:
                     scrollbar.set_current_value(0)
 
@@ -488,10 +498,10 @@ def main():
                 (currently_edited.y * (karaoke.box_size + karaoke.border))
             if x > world.get_width():
                 pygame.draw.rect(world2, (0, 100, 255), (x - world.get_width() + karaoke.box_size / 2, y, karaoke.box_size + karaoke.border,
-                                karaoke.box_size + karaoke.border), 3)
+                                                         karaoke.box_size + karaoke.border), 3)
             else:
                 pygame.draw.rect(world, (0, 100, 255), (x, y, karaoke.box_size + karaoke.border,
-                                karaoke.box_size + karaoke.border), 3)
+                                                        karaoke.box_size + karaoke.border), 3)
 
         # Application events
         events = pygame.event.get()
@@ -525,26 +535,28 @@ def main():
                             karaoke.items[pos[0]][pos[1]] = None
 
             if event.type == pygame.KEYDOWN:
-                #scrollbar moving
+                # scrollbar moving
                 if event.key in [pygame.K_RIGHT, pygame.K_PAGEUP]:
                     key_pressed = 'right'
                     scrollbar_add = 0
                     if scrollbar.get_current_value() + 10 <= scrollbar_size:
-                        scrollbar.set_current_value(scrollbar.get_current_value() + 10)
+                        scrollbar.set_current_value(
+                            scrollbar.get_current_value() + 10)
                     else:
                         scrollbar.set_current_value(scrollbar_size)
-            
+
                 if event.key in [pygame.K_LEFT, pygame.K_PAGEDOWN]:
                     key_pressed = 'left'
                     scrollbar_add = 0
                     if scrollbar.get_current_value() - 10 >= 0:
-                        scrollbar.set_current_value(scrollbar.get_current_value() - 10)
+                        scrollbar.set_current_value(
+                            scrollbar.get_current_value() - 10)
                     else:
                         scrollbar.set_current_value(0)
 
                 if event.key == pygame.K_HOME:
                     scrollbar.set_current_value(1)
-                
+
                 if event.key == pygame.K_END:
                     scrollbar.set_current_value(scrollbar_size)
 
@@ -563,7 +575,7 @@ def main():
                             if karaoke.items[pos[0]][pos[1]] != None:
                                 if karaoke.items[pos[0]][pos[1]].id < 4:
                                     currently_edited = karaoke.items[pos[0]][pos[1]]
-                                    #for box in boxes:
+                                    # for box in boxes:
                                     #    box.enable()
                                 # set values
                                     update_text_boxes(
@@ -650,13 +662,14 @@ def main():
         trunc_world = (scr_size[0], scr_size[1] - thick_h + 5)
 
         if scrollbar_value + 1600 > world.get_width():
-            trunc_world2_orig = (scrollbar.get_current_value() - world.get_width(), 0)
+            trunc_world2_orig = (
+                scrollbar.get_current_value() - world.get_width(), 0)
             world1_end = world.get_width() - trunc_world_orig[0]
             if world1_end > 0:
                 screen.blit(world, (0, 0), (trunc_world_orig,
-                            (world1_end, trunc_world[1])))
+                                            (world1_end, trunc_world[1])))
                 screen.blit(world2, (world1_end, 0), ((0, 0),
-                            (trunc_world[0] - world1_end, trunc_world[1])))
+                                                      (trunc_world[0] - world1_end, trunc_world[1])))
             else:
                 screen.blit(world2, (0, 0), (trunc_world2_orig, trunc_world))
         else:

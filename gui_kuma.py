@@ -35,7 +35,7 @@ if not config.has_section("PATHS"):
 
 # initialize pygame stuff
 pygame.init()
-font = pygame.font.SysFont("Comic-Sans", 18)
+font = pygame.font.SysFont("FiraMono-Italic", 22)
 clock = pygame.time.Clock()
 pygame.display.set_caption('KUMA')
 
@@ -95,9 +95,9 @@ class Karaoke:
 
         for i in range(col_start, col_end):
             world.blit(sheet_bg, (x_coord + (33 * (i)), self.y + self.box_size / 2))
-            if i % 20 == 0:
-                current_time = self.format_time(i, surface2_offset)
-                time_text = font.render(current_time, 1, pygame.Color("black"))
+            if (i + surface2_offset) % 20 == 0:
+                current_time = self.format_time(i + surface2_offset)
+                time_text = font.render(current_time, 1, pygame.Color("grey"))
                 world.blit(time_text, (x_coord + (33 * (i)), 30))
                 world.blit(
                     line_bg, (x_coord + (one_box // 2) + (33 * (i)), self.y + self.box_size / 2))
@@ -109,9 +109,10 @@ class Karaoke:
                     world.blit(self.items[x + surface2_offset]
                                [y].resize(self.box_size), rect)
 
-    def format_time(self, i, surface2_offset):
+
+    def format_time(self, i):
         # display current time, 100 ms each square
-        seconds = (i + surface2_offset) // self.scale
+        seconds = i // self.scale
         minutes = seconds // 60
         if minutes:
             if seconds % 60 == 0:
@@ -420,6 +421,7 @@ def main():
     gui_button_mode = None
     key_pressed = None #none of the arrow keys are pressed right now
     note_id = 0  # note that you get when you want to add one, first is circle
+    fill_colour = (44, 52, 58)
     FPS = int(config['CONFIG']['FPS'])
     # -------------------------------------------------------------------------
     # Main loop
@@ -433,21 +435,21 @@ def main():
         if scrollbar_value + 1600 > world.get_width():
             world1_end = world.get_width() - scrollbar_value
             if world1_end > 0:
-                world.fill((169, 149, 154), rect=pygame.Rect(
+                world.fill((fill_colour), rect=pygame.Rect(
                     scrollbar_value, 0, world1_end, 480))  # clean the screen
-                world2.fill((169, 149, 154), rect=pygame.Rect(
+                world2.fill((fill_colour), rect=pygame.Rect(
                     scrollbar_value - world.get_width(), 0, 1600, 480))  # clean the screen
                 karaoke.draw(world, 1, scrollbar_value,
                              scr_size[0], sheet_bg, line_bg)
                 karaoke.draw(world2, 2, scrollbar_value,
                              scr_size[0], sheet_bg, line_bg)
             else:
-                world2.fill((169, 149, 154), rect=pygame.Rect(
+                world2.fill((fill_colour), rect=pygame.Rect(
                     scrollbar_value - world.get_width(), 0, 1600, 480))  # clean the screen
                 karaoke.draw(world2, 2, scrollbar_value,
                              scr_size[0], sheet_bg, line_bg)
         else:
-            world.fill((169, 149, 154), rect=pygame.Rect(
+            world.fill((fill_colour), rect=pygame.Rect(
                 scrollbar_value, 0, 1600, 480))  # clean the screen
             karaoke.draw(world, 1, scrollbar_value,
                          scr_size[0], sheet_bg, line_bg)
@@ -484,8 +486,12 @@ def main():
                 (currently_edited.x * (karaoke.box_size + karaoke.border))
             y = 2 + karaoke.y + \
                 (currently_edited.y * (karaoke.box_size + karaoke.border))
-            pygame.draw.rect(world, (0, 100, 255), (x, y, karaoke.box_size + karaoke.border,
-                             karaoke.box_size + karaoke.border), 3)
+            if x > world.get_width():
+                pygame.draw.rect(world2, (0, 100, 255), (x - world.get_width() + karaoke.box_size / 2, y, karaoke.box_size + karaoke.border,
+                                karaoke.box_size + karaoke.border), 3)
+            else:
+                pygame.draw.rect(world, (0, 100, 255), (x, y, karaoke.box_size + karaoke.border,
+                                karaoke.box_size + karaoke.border), 3)
 
         # Application events
         events = pygame.event.get()

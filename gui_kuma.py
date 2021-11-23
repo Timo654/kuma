@@ -1,12 +1,10 @@
 # based on https://github.com/TheBigKahuna353/Inventory_system and https://github.com/ppizarror/pygame-menu/blob/master/pygame_menu/examples/other/scrollbar.py
 import pygame
-import pygame_menu
 import pygame_gui
 import json
 from pathlib import Path
 from pygame_gui.windows.ui_file_dialog import UIFileDialog, UIConfirmationDialog
-from pygame_gui.elements import UIDropDownMenu, UILabel, UIButton, UITextEntryLine
-from pygame_menu.widgets import ScrollBar
+from pygame_gui.elements import UIDropDownMenu, UILabel, UIButton, UITextEntryLine, UIHorizontalSlider
 import kbd_reader as kbd
 from math import ceil, floor
 import configparser
@@ -404,26 +402,21 @@ def main():
         box.set_allowed_characters(valid_chars)
         # box.disable()
 
-    # Horizontal ScrollBar
-    thick_h = 20
-    sb_h = ScrollBar(
-        length=scr_size[0],
-        values_range=(50, accurate_size - scr_size[0]),
-        slider_pad=2,
-        page_ctrl_thick=thick_h
-    )
 
-    sb_h.set_shadow(
-        color=(0, 0, 0),
-        position=pygame_menu.locals.POSITION_SOUTHEAST
-    )
-    sb_h.set_position(0, scr_size[1] - thick_h)
-    sb_h.set_page_step(scr_size[0])
+    # Horizontal ScrollBar
+    thick_h = 30
+    scrollbar_size = accurate_size - scr_size[0]
+    scrollbar = UIHorizontalSlider(relative_rect=pygame.Rect(-3, scr_size[1] - thick_h + 2, 1605, thick_h),
+                                                start_value=0,
+                                                value_range=(0, scrollbar_size),
+                                                manager=manager)
+
 
     # what the player is currently editing
     currently_edited = None
     stopped_editing = False
     gui_button_mode = None
+    key_pressed = None #none of the arrow keys are pressed right now
     note_id = 0  # note that you get when you want to add one, first is circle
     FPS = int(config['CONFIG']['FPS'])
     # -------------------------------------------------------------------------
@@ -432,7 +425,7 @@ def main():
     while True:
         # Clock tick
         time_delta = clock.tick(FPS) / 1000
-        scrollbar_value = sb_h.get_value()
+        scrollbar_value = scrollbar.get_current_value()
 
         # draw the screen
         if scrollbar_value + 1600 > world.get_width():
@@ -460,6 +453,21 @@ def main():
         mousex, mousey = pygame.mouse.get_pos()
         mousex += scrollbar_value  # adjust for scrollbar
 
+
+        if key_pressed:
+            diff = 10 + scrollbar_add
+            scrollbar_add += 1
+            if key_pressed == 'right':
+                if scrollbar.get_current_value() + diff <= scrollbar_size:
+                    scrollbar.set_current_value(scrollbar.get_current_value() + diff)
+                else:
+                    scrollbar.set_current_value(scrollbar_size)
+            elif key_pressed == 'left':
+                if scrollbar.get_current_value() - diff >= 0:
+                    scrollbar.set_current_value(scrollbar.get_current_value() - diff)
+                else:
+                    scrollbar.set_current_value(0)
+
         # if holding something, draw it next to mouse
         if selected:
             if mousex > world.get_width():
@@ -485,12 +493,6 @@ def main():
                     config.write(configfile)
                 exit()
 
-            if event.type == pygame.KEYDOWN and event.key == pygame.K_h:
-                sb_h.set_value(100)
-
-            sb_h.update([event])
-            sb_h.draw(screen)
-
             if event.type == pygame.MOUSEBUTTONDOWN:
                 # if right clicked, get a note
                 if event.button == 3:  # right click
@@ -515,6 +517,29 @@ def main():
                             karaoke.items[pos[0]][pos[1]] = None
 
             if event.type == pygame.KEYDOWN:
+                #scrollbar moving
+                if event.key in [pygame.K_RIGHT, pygame.K_PAGEUP]:
+                    key_pressed = 'right'
+                    scrollbar_add = 0
+                    if scrollbar.get_current_value() + 10 <= scrollbar_size:
+                        scrollbar.set_current_value(scrollbar.get_current_value() + 10)
+                    else:
+                        scrollbar.set_current_value(scrollbar_size)
+            
+                if event.key in [pygame.K_LEFT, pygame.K_PAGEDOWN]:
+                    key_pressed = 'left'
+                    scrollbar_add = 0
+                    if scrollbar.get_current_value() - 10 >= 0:
+                        scrollbar.set_current_value(scrollbar.get_current_value() - 10)
+                    else:
+                        scrollbar.set_current_value(0)
+
+                if event.key == pygame.K_HOME:
+                    scrollbar.set_current_value(1)
+                
+                if event.key == pygame.K_END:
+                    scrollbar.set_current_value(scrollbar_size)
+
                 if event.key == pygame.K_DELETE:
                     selected = None  # deletes selected note
                 if event.key == pygame.K_LCTRL:
@@ -558,6 +583,10 @@ def main():
                             # for box in boxes:
                             # box.disable()  # disable text boxes
                             stopped_editing = False  # reset value
+
+            if event.type == pygame.KEYUP:
+                if event.key in [pygame.K_RIGHT, pygame.K_LEFT, pygame.K_PAGEDOWN, pygame.K_PAGEUP]:
+                    key_pressed = None
 
             if event.type == pygame.USEREVENT:
                 if event.user_type == pygame_gui.UI_DROP_DOWN_MENU_CHANGED:
@@ -610,10 +639,10 @@ def main():
             manager.process_events(event)
 
         trunc_world_orig = (scrollbar_value, 0)
-        trunc_world = (scr_size[0], scr_size[1] - thick_h)
+        trunc_world = (scr_size[0], scr_size[1] - thick_h + 5)
 
         if scrollbar_value + 1600 > world.get_width():
-            trunc_world2_orig = (sb_h.get_value() - world.get_width(), 0)
+            trunc_world2_orig = (scrollbar.get_current_value() - world.get_width(), 0)
             world1_end = world.get_width() - trunc_world_orig[0]
             if world1_end > 0:
                 screen.blit(world, (0, 0), (trunc_world_orig,

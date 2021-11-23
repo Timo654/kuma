@@ -6,7 +6,7 @@ KBD moodulit:
 KPM moodulit:
 `import kpm_reader as kpm`
 
-Vaja on PyBinaryReader'it, pygame'i ja pygame-menu'd, saab installida kasutades `pip install binary-reader`, `pip install pygame` ja `pip install pygame-menu`.
+Vaja on PyBinaryReader'it, pygame'i ja pygame-gui'd, saab installida kasutades `pip install binary-reader`, `pip install pygame` ja `pip install pygame-gui`.
 
 
 1 ruut on 100 ms.
@@ -18,6 +18,8 @@ Parema klõpsuga saab muuta käesolevat nooti. Noote saab üles korjata vasaku k
 "Delete" kustutab käesoleva noodi.
 
 "E" vajutades saab muuta noodi parameetreid.
+
+Nooltega saab liigutada scrollbari.
 
 ## TODO list
 * Edasi arendada kaste parameetrite muutmiseks (täpsem aeg, nupu tüüp, cue ID jne)

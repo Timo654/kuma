@@ -295,7 +295,7 @@ def save_before_closing(note, boxes, dropdown, karaoke):
         karaoke.items[note.x][note.y] = None
         note.x = karaoke.pos_convert(note.start_pos)
         karaoke.items[note.x][note.y] = note
-    if len(boxes[1].get_text()) > 0:
+    if len(boxes[1].get_text()) > 0: #TODO - end position changing visually
         note.end_pos = ms_to_game(float(boxes[1].get_text()))
     if len(boxes[2].get_text()) > 0:
         if int(boxes[2].get_text()) < karaoke.rows:
@@ -531,8 +531,9 @@ def main():
                             selected.y = pos[1]
                             selected = karaoke.Add(selected)
                         elif karaoke.items[pos[0]][pos[1]]:
-                            selected = karaoke.items[pos[0]][pos[1]]
-                            karaoke.items[pos[0]][pos[1]] = None
+                            if karaoke.items[pos[0]][pos[1]] != currently_edited:
+                                selected = karaoke.items[pos[0]][pos[1]]
+                                karaoke.items[pos[0]][pos[1]] = None
 
             if event.type == pygame.KEYDOWN:
                 # scrollbar moving
@@ -558,6 +559,7 @@ def main():
                     scrollbar.set_current_value(1)
 
                 if event.key == pygame.K_END:
+                    #TODO - go to last note
                     scrollbar.set_current_value(scrollbar_size)
 
                 if event.key == pygame.K_DELETE:
@@ -655,7 +657,7 @@ def main():
                         currently_edited = None
                     if gui_button_mode == 'Undo':
                         gui_button_mode = None
-                        update_text_boxes(currently_edited, boxes)
+                        update_text_boxes(currently_edited, boxes, note_picker)
             manager.process_events(event)
 
         trunc_world_orig = (scrollbar_value, 0)

@@ -22,7 +22,10 @@ Parema klõpsuga saab muuta käesolevat nooti. Noote saab üles korjata vasaku k
 Nooltega saab liigutada scrollbari.
 
 ## TODO list
-* Muusika mängimine?
+* Muusika mängimine - Play/Pause nupp, liigutab scrollbari, kast laulu ajaga
+* Help nupp
+* Surface suurust vähendada (lõpus olevad nupud lähevad algusesse)
+* Muuta "End", et ta läheks viimase noodi juurde
 * Kasutada kpm moodulit, et sealt lugeda cutscene start time 
 
 ## Viited

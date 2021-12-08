@@ -5,7 +5,7 @@ import json
 from pathlib import Path
 from pygame_gui.windows.ui_file_dialog import UIFileDialog, UIConfirmationDialog
 from pygame_gui.elements import UIDropDownMenu, UILabel, UIButton, UITextEntryLine, UIHorizontalSlider
-import kbd_reader as kbd
+import modules.kbd_reader as kbd
 from math import ceil, floor
 import configparser
 
@@ -65,7 +65,7 @@ class Item:
 class Karaoke:
     def __init__(self):
         self.rows = 8
-        self.col = 3970
+        self.col = 3966
         self.items = [[None for _ in range(self.rows)]
                       for _ in range(self.col)]
         self.box_size = 30
@@ -254,7 +254,7 @@ def write_kbd(file, karaoke):
                     if current_note.end_pos > 0:
                         note['End position'] = current_note.end_pos
                     else:
-                        if karaoke.items[x+1][y] != None:
+                        if karaoke.items[x+1][y] != None: #TODO - fix crash when editing very last note
                             if karaoke.items[x+1][y].id > 3:
                                 o = x + 1
                                 note['Note type'] = karaoke.items[o][y].note_type
@@ -332,7 +332,7 @@ def main():
     scr_size = (1600, 480)
     screen = pygame.display.set_mode((scr_size))
     karaoke = Karaoke()
-    accurate_size = (karaoke.col + 4) * (karaoke.box_size + karaoke.border)
+    accurate_size = (4 + karaoke.col) * (karaoke.box_size + karaoke.border) #TODO - check this
     world = pygame.Surface(
         (int(accurate_size / 2), int(scr_size[1])), pygame.SRCALPHA, 32)
     world2 = pygame.Surface(
@@ -350,7 +350,7 @@ def main():
                             manager=manager)
     undo_button = UIButton(relative_rect=pygame.Rect((315, 395), (200, 50)),
                            text='Undo note changes',
-                           manager=manager)
+                           manager=manager) #TODO - fix crash when no active note
     button_picker = UIDropDownMenu(options_list=controllers,
                                    starting_option=current_controller,
                                    relative_rect=pygame.Rect(10, 390, 200, 30),

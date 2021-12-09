@@ -148,7 +148,6 @@ class Karaoke:
 
     # check whether the mouse in in the grid
     def In_grid(self, x, y):
-        print(x, y)
         if (x < 0) or (y < 0) or (x >= self.col) or (y >= self.rows):
             return False
         return True
@@ -298,8 +297,9 @@ def save_before_closing(note, boxes, dropdown, karaoke):
             karaoke.items[note.x][note.y] = None
             note.x = karaoke.pos_convert(note.start_pos)
             karaoke.items[note.x][note.y] = note
-    if len(boxes[1].get_text()) > 0: #TODO - end position changing visually
+    if len(boxes[1].get_text()) > 0:  # TODO - end position changing visually
         note.end_pos = ms_to_game(float(boxes[1].get_text()))
+
     if len(boxes[2].get_text()) > 0:
         if int(boxes[2].get_text()) < karaoke.rows:
             karaoke.items[note.x][note.y] = None
@@ -335,7 +335,8 @@ def main():
     scr_size = (1600, 480)
     screen = pygame.display.set_mode((scr_size))
     karaoke = Karaoke()
-    accurate_size = (4 + karaoke.col) * (karaoke.box_size + karaoke.border) #FIXME - some notes overflow to the start, minor visual issue.
+    # FIXME - some notes overflow to the start, minor visual issue.
+    accurate_size = (4 + karaoke.col) * (karaoke.box_size + karaoke.border)
     world = pygame.Surface(
         (int(accurate_size / 2), int(scr_size[1])), pygame.SRCALPHA, 32)
     world2 = pygame.Surface(
@@ -397,12 +398,12 @@ def main():
                                  starting_option=assets['Button prompts'][current_controller][1][0],
                                  relative_rect=pygame.Rect(1090, 365, 150, 30),
                                  manager=manager, object_id='#note_picker')
-    # note_picker.disable()
+
     # what the player is holding
     selected = None
     load_item_tex(current_controller, karaoke,
                   selected, note_picker)  # load button textures
-
+    note_picker.disable()
     # load sheet textures and scale them
     sheet_tex = texture_path + '\\' + assets['Sheet texture']
     line_tex = texture_path + '\\' + assets['Line texture']
@@ -418,7 +419,7 @@ def main():
         if i == 2:
             valid_chars.pop()
         boxes[i].set_allowed_characters(valid_chars)
-        # box.disable()
+        boxes[i].disable()
 
     # Horizontal ScrollBar
     thick_h = 30
@@ -562,7 +563,6 @@ def main():
                 if event.key == pygame.K_HOME:
                     scrollbar.set_current_value(1)
 
-            
                 if event.key == pygame.K_END:
                     exit_loop = False
                     if len(karaoke.items) > 0:
@@ -573,7 +573,8 @@ def main():
                                     break
                             if exit_loop:
                                 break
-                        note_loc = i * (karaoke.box_size + karaoke.border) + karaoke.x
+                        note_loc = i * (karaoke.box_size +
+                                        karaoke.border) + karaoke.x
                         scrollbar.set_current_value(note_loc)
 
                 if event.key == pygame.K_DELETE:
@@ -587,13 +588,14 @@ def main():
                 if event.key == pygame.K_e:  # property editing mode
                     pos = karaoke.Get_pos(scrollbar_value)
                     if not currently_edited:
-                        undo_button.enable()
                         if karaoke.In_grid(pos[0], pos[1]):
                             if karaoke.items[pos[0]][pos[1]] != None:
                                 if karaoke.items[pos[0]][pos[1]].id < 4:
                                     currently_edited = karaoke.items[pos[0]][pos[1]]
-                                    # for box in boxes:
-                                    #    box.enable()
+                                    undo_button.enable()
+                                    note_picker.enable()
+                                    for box in boxes:
+                                        box.enable()
                                 # set values
                                     update_text_boxes(
                                         currently_edited, boxes, note_picker)
@@ -617,10 +619,11 @@ def main():
                             save_before_closing(
                                 currently_edited, boxes, note_picker, karaoke)
                             currently_edited = None  # deselect
-                            # for box in boxes:
-                            # box.disable()  # disable text boxes
+                            for box in boxes:
+                                box.disable()  # disable text boxes
                             stopped_editing = False  # reset value
                             undo_button.disable()
+                            note_picker.disable()
 
             if event.type == pygame.KEYUP:
                 if event.key in [pygame.K_RIGHT, pygame.K_LEFT, pygame.K_PAGEDOWN, pygame.K_PAGEUP]:

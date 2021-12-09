@@ -60,7 +60,7 @@ class Item:
         return pygame.transform.scale(self.surface, (size, size))
     
     def note_type_to_int(self):
-        note_list = ['Regular', 'Hold', 'Rapid']
+        note_list = ['Regular', 'Hold', 'Rapid', 'End']
         return note_list.index(self.note_type)
 
 # the karaoke system
@@ -157,7 +157,7 @@ class Karaoke:
         return True
 
 def int_to_note_type(i):
-        note_list = ['Regular', 'Hold', 'Rapid']
+        note_list = ['Regular', 'Hold', 'Rapid', 'End']
         return note_list[i]
 
 # https://python-forum.io/thread-403.html
@@ -285,17 +285,17 @@ def update_fps():  # fps counter from https://pythonprogramming.altervista.org/p
     return fps
 
 
-def update_text_boxes(note, boxes, note_picker, note_type):
+def update_text_boxes(note, boxes, dropdowns):
     # set values
     boxes[0].set_text(str(game_to_ms(note.start_pos)))
     boxes[1].set_text(str(game_to_ms(note.end_pos)))
     boxes[2].set_text(str(note.y))
     boxes[3].set_text(str(note.cue_id))
     boxes[4].set_text(str(note.cuesheet_id))
-    update_dropdown(note_picker, mode='update selection', index=note.id)
-    update_dropdown(note_type, mode='update selection', index=note.note_type_to_int())
+    update_dropdown(dropdowns[0], mode='update selection', index=note.id)
+    update_dropdown(dropdowns[1], mode='update selection', index=note.note_type_to_int())
 
-def save_before_closing(note, boxes, note_picker, note_type, karaoke):
+def save_before_closing(note, boxes, dropdowns, karaoke):
     # TODO - clean
     if len(boxes[0].get_text()) > 0:
         new_pos = ms_to_game(float(boxes[0].get_text()))
@@ -316,8 +316,8 @@ def save_before_closing(note, boxes, note_picker, note_type, karaoke):
         note.cue_id = int(boxes[3].get_text())
     if len(boxes[4].get_text()) > 0:
         note.cuesheet_id = int(boxes[4].get_text())
-    note.id = note_picker.options_list.index(note_picker.selected_option)
-    note.note_type = note_type.selected_option
+    note.id = dropdowns[0].options_list.index(dropdowns[0].selected_option)
+    note.note_type = dropdowns[1].selected_option
     note.surface = items[note.id]
 
 
@@ -363,7 +363,7 @@ def main():
     undo_button = UIButton(relative_rect=pygame.Rect((315, 395), (200, 50)),
                            text='Undo note changes',
                            manager=manager)
-    undo_button.disable()
+    undo_button.hide()
     button_picker = UIDropDownMenu(options_list=controllers,
                                    starting_option=current_controller,
                                    relative_rect=pygame.Rect(10, 390, 200, 30),
@@ -410,7 +410,7 @@ def main():
                                  starting_option=assets['Button prompts'][current_controller][1][0],
                                  relative_rect=pygame.Rect(1090, 365, 150, 30),
                                  manager=manager, object_id='#note_picker')
-    note_types = ['Regular', 'Hold', 'Rapid']
+    note_types = ['Regular', 'Hold', 'Rapid', 'End']
     note_type_picker = UIDropDownMenu(options_list=note_types,
                                  starting_option=note_types[0],
                                  relative_rect=pygame.Rect(1245, 365, 150, 30),
@@ -420,8 +420,9 @@ def main():
     selected = None
     load_item_tex(current_controller, karaoke,
                   selected, note_picker)  # load button textures
-    note_picker.disable()
-    note_type_picker.disable()
+    dropdowns = [note_picker, note_type_picker]
+    for dropdown in dropdowns: #TODO update code to use dropdowns
+        dropdown.hide()
     # load sheet textures and scale them
     sheet_tex = texture_path + '\\' + assets['Sheet texture']
     line_tex = texture_path + '\\' + assets['Line texture']
@@ -433,11 +434,16 @@ def main():
         sheet_bg, (karaoke.box_size + karaoke.border, (karaoke.box_size + karaoke.border) * karaoke.rows))
 
     boxes = [start_box, end_box, vert_box, cue_box, cuesheet_box]
+    box_labels = [start_label, end_label, vert_label, cue_label, cuesheet_label, note_button_label, note_type_label]
+
     for i in range(len(boxes)):
         if i == 2:
             valid_chars.pop()
         boxes[i].set_allowed_characters(valid_chars)
-        boxes[i].disable()
+        boxes[i].hide()
+
+    for label in box_labels:
+        label.hide()
 
     # Horizontal ScrollBar
     thick_h = 30
@@ -610,24 +616,26 @@ def main():
                             if karaoke.items[pos[0]][pos[1]] != None:
                                 if karaoke.items[pos[0]][pos[1]].id < 4:
                                     currently_edited = karaoke.items[pos[0]][pos[1]]
-                                    undo_button.enable()
-                                    note_picker.enable()
-                                    note_type_picker.enable()
+                                    for dropdown in dropdowns:
+                                        dropdown.show()
+                                    undo_button.show()
+                                    for label in box_labels:
+                                        label.show()
                                     for box in boxes:
-                                        box.enable()
+                                        box.show()
                                 # set values
                                     update_text_boxes(
-                                        currently_edited, boxes, note_picker, note_type_picker) #TODO - cleanup all the generic stuff
+                                        currently_edited, boxes, dropdowns) #TODO - cleanup all the generic stuff
 
                     else:
                         if karaoke.In_grid(pos[0], pos[1]):
                             if karaoke.items[pos[0]][pos[1]] != currently_edited and karaoke.items[pos[0]][pos[1]] != None:
                                 if karaoke.items[pos[0]][pos[1]].id < 4:
                                     save_before_closing(
-                                        currently_edited, boxes, note_picker, note_type_picker, karaoke)
+                                        currently_edited, boxes, dropdowns, karaoke)
                                     currently_edited = karaoke.items[pos[0]][pos[1]]
                                     update_text_boxes(
-                                        currently_edited, boxes, note_picker, note_type_picker)
+                                        currently_edited, boxes, dropdowns)
                                 else:
                                     stopped_editing = True
                             else:
@@ -636,14 +644,16 @@ def main():
                             stopped_editing = True
                         if stopped_editing:
                             save_before_closing(
-                                currently_edited, boxes, note_picker, note_type_picker, karaoke)
+                                currently_edited, boxes, dropdowns, karaoke)
                             currently_edited = None  # deselect
-                            for box in boxes:
-                                box.disable()  # disable text boxes
                             stopped_editing = False  # reset value
-                            undo_button.disable()
-                            note_picker.disable()
-                            note_type_picker.disable()
+                            for box in boxes:
+                                box.hide()  # disable text boxes
+                            for label in box_labels:
+                                label.hide()
+                            for dropdown in dropdowns:
+                                dropdown.hide()
+                            undo_button.hide()
 
             if event.type == pygame.KEYUP:
                 if event.key in [pygame.K_RIGHT, pygame.K_LEFT, pygame.K_PAGEDOWN, pygame.K_PAGEUP]:
@@ -696,7 +706,7 @@ def main():
                         currently_edited = None
                     if gui_button_mode == 'Undo':
                         gui_button_mode = None
-                        update_text_boxes(currently_edited, boxes, note_picker)
+                        update_text_boxes(currently_edited, boxes, note_picker, note_type_picker)
             manager.process_events(event)
 
         trunc_world_orig = (scrollbar_value, 0)

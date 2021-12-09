@@ -58,6 +58,10 @@ class Item:
 
     def resize(self, size):
         return pygame.transform.scale(self.surface, (size, size))
+    
+    def note_type_to_int(self):
+        note_list = ['Regular', 'Hold', 'Rapid']
+        return note_list.index(self.note_type)
 
 # the karaoke system
 
@@ -152,6 +156,9 @@ class Karaoke:
             return False
         return True
 
+def int_to_note_type(i):
+        note_list = ['Regular', 'Hold', 'Rapid']
+        return note_list[i]
 
 # https://python-forum.io/thread-403.html
 def strip_from_sheet(sheet, start, size, columns, rows):
@@ -278,17 +285,17 @@ def update_fps():  # fps counter from https://pythonprogramming.altervista.org/p
     return fps
 
 
-def update_text_boxes(note, boxes, dropdown):
+def update_text_boxes(note, boxes, note_picker, note_type):
     # set values
     boxes[0].set_text(str(game_to_ms(note.start_pos)))
     boxes[1].set_text(str(game_to_ms(note.end_pos)))
     boxes[2].set_text(str(note.y))
     boxes[3].set_text(str(note.cue_id))
     boxes[4].set_text(str(note.cuesheet_id))
-    update_dropdown(dropdown, mode='update selection', index=note.id)
+    update_dropdown(note_picker, mode='update selection', index=note.id)
+    update_dropdown(note_type, mode='update selection', index=note.note_type_to_int())
 
-
-def save_before_closing(note, boxes, dropdown, karaoke):
+def save_before_closing(note, boxes, note_picker, note_type, karaoke):
     # TODO - clean
     if len(boxes[0].get_text()) > 0:
         new_pos = ms_to_game(float(boxes[0].get_text()))
@@ -309,7 +316,8 @@ def save_before_closing(note, boxes, dropdown, karaoke):
         note.cue_id = int(boxes[3].get_text())
     if len(boxes[4].get_text()) > 0:
         note.cuesheet_id = int(boxes[4].get_text())
-    note.id = dropdown.options_list.index(dropdown.selected_option)
+    note.id = note_picker.options_list.index(note_picker.selected_option)
+    note.note_type = note_type.selected_option
     note.surface = items[note.id]
 
 
@@ -379,6 +387,10 @@ def main():
     note_button_label = UILabel(pygame.Rect((1090, 340), (150, 22)),
                                 "Note button",
                                 manager=manager)
+    note_type_label = UILabel(pygame.Rect((1245, 340), (150, 22)),
+                                "Note type",
+                                manager=manager)
+
     fps_label = UILabel(pygame.Rect((0, 0), (30, 30)),
                         "0",
                         manager=manager)
@@ -398,12 +410,18 @@ def main():
                                  starting_option=assets['Button prompts'][current_controller][1][0],
                                  relative_rect=pygame.Rect(1090, 365, 150, 30),
                                  manager=manager, object_id='#note_picker')
+    note_types = ['Regular', 'Hold', 'Rapid']
+    note_type_picker = UIDropDownMenu(options_list=note_types,
+                                 starting_option=note_types[0],
+                                 relative_rect=pygame.Rect(1245, 365, 150, 30),
+                                 manager=manager, object_id='#type_picker')
 
     # what the player is holding
     selected = None
     load_item_tex(current_controller, karaoke,
                   selected, note_picker)  # load button textures
     note_picker.disable()
+    note_type_picker.disable()
     # load sheet textures and scale them
     sheet_tex = texture_path + '\\' + assets['Sheet texture']
     line_tex = texture_path + '\\' + assets['Line texture']
@@ -594,21 +612,22 @@ def main():
                                     currently_edited = karaoke.items[pos[0]][pos[1]]
                                     undo_button.enable()
                                     note_picker.enable()
+                                    note_type_picker.enable()
                                     for box in boxes:
                                         box.enable()
                                 # set values
                                     update_text_boxes(
-                                        currently_edited, boxes, note_picker)
+                                        currently_edited, boxes, note_picker, note_type_picker) #TODO - cleanup all the generic stuff
 
                     else:
                         if karaoke.In_grid(pos[0], pos[1]):
                             if karaoke.items[pos[0]][pos[1]] != currently_edited and karaoke.items[pos[0]][pos[1]] != None:
                                 if karaoke.items[pos[0]][pos[1]].id < 4:
                                     save_before_closing(
-                                        currently_edited, boxes, note_picker, karaoke)
+                                        currently_edited, boxes, note_picker, note_type_picker, karaoke)
                                     currently_edited = karaoke.items[pos[0]][pos[1]]
                                     update_text_boxes(
-                                        currently_edited, boxes, note_picker)
+                                        currently_edited, boxes, note_picker, note_type_picker)
                                 else:
                                     stopped_editing = True
                             else:
@@ -617,13 +636,14 @@ def main():
                             stopped_editing = True
                         if stopped_editing:
                             save_before_closing(
-                                currently_edited, boxes, note_picker, karaoke)
+                                currently_edited, boxes, note_picker, note_type_picker, karaoke)
                             currently_edited = None  # deselect
                             for box in boxes:
                                 box.disable()  # disable text boxes
                             stopped_editing = False  # reset value
                             undo_button.disable()
                             note_picker.disable()
+                            note_type_picker.disable()
 
             if event.type == pygame.KEYUP:
                 if event.key in [pygame.K_RIGHT, pygame.K_LEFT, pygame.K_PAGEDOWN, pygame.K_PAGEUP]:

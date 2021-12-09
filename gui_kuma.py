@@ -58,7 +58,7 @@ class Item:
 
     def resize(self, size):
         return pygame.transform.scale(self.surface, (size, size))
-    
+
     def note_type_to_int(self):
         note_list = ['Regular', 'Hold', 'Rapid', 'End']
         return note_list.index(self.note_type)
@@ -150,17 +150,23 @@ class Karaoke:
     def Add(self, Item):
         self.items[Item.x][Item.y] = Item
 
+    def Remove(self, x, y):
+        self.items[x][y] = None
+
     # check whether the mouse in in the grid
     def In_grid(self, x, y):
         if (x < 0) or (y < 0) or (x >= self.col) or (y >= self.rows):
             return False
         return True
 
+
 def int_to_note_type(i):
-        note_list = ['Regular', 'Hold', 'Rapid', 'End']
-        return note_list[i]
+    note_list = ['Regular', 'Hold', 'Rapid', 'End']
+    return note_list[i]
 
 # https://python-forum.io/thread-403.html
+
+
 def strip_from_sheet(sheet, start, size, columns, rows):
     frames = []
     for j in range(rows):
@@ -293,7 +299,9 @@ def update_text_boxes(note, boxes, dropdowns):
     boxes[3].set_text(str(note.cue_id))
     boxes[4].set_text(str(note.cuesheet_id))
     update_dropdown(dropdowns[0], mode='update selection', index=note.id)
-    update_dropdown(dropdowns[1], mode='update selection', index=note.note_type_to_int())
+    update_dropdown(dropdowns[1], mode='update selection',
+                    index=note.note_type_to_int())
+
 
 def save_before_closing(note, boxes, dropdowns, karaoke):
     # TODO - clean
@@ -304,9 +312,6 @@ def save_before_closing(note, boxes, dropdowns, karaoke):
             karaoke.items[note.x][note.y] = None
             note.x = karaoke.pos_convert(note.start_pos)
             karaoke.items[note.x][note.y] = note
-    if len(boxes[1].get_text()) > 0:  # TODO - end position changing visually
-        note.end_pos = ms_to_game(float(boxes[1].get_text()))
-
     if len(boxes[2].get_text()) > 0:
         if int(boxes[2].get_text()) < karaoke.rows:
             karaoke.items[note.x][note.y] = None
@@ -319,6 +324,37 @@ def save_before_closing(note, boxes, dropdowns, karaoke):
     note.id = dropdowns[0].options_list.index(dropdowns[0].selected_option)
     note.note_type = dropdowns[1].selected_option
     note.surface = items[note.id]
+
+    if len(boxes[1].get_text()) > 0:
+        if note.note_type != 'Regular':
+            end_pos = ms_to_game(float(boxes[1].get_text()))
+            if end_pos < note.end_pos:
+                old_end_pos = karaoke.pos_convert(note.end_pos)
+                new_end_pos = karaoke.pos_convert(end_pos)
+                start_pos = karaoke.pos_convert(note.start_pos)
+                for i in range(old_end_pos + 1, new_end_pos, -1):
+                    if i == start_pos:
+                        break
+                    karaoke.Remove(i, note.y)
+
+            if end_pos > note.start_pos:
+                note.end_pos = end_pos
+                start_pos = karaoke.pos_convert(note.start_pos)
+                end_pos = karaoke.pos_convert(note.end_pos)
+                if note.note_type == 'Hold':
+                    note_id = 4
+                else:
+                    note_id = 5
+                progress_value = 0
+                for i in range(start_pos + 1, end_pos):
+                    progress_value += 300
+                    karaoke.Add(Item(i, note.y, note_id,
+                                     note.note_type, note.start_pos + progress_value))
+
+                karaoke.Add(
+                    Item(end_pos, note.y, note.id, 'End', note.end_pos))
+            else:
+                note.end_pos = 0
 
 
 # new_list is a list and option is list index
@@ -334,6 +370,16 @@ def update_dropdown(dropdown, mode, new_list=list(), index=0):
         dropdown.menu_states['closed'].finish()
         dropdown.menu_states['closed'].start()
     dropdown.rebuild()
+
+
+def stop_editing(boxes, box_labels, dropdowns, undo_button):
+    for box in boxes:
+        box.hide()  # disable text boxes
+        for label in box_labels:
+            label.hide()
+        for dropdown in dropdowns:
+            dropdown.hide()
+        undo_button.hide()
 
 
 def main():
@@ -388,8 +434,8 @@ def main():
                                 "Note button",
                                 manager=manager)
     note_type_label = UILabel(pygame.Rect((1245, 340), (150, 22)),
-                                "Note type",
-                                manager=manager)
+                              "Note type",
+                              manager=manager)
 
     fps_label = UILabel(pygame.Rect((0, 0), (30, 30)),
                         "0",
@@ -412,16 +458,17 @@ def main():
                                  manager=manager, object_id='#note_picker')
     note_types = ['Regular', 'Hold', 'Rapid', 'End']
     note_type_picker = UIDropDownMenu(options_list=note_types,
-                                 starting_option=note_types[0],
-                                 relative_rect=pygame.Rect(1245, 365, 150, 30),
-                                 manager=manager, object_id='#type_picker')
+                                      starting_option=note_types[0],
+                                      relative_rect=pygame.Rect(
+                                          1245, 365, 150, 30),
+                                      manager=manager, object_id='#type_picker')
 
     # what the player is holding
     selected = None
     load_item_tex(current_controller, karaoke,
                   selected, note_picker)  # load button textures
     dropdowns = [note_picker, note_type_picker]
-    for dropdown in dropdowns: #TODO update code to use dropdowns
+    for dropdown in dropdowns:
         dropdown.hide()
     # load sheet textures and scale them
     sheet_tex = texture_path + '\\' + assets['Sheet texture']
@@ -434,7 +481,8 @@ def main():
         sheet_bg, (karaoke.box_size + karaoke.border, (karaoke.box_size + karaoke.border) * karaoke.rows))
 
     boxes = [start_box, end_box, vert_box, cue_box, cuesheet_box]
-    box_labels = [start_label, end_label, vert_label, cue_label, cuesheet_label, note_button_label, note_type_label]
+    box_labels = [start_label, end_label, vert_label, cue_label,
+                  cuesheet_label, note_button_label, note_type_label]
 
     for i in range(len(boxes)):
         if i == 2:
@@ -602,6 +650,11 @@ def main():
                         scrollbar.set_current_value(note_loc)
 
                 if event.key == pygame.K_DELETE:
+                    if currently_edited:
+                        gui_button_mode = 'Reset'
+                        delete_note = UIConfirmationDialog(
+                            rect=pygame.Rect(0, 0, 300, 300), manager=manager, action_long_desc='Are you sure you want to remove this note? This change cannot be undone.', window_title='Delete note')
+
                     selected = None  # deletes selected note
                 if event.key == pygame.K_LCTRL:
                     note_id = 4
@@ -625,7 +678,7 @@ def main():
                                         box.show()
                                 # set values
                                     update_text_boxes(
-                                        currently_edited, boxes, dropdowns) #TODO - cleanup all the generic stuff
+                                        currently_edited, boxes, dropdowns)  # TODO - cleanup all the generic stuff
 
                     else:
                         if karaoke.In_grid(pos[0], pos[1]):
@@ -645,15 +698,10 @@ def main():
                         if stopped_editing:
                             save_before_closing(
                                 currently_edited, boxes, dropdowns, karaoke)
-                            currently_edited = None  # deselect
                             stopped_editing = False  # reset value
-                            for box in boxes:
-                                box.hide()  # disable text boxes
-                            for label in box_labels:
-                                label.hide()
-                            for dropdown in dropdowns:
-                                dropdown.hide()
-                            undo_button.hide()
+                            currently_edited = None  # deselect
+                            stop_editing(boxes, box_labels,
+                                         dropdowns, undo_button)
 
             if event.type == pygame.KEYUP:
                 if event.key in [pygame.K_RIGHT, pygame.K_LEFT, pygame.K_PAGEDOWN, pygame.K_PAGEUP]:
@@ -703,10 +751,18 @@ def main():
                     if gui_button_mode == 'Reset':
                         gui_button_mode = None
                         karaoke = Karaoke()
-                        currently_edited = None
+                        if currently_edited:
+                            currently_edited = None
+                            stop_editing(boxes, box_labels,
+                                         dropdowns, undo_button)
                     if gui_button_mode == 'Undo':
                         gui_button_mode = None
-                        update_text_boxes(currently_edited, boxes, note_picker, note_type_picker)
+                        update_text_boxes(currently_edited,
+                                          boxes, dropdowns)
+                    if gui_button_mode == 'Delete':
+                        karaoke.Remove(pos[0], pos[1])
+                        stop_editing(boxes, box_labels, dropdowns, undo_button)
+                        currently_edited = None
             manager.process_events(event)
 
         trunc_world_orig = (scrollbar_value, 0)

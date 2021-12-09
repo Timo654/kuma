@@ -148,6 +148,7 @@ class Karaoke:
 
     # check whether the mouse in in the grid
     def In_grid(self, x, y):
+        print(x, y)
         if (x < 0) or (y < 0) or (x >= self.col) or (y >= self.rows):
             return False
         return True
@@ -254,7 +255,7 @@ def write_kbd(file, karaoke):
                     if current_note.end_pos > 0:
                         note['End position'] = current_note.end_pos
                     else:
-                        if karaoke.items[x+1][y] != None: #TODO - fix crash when editing very last note
+                        if karaoke.items[x+1][y] != None:
                             if karaoke.items[x+1][y].id > 3:
                                 o = x + 1
                                 note['Note type'] = karaoke.items[o][y].note_type
@@ -291,10 +292,12 @@ def update_text_boxes(note, boxes, dropdown):
 def save_before_closing(note, boxes, dropdown, karaoke):
     # TODO - clean
     if len(boxes[0].get_text()) > 0:
-        note.start_pos = ms_to_game(float(boxes[0].get_text()))
-        karaoke.items[note.x][note.y] = None
-        note.x = karaoke.pos_convert(note.start_pos)
-        karaoke.items[note.x][note.y] = note
+        new_pos = ms_to_game(float(boxes[0].get_text()))
+        if karaoke.pos_convert(new_pos) <= len(karaoke.items):
+            note.start_pos = new_pos
+            karaoke.items[note.x][note.y] = None
+            note.x = karaoke.pos_convert(note.start_pos)
+            karaoke.items[note.x][note.y] = note
     if len(boxes[1].get_text()) > 0: #TODO - end position changing visually
         note.end_pos = ms_to_game(float(boxes[1].get_text()))
     if len(boxes[2].get_text()) > 0:
@@ -332,7 +335,7 @@ def main():
     scr_size = (1600, 480)
     screen = pygame.display.set_mode((scr_size))
     karaoke = Karaoke()
-    accurate_size = (4 + karaoke.col) * (karaoke.box_size + karaoke.border) #TODO - check this
+    accurate_size = (4 + karaoke.col) * (karaoke.box_size + karaoke.border) #FIXME - some notes overflow to the start, minor visual issue.
     world = pygame.Surface(
         (int(accurate_size / 2), int(scr_size[1])), pygame.SRCALPHA, 32)
     world2 = pygame.Surface(
@@ -350,7 +353,8 @@ def main():
                             manager=manager)
     undo_button = UIButton(relative_rect=pygame.Rect((315, 395), (200, 50)),
                            text='Undo note changes',
-                           manager=manager) #TODO - fix crash when no active note
+                           manager=manager)
+    undo_button.disable()
     button_picker = UIDropDownMenu(options_list=controllers,
                                    starting_option=current_controller,
                                    relative_rect=pygame.Rect(10, 390, 200, 30),
@@ -558,9 +562,19 @@ def main():
                 if event.key == pygame.K_HOME:
                     scrollbar.set_current_value(1)
 
+            
                 if event.key == pygame.K_END:
-                    #TODO - go to last note
-                    scrollbar.set_current_value(scrollbar_size)
+                    exit_loop = False
+                    if len(karaoke.items) > 0:
+                        for i in range(len(karaoke.items) - 1, 0, -1):
+                            for o in range(len(karaoke.items[i])):
+                                if karaoke.items[i][o] != None:
+                                    exit_loop = True
+                                    break
+                            if exit_loop:
+                                break
+                        note_loc = i * (karaoke.box_size + karaoke.border) + karaoke.x
+                        scrollbar.set_current_value(note_loc)
 
                 if event.key == pygame.K_DELETE:
                     selected = None  # deletes selected note
@@ -573,6 +587,7 @@ def main():
                 if event.key == pygame.K_e:  # property editing mode
                     pos = karaoke.Get_pos(scrollbar_value)
                     if not currently_edited:
+                        undo_button.enable()
                         if karaoke.In_grid(pos[0], pos[1]):
                             if karaoke.items[pos[0]][pos[1]] != None:
                                 if karaoke.items[pos[0]][pos[1]].id < 4:
@@ -605,6 +620,7 @@ def main():
                             # for box in boxes:
                             # box.disable()  # disable text boxes
                             stopped_editing = False  # reset value
+                            undo_button.disable()
 
             if event.type == pygame.KEYUP:
                 if event.key in [pygame.K_RIGHT, pygame.K_LEFT, pygame.K_PAGEDOWN, pygame.K_PAGEUP]:

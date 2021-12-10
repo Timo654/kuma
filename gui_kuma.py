@@ -651,7 +651,7 @@ def main():
 
                 if event.key == pygame.K_DELETE:
                     if currently_edited:
-                        gui_button_mode = 'Reset'
+                        gui_button_mode = 'Delete'
                         delete_note = UIConfirmationDialog(
                             rect=pygame.Rect(0, 0, 300, 300), manager=manager, action_long_desc='Are you sure you want to remove this note? This change cannot be undone.', window_title='Delete note')
 
@@ -760,7 +760,7 @@ def main():
                         update_text_boxes(currently_edited,
                                           boxes, dropdowns)
                     if gui_button_mode == 'Delete':
-                        karaoke.Remove(pos[0], pos[1])
+                        karaoke.Remove(currently_edited.x, currently_edited.y)
                         stop_editing(boxes, box_labels, dropdowns, undo_button)
                         currently_edited = None
             manager.process_events(event)

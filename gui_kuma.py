@@ -1,15 +1,13 @@
 # based on https://github.com/TheBigKahuna353/Inventory_system and https://github.com/ppizarror/pygame-menu/blob/master/pygame_menu/examples/other/scrollbar.py
 import pygame
-import pygame_gui
-import json
-from pathlib import Path
-from ui.ui_menu_bar import UIMenuBar
-from pygame_gui import UI_BUTTON_START_PRESS, UI_WINDOW_MOVED_TO_FRONT, UI_WINDOW_CLOSE
-from pygame_gui import UI_FILE_DIALOG_PATH_PICKED
+from pygame_gui import UIManager, UI_BUTTON_START_PRESS, UI_BUTTON_PRESSED, UI_DROP_DOWN_MENU_CHANGED, UI_CONFIRMATION_DIALOG_CONFIRMED
 from pygame_gui.windows import UIFileDialog, UIConfirmationDialog, UIMessageWindow
 from pygame_gui.elements import UIDropDownMenu, UILabel, UIButton, UITextEntryLine, UIHorizontalSlider
 import modules.kbd_reader as kbd
+from modules.ui_menu_bar import UIMenuBar
+from pathlib import Path
 from math import ceil, floor
+import json
 import configparser
 
 asset_file = 'assets.json'
@@ -400,7 +398,7 @@ def main():
         (accurate_size - world.get_width(), int(scr_size[1])), pygame.SRCALPHA, 32)
 
     # menu bar from https://github.com/MyreMylar/pygame_paint
-    manager = pygame_gui.UIManager(scr_size, theme_path='ui/ui_theme.json')
+    manager = UIManager(scr_size, theme_path='assets/ui_theme.json')
     menu_data = {'#file_menu': {'display_name': 'File',
                                 'items':
                                 {
@@ -788,12 +786,12 @@ def main():
                                     manager=manager,
                                     window_title='About')
 
-                if event.user_type == pygame_gui.UI_DROP_DOWN_MENU_CHANGED:
+                if event.user_type == UI_DROP_DOWN_MENU_CHANGED:
                     config.set("CONFIG", "BUTTONS", str(
                         button_picker.selected_option))
                     load_item_tex(button_picker.selected_option,
                                   karaoke, selected, note_picker)
-                if event.user_type == pygame_gui.UI_BUTTON_PRESSED:
+                if event.user_type == UI_BUTTON_PRESSED:
                     if gui_button_mode == 'Input':
                         if event.ui_element == input_selection.ok_button:
                             gui_button_mode = None
@@ -817,7 +815,7 @@ def main():
                         gui_button_mode = 'Undo'
                         undo_note = UIConfirmationDialog(
                             rect=pygame.Rect(0, 0, 300, 300), manager=manager, action_long_desc='Are you sure you want to undo changes made to this note?', window_title='Undo changes')
-                if event.user_type == pygame_gui.UI_CONFIRMATION_DIALOG_CONFIRMED:  # reset event
+                if event.user_type == UI_CONFIRMATION_DIALOG_CONFIRMED:  # reset event
                     if gui_button_mode == 'Reset':
                         gui_button_mode = None
                         karaoke = Karaoke()

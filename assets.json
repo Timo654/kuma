@@ -48,5 +48,10 @@
         "Y"
       ]
     ]
+  },
+  "Languages": {
+    "English": "en",
+    "Eesti": "et",
+    "Polski": "pl"
   }
 }

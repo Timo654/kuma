@@ -11,6 +11,16 @@ else:
     assets['Sheet texture'] = 'sheet.png'
     assets['Line texture'] = 'line.png'
     assets['Button prompts'] = dict()
+    assets['Languages'] = dict()
+
+adding_languages = True
+while adding_languages:
+    language_name = input('Enter the language name (in the native language) or enter to stop: ')
+    if language_name == "":
+        adding_languages = False
+    else:
+        assets['Languages'][language_name] = input('Enter the language code: ')
+
 
 running = True
 while running:

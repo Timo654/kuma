@@ -5,29 +5,6 @@ def game_to_ms(pos):
     """Converts time from Yakuza time to milliseconds"""
     return float(pos / 3)
 
-def read_note_type(note_type):
-    """Gets the note type ID and returns it as string."""
-    if note_type == 0:
-        return 'Regular'
-    elif note_type == 1:
-        return 'Hold'
-    elif note_type == 2:
-        return 'Rapid'
-    else:
-        raise Exception(f'Invalid note type ID {note_type}')
-
-
-def write_note_type(note_type):
-    """Gets the note type string and returns it as ID."""
-    if note_type == 'Regular':
-        return 0
-    elif note_type == 'Hold':
-        return 1
-    elif note_type == 'Rapid':
-        return 2
-    else:
-        raise Exception(f'Invalid note type {note_type}')
-
 def write_file(data, filename, cutscene_start=0):
     """Writes the kbd from dict to the specified filename.\n
     The first parameter is a dict containin info read from kbd,\n
@@ -44,13 +21,13 @@ def write_file(data, filename, cutscene_start=0):
         kbd_n.write_uint32(note['Vertical position'])
         kbd_n.write_uint32(0)  # Padding
         kbd_n.write_uint32(note['Button type'])
-        kbd_n.write_uint32(write_note_type(note['Note type']))
+        kbd_n.write_uint32(note['Note type']) # 0 regular, 1 hold, 2 rapid
         kbd_n.write_uint16(note['Cue ID'])
         kbd_n.write_uint16(note['Cuesheet ID'])
         kbd_n.write_uint32(0)  # Padding
 
         # counting score
-        if note['Note type'] == 'Regular':
+        if note['Note type'] == 0:
             max_score += 10
         else:
             max_score += 30
@@ -108,7 +85,7 @@ def read_file(input_file):
         note['Vertical position'] = kbd.read_uint32()
         kbd.seek(4, 1)  # unused, so we're skipping it
         note['Button type'] = kbd.read_uint32()
-        note['Note type'] = read_note_type(kbd.read_uint32())
+        note['Note type'] = kbd.read_uint32() # 0 regular, 1 hold, 2 rapid
         note['Cue ID'] = kbd.read_uint16()  # Audio cheer ID
         note['Cuesheet ID'] = kbd.read_uint16()  # Audio cheer container ID
         kbd.seek(4, 1)  # unused, so we're skipping it

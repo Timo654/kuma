@@ -10,16 +10,20 @@ from pathlib import Path
 from math import ceil, floor
 import json
 import configparser
+import gettext
 
+VERSION = "1.0.0"
+TRANSLATORS = 'Timo654, ketruB'
 asset_file = 'assets.json'
 if Path(asset_file).is_file():
     with open(asset_file, 'r') as json_file:
         assets = json.load(json_file)
 else:
-    raise Exception('Asset data missing')
+    raise Exception(_('Asset data missing'))
 
 texture_path = assets['Texture folder']
 controllers = [key for key in assets['Button prompts']]
+languages = [key for key in assets['Languages']]
 
 # read/create settings
 settings_file = 'KUMA_settings.ini'
@@ -30,6 +34,7 @@ if not config.has_section("CONFIG"):
     config.add_section("CONFIG")
     config.set("CONFIG", "FPS", str(60))
     config.set("CONFIG", "BUTTONS", controllers[0])
+    config.set("CONFIG", "LANGUAGE", languages[0])
 if not config.has_section("PATHS"):
     config.add_section("PATHS")
     config.set("PATHS", "Input", str(Path().resolve()) + '\\input_file.kbd')
@@ -45,9 +50,16 @@ font = pygame.font.SysFont("FiraCode", 22)
 clock = pygame.time.Clock()
 pygame.display.set_caption('KUMA')
 
+def switch_language(language, boot=False):
+    lang_code = assets['Languages'][language]
+    lang = gettext.translation(lang_code, localedir='locales', languages=[lang_code])
+    lang.install()
+    _ = lang.gettext
+    if not boot:
+        print(_('Language changed, please restart the program to see the changes.'))
 
+switch_language(config['CONFIG']['LANGUAGE'], True)
 # class for a item, just holds the surface and can resize it
-
 
 class Item:
     # default end pos, cue id and cuesheet id is 0
@@ -65,9 +77,6 @@ class Item:
     def resize(self, size):
         return pygame.transform.scale(self.surface, (size, size))
 
-    def note_type_to_int(self):
-        note_list = ['Regular', 'Hold', 'Rapid', 'End']
-        return note_list.index(self.note_type)
 
 # the karaoke system
 
@@ -125,12 +134,13 @@ class Karaoke:
         seconds = i // self.scale
         minutes = seconds // 60
         if minutes:
-            if seconds % 60 == 0:
-                return f'{minutes} min'
+            if seconds % 60 == 0: 
+                return _("{min} min").format(min=minutes)
             else:
-                return f'{minutes} min {seconds - (minutes * 60)} s'
+                seconds = seconds - (minutes * 60)
+                return _("{min} min {sec} s").format(min=minutes, sec=seconds)
         else:
-            return f'{seconds} s'
+            return _("{sec} s").format(sec=seconds)
 
     # get the square that the mouse is over
     def Get_pos(self, scroll):
@@ -165,10 +175,6 @@ class Karaoke:
             return False
         return True
 
-
-def int_to_note_type(i):
-    note_list = ['Regular', 'Hold', 'Rapid', 'End']
-    return note_list[i]
 
 # https://python-forum.io/thread-403.html
 
@@ -227,9 +233,9 @@ def load_kpm(file, cutscene_box, refresh=1):
     try:
         data = kpm.read_file(file)
     except(ValueError):
-        print('Unable to read file.')
+        print(_('Unable to read file.'))
     except(PermissionError):
-        print('Unable to open file.')
+        print(_('Unable to open file.'))
     else:
         if refresh:
             cutscene_box.set_text(
@@ -244,25 +250,25 @@ def save_kpm(file, cutscene_box, data):
         data['Parameters'][0]['Cutscene start time'] = float(
             cutscene_box.get_text())
         kpm.write_file(data, file)
-        print('KPM written to', file)
+        print(_("KPM written to {}").format(file))
 
 
 def load_kbd(file, karaoke, cutscene_box):
     try:
         data = kbd.read_file(file)
     except(ValueError):
-        print('Unable to read file.')
+        print(_('Unable to read file.'))
     except(PermissionError):
-        print('Unable to open file.')
+        print(_('Unable to open file.'))
     else:
         karaoke = Karaoke()  # reset data
         for note in data['Notes']:
             start_pos = karaoke.pos_convert(note['Start position'])
             karaoke.Add(Item(start_pos, note['Vertical position'], note['Button type'], note['Note type'],
                              note['Start position'], end_pos=note['End position'], cue_id=note['Cue ID'], cuesheet_id=note['Cuesheet ID']))
-            if note['Note type'] != 'Regular':
+            if note['Note type'] != 0:
                 end_pos = karaoke.pos_convert(note['End position'])
-                if note['Note type'] == 'Hold':
+                if note['Note type'] == 1:
                     note_id = 4
                 else:
                     note_id = 5
@@ -272,7 +278,7 @@ def load_kbd(file, karaoke, cutscene_box):
                     karaoke.Add(Item(i, note['Vertical position'], note_id,
                                      note['Note type'], note['Start position'] + progress_value))
                 karaoke.Add(Item(
-                    end_pos, note['Vertical position'], note['Button type'], 'End', note['End position']))
+                    end_pos, note['Vertical position'], note['Button type'], 3, note['End position']))
         kpm_file = (str(file.parent) + '\\' +
                     file.stem.split('_')[0] + '_param.kpm')
         if Path(kpm_file).exists:
@@ -288,7 +294,7 @@ def write_kbd(file, karaoke, cutscene_box):
         y = 0
         while y < len(karaoke.items[x]):
             if karaoke.items[x][y] != None:
-                if karaoke.items[x][y].id <= 3 and karaoke.items[x][y].note_type != 'End':
+                if karaoke.items[x][y].id <= 3 and karaoke.items[x][y].note_type != 3: #if not End
                     current_note = karaoke.items[x][y]
                     note = dict()
                     note['Start position'] = current_note.start_pos
@@ -307,7 +313,7 @@ def write_kbd(file, karaoke, cutscene_box):
                                 note['Note type'] = karaoke.items[o][y].note_type
                                 while karaoke.items[o][y].id > 3:
                                     o += 1
-                                karaoke.items[o][y].note_type = 'End'
+                                karaoke.items[o][y].note_type = 3 #End
                                 note['End position'] = karaoke.pos_to_game(o)
                                 current_note.end_pos = note['End position']
                     note_list.append(note)
@@ -317,7 +323,7 @@ def write_kbd(file, karaoke, cutscene_box):
     data['Header'] = dict()
     data['Header']['Version'] = 2
     kbd.write_file(data, file, cutscene_start=float(cutscene_box.get_text()))
-    print('File written to', file)
+    print(_("File written to {}").format(file))
 
 
 def update_fps():  # fps counter from https://pythonprogramming.altervista.org/pygame-how-to-display-the-frame-rate-fps-on-the-screen/
@@ -334,7 +340,7 @@ def update_text_boxes(note, boxes, dropdowns):
     boxes[4].set_text(str(note.cuesheet_id))
     update_dropdown(dropdowns[0], mode='update selection', index=note.id)
     update_dropdown(dropdowns[1], mode='update selection',
-                    index=note.note_type_to_int())
+                    index=note.note_type)
 
 
 def save_before_closing(note, boxes, dropdowns, karaoke):
@@ -356,11 +362,11 @@ def save_before_closing(note, boxes, dropdowns, karaoke):
     if len(boxes[4].get_text()) > 0:
         note.cuesheet_id = int(boxes[4].get_text())
     note.id = dropdowns[0].options_list.index(dropdowns[0].selected_option)
-    note.note_type = dropdowns[1].selected_option
+    note.note_type = dropdowns[1].options_list.index(dropdowns[1].selected_option)
     note.surface = items[note.id]
 
     if len(boxes[1].get_text()) > 0:
-        if note.note_type != 'Regular':
+        if note.note_type != 0:
             end_pos = ms_to_game(float(boxes[1].get_text()))
             if end_pos < note.end_pos:
                 old_end_pos = karaoke.pos_convert(note.end_pos)
@@ -375,7 +381,7 @@ def save_before_closing(note, boxes, dropdowns, karaoke):
                 note.end_pos = end_pos
                 start_pos = karaoke.pos_convert(note.start_pos)
                 end_pos = karaoke.pos_convert(note.end_pos)
-                if note.note_type == 'Hold':
+                if note.note_type == 1:
                     note_id = 4
                 else:
                     note_id = 5
@@ -386,7 +392,7 @@ def save_before_closing(note, boxes, dropdowns, karaoke):
                                      note.note_type, note.start_pos + progress_value))
 
                 karaoke.Add(
-                    Item(end_pos, note.y, note.id, 'End', note.end_pos))
+                    Item(end_pos, note.y, note.id, 4, note.end_pos)) # note type 4 is hold/rapid end, not an actual thing in the game
             else:
                 note.end_pos = 0
 
@@ -415,11 +421,14 @@ def stop_editing(boxes, box_labels, dropdowns, undo_button):
             dropdown.hide()
         undo_button.hide()
 
-
 def main():
     current_controller = config['CONFIG']['BUTTONS']
     if current_controller not in controllers:
         current_controller = controllers[0]
+    current_language = config['CONFIG']['LANGUAGE']
+    if current_language not in languages:
+        current_language = languages[0]
+
     scr_size = (1600, 480)
     screen = pygame.display.set_mode((scr_size))
     karaoke = Karaoke()
@@ -433,20 +442,20 @@ def main():
     # TODO - sort the buttons in a logical order
     # menu bar from https://github.com/MyreMylar/pygame_paint
     manager = UIManager(scr_size, theme_path='assets/ui_theme.json')
-    menu_data = {'#file_menu': {'display_name': 'File',
+    menu_data = {'#file_menu': {'display_name': _('File'),
                                 'items':
                                 {
-                                    '#new': {'display_name': 'New...'},
-                                    '#open': {'display_name': 'Open...'},
-                                    '#save': {'display_name': 'Save'},
-                                    '#save_as': {'display_name': 'Save As...'}
+                                    '#new': {'display_name': _('New...')},
+                                    '#open': {'display_name': _('Open...')},
+                                    '#save': {'display_name': _('Save')},
+                                    '#save_as': {'display_name': _('Save As...')}
                                 }
                                 },
-                 '#help_menu': {'display_name': 'Help',
+                 '#help_menu': {'display_name': _('Help'),
                                     'items':
                                         {
-                                            '#how_to_use': {'display_name': 'How to use'},
-                                            '#about': {'display_name': 'About'}
+                                            '#how_to_use': {'display_name': _('How to use')},
+                                            '#about': {'display_name': _('About')}
                                         }
                                 }
                  }
@@ -455,45 +464,50 @@ def main():
                          manager=manager)
 
     undo_button = UIButton(relative_rect=pygame.Rect((315, 395), (200, 30)),
-                           text='Undo note changes',
+                           text=_('Undo note changes'),
                            manager=manager)
     undo_button.hide()
     button_picker = UIDropDownMenu(options_list=controllers,
                                    starting_option=current_controller,
                                    relative_rect=pygame.Rect(100, 0, 200, 25),
-                                   manager=manager)
+                                   manager=manager, object_id='#button_picker')
 
-    load_kpm_button = UIButton(relative_rect=pygame.Rect((175, 340), (100, 30)),
-                               text='Load time',
+    language_picker = UIDropDownMenu(options_list=languages,
+                                   starting_option=current_language,
+                                   relative_rect=pygame.Rect(300, 0, 150, 25),
+                                   manager=manager, object_id='#language_picker')
+
+    load_kpm_button = UIButton(relative_rect=pygame.Rect((175, 340), (120, 30)),
+                               text=_('Load time'),
                                manager=manager)
-    save_kpm_button = UIButton(relative_rect=pygame.Rect((175, 365), (100, 30)),
-                               text='Save time',
+    save_kpm_button = UIButton(relative_rect=pygame.Rect((175, 365), (120, 30)),
+                               text=_('Save time'),
                                manager=manager)
 
     cutscene_label = UILabel(pygame.Rect((10, 340), (150, 22)),
-                             "Cutscene start",
+                             _("Cutscene start"),
                              manager=manager)
 
     start_label = UILabel(pygame.Rect((315, 340), (150, 22)),
-                          "Start position",
+                          _("Start position"),
                           manager=manager)
     end_label = UILabel(pygame.Rect((470, 340), (150, 22)),
-                        "End position",
+                        _("End position"),
                         manager=manager)
     vert_label = UILabel(pygame.Rect((625, 340), (150, 22)),
-                         "Vertical position",
+                         _("Vertical position"),
                          manager=manager)
     cue_label = UILabel(pygame.Rect((780, 340), (150, 22)),
-                        "Cue ID",
+                        _("Cue ID"),
                         manager=manager)
     cuesheet_label = UILabel(pygame.Rect((935, 340), (150, 22)),
-                             "Cuesheet ID",
+                             _("Cuesheet ID"),
                              manager=manager)
     note_button_label = UILabel(pygame.Rect((1090, 340), (150, 22)),
-                                "Note button",
+                                _("Note button"),
                                 manager=manager)
     note_type_label = UILabel(pygame.Rect((1245, 340), (150, 22)),
-                              "Note type",
+                              _("Note type"),
                               manager=manager)
 
     fps_label = UILabel(pygame.Rect((0, 30), (30, 30)),
@@ -518,7 +532,7 @@ def main():
                                  starting_option=assets['Button prompts'][current_controller][1][0],
                                  relative_rect=pygame.Rect(1090, 365, 150, 30),
                                  manager=manager, object_id='#note_picker')
-    note_types = ['Regular', 'Hold', 'Rapid', 'End']
+    note_types = [_('Regular'), _('Hold'), _('Rapid'), _('End')]
     note_type_picker = UIDropDownMenu(options_list=note_types,
                                       starting_option=note_types[0],
                                       relative_rect=pygame.Rect(
@@ -661,7 +675,7 @@ def main():
                             note_id += 1
                         else:
                             note_id = 0
-                    selected = Item(0, 0, note_id, 'Regular', 0)  # add item
+                    selected = Item(0, 0, note_id, 0, 0)  # add item
                 elif event.button == 1:  # left click
                     pos = karaoke.Get_pos(scrollbar_value)
                     if karaoke.In_grid(pos[0], pos[1]):
@@ -718,7 +732,8 @@ def main():
                     if currently_edited:
                         gui_button_mode = 'Delete'
                         delete_note = UIConfirmationDialog(
-                            rect=pygame.Rect(0, 0, 300, 300), manager=manager, action_long_desc='Are you sure you want to remove this note? This change cannot be undone.', window_title='Delete note')
+                            rect=pygame.Rect(0, 0, 300, 300), manager=manager, action_long_desc=_('Are you sure you want to remove this note? This change cannot be undone.'), window_title=_('Delete note'), action_short_name=_('OK'))
+                        delete_note.cancel_button.set_text(_('Cancel'))
 
                     selected = None  # deletes selected note
                 if event.key == pygame.K_LCTRL:
@@ -778,59 +793,73 @@ def main():
                     if event.ui_element == load_kpm_button:
                         gui_button_mode = 'KPM_Input'
                         kpm_input_selection = UIFileDialog(
-                            rect=pygame.Rect(0, 0, 300, 300), manager=manager, allow_picking_directories=True, allow_existing_files_only=True, window_title='Select a parametre file (kpm)', initial_file_path=Path(config['PATHS']['KPM_Input']))
+                            rect=pygame.Rect(0, 0, 300, 300), manager=manager, allow_picking_directories=True, allow_existing_files_only=True, window_title=_('Select a parametre file (kpm)'), initial_file_path=Path(config['PATHS']['KPM_Input']))
+                        kpm_input_selection.ok_button.set_text(_('OK'))
+                        kpm_input_selection.cancel_button.set_text(_('Cancel'))
 
                     if event.ui_element == save_kpm_button:
                         gui_button_mode = 'KPM_Output'
                         kpm_output_selection = UIFileDialog(
-                            rect=pygame.Rect(0, 0, 300, 300), manager=manager, allow_picking_directories=True, window_title='Select an output file (kpm)', initial_file_path=Path(config['PATHS']['KPM_Output']))
+                            rect=pygame.Rect(0, 0, 300, 300), manager=manager, allow_picking_directories=True, window_title=_('Select an output file (kpm)'), initial_file_path=Path(config['PATHS']['KPM_Output']))
+                        kpm_output_selection.ok_button.set_text(_('OK'))
+                        kpm_output_selection.cancel_button.set_text(_('Cancel'))
 
                     if event.ui_object_id == 'menu_bar.#file_menu_items.#open':
                         gui_button_mode = 'Input'
                         input_selection = UIFileDialog(
-                            rect=pygame.Rect(0, 0, 300, 300), manager=manager, allow_picking_directories=True, allow_existing_files_only=True, window_title='Select an input file (kbd)', initial_file_path=Path(config['PATHS']['Input']))
-
+                            rect=pygame.Rect(0, 0, 300, 300), manager=manager, allow_picking_directories=True, allow_existing_files_only=True, window_title=_('Select an input file (kbd)'), initial_file_path=Path(config['PATHS']['Input']))
+                        input_selection.ok_button.set_text(_('OK'))
+                        input_selection.cancel_button.set_text(_('Cancel'))
                     if event.ui_object_id == 'menu_bar.#file_menu_items.#new':
                         gui_button_mode = 'Reset'
                         reset_all = UIConfirmationDialog(
-                            rect=pygame.Rect(0, 0, 300, 300), manager=manager, action_long_desc='Are you sure you want to create a new file? Any unsaved changes will be lost.', window_title='Create a new file')
-
+                        rect=pygame.Rect(0, 0, 300, 300), manager=manager, action_long_desc=_('Are you sure you want to create a new file? Any unsaved changes will be lost.'), window_title=_('Create a new file'), action_short_name=_('OK'))
+                        reset_all.cancel_button.set_text(_('Cancel'))
                     if event.ui_object_id == 'menu_bar.#file_menu_items.#save':
                         if open_file != None:
                             gui_button_mode = 'Save'
                             save = UIConfirmationDialog(
-                                rect=pygame.Rect(0, 0, 300, 300), manager=manager, action_long_desc=f'Are you sure you want to overwrite {open_file.name}?', window_title='Create a new file')
+                                rect=pygame.Rect(0, 0, 300, 300), manager=manager, action_long_desc=_("Are you sure you want to overwrite {}?").format(open_file.name), window_title=_('Create a new file'), action_short_name=_('OK'))
+                            save.cancel_button.set_text(_('Cancel'))
                         else:
                             gui_button_mode = 'Output'
                             output_selection = UIFileDialog(
-                                rect=pygame.Rect(0, 0, 300, 300), manager=manager, allow_picking_directories=True, window_title='Select an output file (kbd)', initial_file_path=Path(config['PATHS']['Output']))
+                                rect=pygame.Rect(0, 0, 300, 300), manager=manager, allow_picking_directories=True, window_title=_('Select an output file (kbd)'), initial_file_path=Path(config['PATHS']['Output']))
+                            output_selection.ok_button.set_text(_('OK'))
+                            output_selection.cancel_button.set_text(_('Cancel'))
 
                     if event.ui_object_id == 'menu_bar.#file_menu_items.#save_as':
                         gui_button_mode = 'Output'
                         output_selection = UIFileDialog(
-                            rect=pygame.Rect(0, 0, 300, 300), manager=manager, allow_picking_directories=True, window_title='Select an output file (kbd)', initial_file_path=Path(config['PATHS']['Output']))
+                            rect=pygame.Rect(0, 0, 300, 300), manager=manager, allow_picking_directories=True, window_title=_('Select an output file (kbd)'), initial_file_path=Path(config['PATHS']['Output']))
+                        output_selection.ok_button.set_text(_('OK'))
+                        output_selection.cancel_button.set_text(_('Cancel'))
 
                     if event.ui_object_id == 'menu_bar.#help_menu_items.#how_to_use':
                         info_window_rect = pygame.Rect(0, 0, 400, 250)
                         info_window_rect.center = screen.get_rect().center
 
-                        UIMessageWindow(rect=info_window_rect,
-                                        html_message='<br><b>How to use</b><br>'
+                        help_window = UIMessageWindow(rect=info_window_rect,
+                                        html_message=_('<br><b>How to use</b><br>'
                                         '---------------<br><br>'
-                                        '<b>Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum. </b>',
+                                        '<b>Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum. </b>'),
                                         manager=manager,
-                                        window_title='Help')
+                                        window_title=_('Help'))
+                        help_window.dismiss_button.set_text(_('Close'))
 
                     if event.ui_object_id == 'menu_bar.#help_menu_items.#about':
                         about_window_rect = pygame.Rect(0, 0, 400, 250)
                         about_window_rect.center = screen.get_rect().center
-                        UIMessageWindow(rect=about_window_rect,
-                                        html_message='<br><b>KUMA</b><br>'
+                        about_window = UIMessageWindow(rect=about_window_rect,
+                                        html_message=_('<br><b>KUMA</b><br>'
                                         '---------------<br><br>'
-                                        '<b>Version: </b>1.0.0<br>'
-                                        '<b>Created by: </b>Timo654<br>',
+                                        '<b>A karaoke editor for Dragon Engine games.<br>'
+                                        '<b>Version: </b>{ver}<br>'
+                                        '<b>Created by: </b>Timo654<br>'
+                                        '<b>Translations: </b>{translators}<br>').format(ver=VERSION, translators=TRANSLATORS),
                                         manager=manager,
-                                        window_title='About')
+                                        window_title=_('About'))
+                        about_window.dismiss_button.set_text(_('Close'))
 
                 if event.user_type == UI_BUTTON_PRESSED:
                     if gui_button_mode == 'Input':
@@ -839,6 +868,9 @@ def main():
                             open_file = input_selection.current_file_path
                             config.set("PATHS", "Input", str(
                                 input_selection.current_file_path))
+                            if currently_edited:
+                                stop_editing(boxes, box_labels, dropdowns, undo_button)
+                                currently_edited = None
                             karaoke = load_kbd(
                                 input_selection.current_file_path, karaoke, cutscene_box)
                             currently_edited = None
@@ -868,14 +900,18 @@ def main():
                     if event.ui_element == undo_button:
                         gui_button_mode = 'Undo'
                         undo_note = UIConfirmationDialog(
-                            rect=pygame.Rect(0, 0, 300, 300), manager=manager, action_long_desc='Are you sure you want to undo changes made to this note?', window_title='Undo changes')
+                            rect=pygame.Rect(0, 0, 300, 300), manager=manager, action_long_desc=_('Are you sure you want to undo changes made to this note?'), window_title=_('Undo changes'), action_short_name=_('OK'))
+                        undo_note.cancel_button.set_text(_('Cancel'))
 
-                if event.user_type == UI_DROP_DOWN_MENU_CHANGED:
+                if (event.user_type == UI_DROP_DOWN_MENU_CHANGED and event.ui_object_id == '#button_picker'):
                     config.set("CONFIG", "BUTTONS", str(
                         button_picker.selected_option))
                     load_item_tex(button_picker.selected_option,
                                   karaoke, selected, note_picker)
-
+                if (event.user_type == UI_DROP_DOWN_MENU_CHANGED and event.ui_object_id == '#language_picker'):
+                    config.set("CONFIG", "LANGUAGE", str(
+                        language_picker.selected_option))
+                    switch_language(language_picker.selected_option)
                 if event.user_type == UI_CONFIRMATION_DIALOG_CONFIRMED:  # reset event
                     if gui_button_mode == 'Reset':
                         gui_button_mode = None
@@ -897,7 +933,7 @@ def main():
                             write_kbd(
                                 open_file, karaoke, cutscene_box)
                         else:
-                            raise Exception('No open file, unable to save!')
+                            raise Exception(_('No open file, unable to save!'))
 
             manager.process_events(event)
 

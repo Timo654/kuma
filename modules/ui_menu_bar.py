@@ -2,6 +2,7 @@ from typing import Union, Dict, Tuple
 
 import pygame
 import pygame_gui
+from pygame_gui import ui_manager
 
 from pygame_gui.core.interfaces import IContainerLikeInterface, IUIManagerInterface
 from pygame_gui.core import UIElement, UIContainer
@@ -60,11 +61,12 @@ class UIMenuBar(UIElement):
                                               object_id='#menu_bar_container')
 
         top_level_button_x = 0
+        self.top_level_buttons = list()
         for menu_item_key, menu_item_data in self.menu_item_data.items():
             # create top level menu buttons
             default_font = self.ui_manager.get_theme().get_font_dictionary().get_default_font()
             item_text_size = default_font.size(menu_item_data['display_name'])
-            UIButton(pygame.Rect(top_level_button_x,
+            button = UIButton(pygame.Rect(top_level_button_x,
                                  0,
                                  item_text_size[0]+10,
                                  self.menu_bar_container.rect.height),
@@ -73,6 +75,7 @@ class UIMenuBar(UIElement):
                      container=self.menu_bar_container,
                      object_id=menu_item_key,
                      parent_element=self)
+            self.top_level_buttons.append(button)
             top_level_button_x += item_text_size[0]+10
 
     def unfocus(self):
@@ -258,6 +261,17 @@ class UIMenuBar(UIElement):
 
         if has_any_changed:
             self.rebuild()
+    def set_text(self, data):
+        """
+        For reloading the text.
+
+        """
+        self.menu_item_data = data
+        i = 0
+        for _, menu_item_data in data.items():
+            # change top level menu button text
+            self.top_level_buttons[i].set_text(menu_item_data['display_name'])
+            i += 1
 
     def rebuild(self):
         """

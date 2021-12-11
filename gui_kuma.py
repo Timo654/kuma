@@ -11,9 +11,10 @@ from math import ceil, floor
 import json
 import configparser
 import gettext
+import locale
 
 VERSION = "1.0.0"
-TRANSLATORS = 'Timo654, ketruB'
+TRANSLATORS = 'Timo654, ketrub'
 asset_file = 'assets.json'
 if Path(asset_file).is_file():
     with open(asset_file, 'r') as json_file:
@@ -25,6 +26,13 @@ texture_path = assets['Texture folder']
 controllers = [key for key in assets['Button prompts']]
 languages = [key for key in assets['Languages']]
 
+
+def get_default_language():
+    loc = locale.getdefaultlocale() # get current locale
+    lang_code = loc[0].split('_')[0]
+    language = list(assets['Languages'].keys())[list(assets['Languages'].values()).index(lang_code)]
+    return language
+
 # read/create settings
 settings_file = 'KUMA_settings.ini'
 config = configparser.ConfigParser()
@@ -34,7 +42,7 @@ if not config.has_section("CONFIG"):
     config.add_section("CONFIG")
     config.set("CONFIG", "FPS", str(60))
     config.set("CONFIG", "BUTTONS", controllers[0])
-    config.set("CONFIG", "LANGUAGE", languages[0])
+    config.set("CONFIG", "LANGUAGE", get_default_language())
 if not config.has_section("PATHS"):
     config.add_section("PATHS")
     config.set("PATHS", "Input", str(Path().resolve()) + '\\input_file.kbd')
@@ -49,16 +57,6 @@ pygame.init()
 font = pygame.font.SysFont("FiraCode", 22)
 clock = pygame.time.Clock()
 pygame.display.set_caption('KUMA')
-
-def switch_language(language, boot=False):
-    lang_code = assets['Languages'][language]
-    lang = gettext.translation(lang_code, localedir='locales', languages=[lang_code])
-    lang.install()
-    _ = lang.gettext
-    if not boot:
-        print(_('Language changed, please restart the program to see the changes.'))
-
-switch_language(config['CONFIG']['LANGUAGE'], True)
 # class for a item, just holds the surface and can resize it
 
 class Item:
@@ -421,7 +419,50 @@ def stop_editing(boxes, box_labels, dropdowns, undo_button):
             dropdown.hide()
         undo_button.hide()
 
+def update_text(params):
+    params[0].set_text(_('Undo note changes'))
+    params[1].set_text(_('Load time'))
+    params[2].set_text(_('Save time'))
+    params[3].set_text(_('Cutscene start'))
+    params[4].set_text(_('Start position'))
+    params[5].set_text(_('Vertical position'))
+    params[6].set_text(_('Cue ID'))
+    params[7].set_text(_('Cuesheet ID'))
+    params[8].set_text(_('Note button'))
+    params[9].set_text(_('Note type'))
+    params[11].set_text(_('End position'))
+    update_dropdown(params[10], mode='update all', new_list=[_('Regular'), _('Hold'), _('Rapid'), _('End')], index=params[10].options_list.index(params[10].selected_option))
+    menu_data = {'#file_menu': {'display_name': _('File'),
+                                'items':
+                                {
+                                    '#new': {'display_name': _('New...')},
+                                    '#open': {'display_name': _('Open...')},
+                                    '#save': {'display_name': _('Save')},
+                                    '#save_as': {'display_name': _('Save As...')}
+                                }
+                                },
+                 '#help_menu': {'display_name': _('Help'),
+                                    'items':
+                                        {
+                                            '#how_to_use': {'display_name': _('How to use')},
+                                            '#about': {'display_name': _('About')}
+                                        }
+                                }
+                 }
+    params[12].set_text(menu_data)
+
+
+def switch_language(language, params=None, boot=False):
+    lang_code = assets['Languages'][language]
+    lang = gettext.translation(lang_code, localedir='locales', languages=[lang_code])
+    lang.install()
+    _ = lang.gettext
+    if not boot:
+        print(_('Language changed.'))
+        update_text(params)
+   
 def main():
+    switch_language(config['CONFIG']['LANGUAGE'], boot=True) 
     current_controller = config['CONFIG']['BUTTONS']
     if current_controller not in controllers:
         current_controller = controllers[0]
@@ -619,7 +660,7 @@ def main():
 
         mousex, mousey = pygame.mouse.get_pos()
         mousex += scrollbar_value  # adjust for scrollbar
-
+                               
         if key_pressed:
             diff = 10 + scrollbar_add
             scrollbar_add += 1
@@ -643,7 +684,7 @@ def main():
                             (mousex - world.get_width(), mousey))
             else:
                 world.blit(selected.resize(20), (mousex, mousey))
-
+        
         # if editing note params
         if currently_edited:
             x = 2 + karaoke.x + \
@@ -911,7 +952,7 @@ def main():
                 if (event.user_type == UI_DROP_DOWN_MENU_CHANGED and event.ui_object_id == '#language_picker'):
                     config.set("CONFIG", "LANGUAGE", str(
                         language_picker.selected_option))
-                    switch_language(language_picker.selected_option)
+                    switch_language(language_picker.selected_option, params=[undo_button, load_kpm_button, save_kpm_button, cutscene_label, start_label, vert_label, cue_label, cuesheet_label, note_button_label, note_type_label, note_type_picker, end_label, menu_bar, manager])
                 if event.user_type == UI_CONFIRMATION_DIALOG_CONFIRMED:  # reset event
                     if gui_button_mode == 'Reset':
                         gui_button_mode = None

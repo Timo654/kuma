@@ -282,7 +282,7 @@ def load_kbd(file, karaoke, cutscene_box):
                     end_pos, note['Vertical position'], note['Button type'], 3, note['End position']))
         kpm_file = (str(file.parent) + '\\' +
                     file.stem.split('_')[0] + '_param.kpm')
-        if Path(kpm_file).exists:
+        if Path(kpm_file).exists():
             load_kpm(kpm_file, cutscene_box)
     return karaoke
 

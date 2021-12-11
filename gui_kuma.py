@@ -28,10 +28,12 @@ languages = [key for key in assets['Languages']]
 
 
 def get_default_language():
-    loc = locale.getdefaultlocale() # get current locale
+    loc = locale.getdefaultlocale()  # get current locale
     lang_code = loc[0].split('_')[0]
-    language = list(assets['Languages'].keys())[list(assets['Languages'].values()).index(lang_code)]
+    language = list(assets['Languages'].keys())[list(
+        assets['Languages'].values()).index(lang_code)]
     return language
+
 
 # read/create settings
 settings_file = 'KUMA_settings.ini'
@@ -58,6 +60,7 @@ font = pygame.font.SysFont("FiraCode", 22)
 clock = pygame.time.Clock()
 pygame.display.set_caption('KUMA')
 # class for a item, just holds the surface and can resize it
+
 
 class Item:
     # default end pos, cue id and cuesheet id is 0
@@ -132,7 +135,7 @@ class Karaoke:
         seconds = i // self.scale
         minutes = seconds // 60
         if minutes:
-            if seconds % 60 == 0: 
+            if seconds % 60 == 0:
                 return _("{min} min").format(min=minutes)
             else:
                 seconds = seconds - (minutes * 60)
@@ -292,7 +295,7 @@ def write_kbd(file, karaoke, cutscene_box):
         y = 0
         while y < len(karaoke.items[x]):
             if karaoke.items[x][y] != None:
-                if karaoke.items[x][y].id <= 3 and karaoke.items[x][y].note_type != 3: #if not End
+                if karaoke.items[x][y].id <= 3 and karaoke.items[x][y].note_type != 3:  # if not End
                     current_note = karaoke.items[x][y]
                     note = dict()
                     note['Start position'] = current_note.start_pos
@@ -311,7 +314,7 @@ def write_kbd(file, karaoke, cutscene_box):
                                 note['Note type'] = karaoke.items[o][y].note_type
                                 while karaoke.items[o][y].id > 3:
                                     o += 1
-                                karaoke.items[o][y].note_type = 3 #End
+                                karaoke.items[o][y].note_type = 3  # End
                                 note['End position'] = karaoke.pos_to_game(o)
                                 current_note.end_pos = note['End position']
                     note_list.append(note)
@@ -360,39 +363,42 @@ def save_before_closing(note, boxes, dropdowns, karaoke):
     if len(boxes[4].get_text()) > 0:
         note.cuesheet_id = int(boxes[4].get_text())
     note.id = dropdowns[0].options_list.index(dropdowns[0].selected_option)
-    note.note_type = dropdowns[1].options_list.index(dropdowns[1].selected_option)
+    note.note_type = dropdowns[1].options_list.index(
+        dropdowns[1].selected_option)
     note.surface = items[note.id]
 
     if len(boxes[1].get_text()) > 0:
         if note.note_type != 0:
             end_pos = ms_to_game(float(boxes[1].get_text()))
-            if end_pos < note.end_pos:
-                old_end_pos = karaoke.pos_convert(note.end_pos)
-                new_end_pos = karaoke.pos_convert(end_pos)
-                start_pos = karaoke.pos_convert(note.start_pos)
-                for i in range(old_end_pos + 1, new_end_pos, -1):
-                    if i == start_pos:
-                        break
-                    karaoke.Remove(i, note.y)
+        else:
+            end_pos = 0
+        if end_pos < note.end_pos:
+            old_end_pos = karaoke.pos_convert(note.end_pos)
+            new_end_pos = karaoke.pos_convert(end_pos)
+            start_pos = karaoke.pos_convert(note.start_pos)
+            for i in range(old_end_pos + 1, new_end_pos, -1):
+                if i == start_pos:
+                    break
+                karaoke.Remove(i, note.y)
 
-            if end_pos > note.start_pos:
-                note.end_pos = end_pos
-                start_pos = karaoke.pos_convert(note.start_pos)
-                end_pos = karaoke.pos_convert(note.end_pos)
-                if note.note_type == 1:
-                    note_id = 4
-                else:
-                    note_id = 5
-                progress_value = 0
-                for i in range(start_pos + 1, end_pos):
-                    progress_value += 100
-                    karaoke.Add(Item(i, note.y, note_id,
-                                     note.note_type, note.start_pos + progress_value))
-
-                karaoke.Add(
-                    Item(end_pos, note.y, note.id, 4, note.end_pos)) # note type 4 is hold/rapid end, not an actual thing in the game
+        if end_pos > note.start_pos:
+            note.end_pos = end_pos
+            start_pos = karaoke.pos_convert(note.start_pos)
+            end_pos = karaoke.pos_convert(note.end_pos)
+            if note.note_type == 1:
+                note_id = 4
             else:
-                note.end_pos = 0
+                note_id = 5
+            progress_value = 0
+            for i in range(start_pos + 1, end_pos):
+                progress_value += 100
+                karaoke.Add(Item(i, note.y, note_id,
+                                 note.note_type, note.start_pos + progress_value))
+
+            karaoke.Add(
+                Item(end_pos, note.y, note.id, 3, note.end_pos))  # note type 3 is hold/rapid end, not an actual thing in the game
+        else:
+            note.end_pos = 0
 
 
 # new_list is a list and option is list index
@@ -419,6 +425,7 @@ def stop_editing(boxes, box_labels, dropdowns, undo_button):
             dropdown.hide()
         undo_button.hide()
 
+
 def update_text(params):
     params[0].set_text(_('Undo note changes'))
     params[1].set_text(_('Load time'))
@@ -431,7 +438,8 @@ def update_text(params):
     params[8].set_text(_('Note button'))
     params[9].set_text(_('Note type'))
     params[11].set_text(_('End position'))
-    update_dropdown(params[10], mode='update all', new_list=[_('Regular'), _('Hold'), _('Rapid'), _('End')], index=params[10].options_list.index(params[10].selected_option))
+    update_dropdown(params[10], mode='update all', new_list=[_('Regular'), _('Hold'), _(
+        'Rapid'), _('End')], index=params[10].options_list.index(params[10].selected_option))
     menu_data = {'#file_menu': {'display_name': _('File'),
                                 'items':
                                 {
@@ -439,30 +447,32 @@ def update_text(params):
                                     '#open': {'display_name': _('Open...')},
                                     '#save': {'display_name': _('Save')},
                                     '#save_as': {'display_name': _('Save As...')}
-                                }
-                                },
-                 '#help_menu': {'display_name': _('Help'),
+    }
+    },
+        '#help_menu': {'display_name': _('Help'),
                                     'items':
                                         {
                                             '#how_to_use': {'display_name': _('How to use')},
                                             '#about': {'display_name': _('About')}
-                                        }
-                                }
-                 }
+        }
+    }
+    }
     params[12].set_text(menu_data)
 
 
 def switch_language(language, params=None, boot=False):
     lang_code = assets['Languages'][language]
-    lang = gettext.translation(lang_code, localedir='locales', languages=[lang_code])
+    lang = gettext.translation(
+        lang_code, localedir='locales', languages=[lang_code])
     lang.install()
     _ = lang.gettext
     if not boot:
         print(_('Language changed.'))
         update_text(params)
-   
+
+
 def main():
-    switch_language(config['CONFIG']['LANGUAGE'], boot=True) 
+    switch_language(config['CONFIG']['LANGUAGE'], boot=True)
     current_controller = config['CONFIG']['BUTTONS']
     if current_controller not in controllers:
         current_controller = controllers[0]
@@ -490,16 +500,16 @@ def main():
                                     '#open': {'display_name': _('Open...')},
                                     '#save': {'display_name': _('Save')},
                                     '#save_as': {'display_name': _('Save As...')}
-                                }
-                                },
-                 '#help_menu': {'display_name': _('Help'),
+    }
+    },
+        '#help_menu': {'display_name': _('Help'),
                                     'items':
                                         {
                                             '#how_to_use': {'display_name': _('How to use')},
                                             '#about': {'display_name': _('About')}
-                                        }
-                                }
-                 }
+        }
+    }
+    }
     menu_bar = UIMenuBar(relative_rect=pygame.Rect(0, 0, scr_size[0], 25),
                          menu_item_data=menu_data,
                          manager=manager)
@@ -514,9 +524,10 @@ def main():
                                    manager=manager, object_id='#button_picker')
 
     language_picker = UIDropDownMenu(options_list=languages,
-                                   starting_option=current_language,
-                                   relative_rect=pygame.Rect(300, 0, 150, 25),
-                                   manager=manager, object_id='#language_picker')
+                                     starting_option=current_language,
+                                     relative_rect=pygame.Rect(
+                                         300, 0, 150, 25),
+                                     manager=manager, object_id='#language_picker')
 
     load_kpm_button = UIButton(relative_rect=pygame.Rect((175, 340), (120, 30)),
                                text=_('Load time'),
@@ -660,7 +671,7 @@ def main():
 
         mousex, mousey = pygame.mouse.get_pos()
         mousex += scrollbar_value  # adjust for scrollbar
-                               
+
         if key_pressed:
             diff = 10 + scrollbar_add
             scrollbar_add += 1
@@ -684,7 +695,7 @@ def main():
                             (mousex - world.get_width(), mousey))
             else:
                 world.blit(selected.resize(20), (mousex, mousey))
-        
+
         # if editing note params
         if currently_edited:
             x = 2 + karaoke.x + \
@@ -843,7 +854,8 @@ def main():
                         kpm_output_selection = UIFileDialog(
                             rect=pygame.Rect(0, 0, 300, 300), manager=manager, allow_picking_directories=True, window_title=_('Select an output file (kpm)'), initial_file_path=Path(config['PATHS']['KPM_Output']))
                         kpm_output_selection.ok_button.set_text(_('OK'))
-                        kpm_output_selection.cancel_button.set_text(_('Cancel'))
+                        kpm_output_selection.cancel_button.set_text(
+                            _('Cancel'))
 
                     if event.ui_object_id == 'menu_bar.#file_menu_items.#open':
                         gui_button_mode = 'Input'
@@ -854,7 +866,7 @@ def main():
                     if event.ui_object_id == 'menu_bar.#file_menu_items.#new':
                         gui_button_mode = 'Reset'
                         reset_all = UIConfirmationDialog(
-                        rect=pygame.Rect(0, 0, 300, 300), manager=manager, action_long_desc=_('Are you sure you want to create a new file? Any unsaved changes will be lost.'), window_title=_('Create a new file'), action_short_name=_('OK'))
+                            rect=pygame.Rect(0, 0, 300, 300), manager=manager, action_long_desc=_('Are you sure you want to create a new file? Any unsaved changes will be lost.'), window_title=_('Create a new file'), action_short_name=_('OK'))
                         reset_all.cancel_button.set_text(_('Cancel'))
                     if event.ui_object_id == 'menu_bar.#file_menu_items.#save':
                         if open_file != None:
@@ -867,7 +879,8 @@ def main():
                             output_selection = UIFileDialog(
                                 rect=pygame.Rect(0, 0, 300, 300), manager=manager, allow_picking_directories=True, window_title=_('Select an output file (kbd)'), initial_file_path=Path(config['PATHS']['Output']))
                             output_selection.ok_button.set_text(_('OK'))
-                            output_selection.cancel_button.set_text(_('Cancel'))
+                            output_selection.cancel_button.set_text(
+                                _('Cancel'))
 
                     if event.ui_object_id == 'menu_bar.#file_menu_items.#save_as':
                         gui_button_mode = 'Output'
@@ -881,25 +894,25 @@ def main():
                         info_window_rect.center = screen.get_rect().center
 
                         help_window = UIMessageWindow(rect=info_window_rect,
-                                        html_message=_('<br><b>How to use</b><br>'
-                                        '---------------<br><br>'
-                                        '<b>Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum. </b>'),
-                                        manager=manager,
-                                        window_title=_('Help'))
+                                                      html_message=_('<br><b>How to use</b><br>'
+                                                                     '---------------<br><br>'
+                                                                     '<b>Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum. </b>'),
+                                                      manager=manager,
+                                                      window_title=_('Help'))
                         help_window.dismiss_button.set_text(_('Close'))
 
                     if event.ui_object_id == 'menu_bar.#help_menu_items.#about':
                         about_window_rect = pygame.Rect(0, 0, 400, 250)
                         about_window_rect.center = screen.get_rect().center
                         about_window = UIMessageWindow(rect=about_window_rect,
-                                        html_message=_('<br><b>KUMA</b><br>'
-                                        '---------------<br><br>'
-                                        '<b>A karaoke editor for Dragon Engine games.<br>'
-                                        '<b>Version: </b>{ver}<br>'
-                                        '<b>Created by: </b>Timo654<br>'
-                                        '<b>Translations: </b>{translators}<br>').format(ver=VERSION, translators=TRANSLATORS),
-                                        manager=manager,
-                                        window_title=_('About'))
+                                                       html_message=_('<br><b>KUMA</b><br>'
+                                                                      '---------------<br><br>'
+                                                                      '<b>A karaoke editor for Dragon Engine games.<br>'
+                                                                      '<b>Version: </b>{ver}<br>'
+                                                                      '<b>Created by: </b>Timo654<br>'
+                                                                      '<b>Translations: </b>{translators}<br>').format(ver=VERSION, translators=TRANSLATORS),
+                                                       manager=manager,
+                                                       window_title=_('About'))
                         about_window.dismiss_button.set_text(_('Close'))
 
                 if event.user_type == UI_BUTTON_PRESSED:
@@ -910,7 +923,8 @@ def main():
                             config.set("PATHS", "Input", str(
                                 input_selection.current_file_path))
                             if currently_edited:
-                                stop_editing(boxes, box_labels, dropdowns, undo_button)
+                                stop_editing(boxes, box_labels,
+                                             dropdowns, undo_button)
                                 currently_edited = None
                             karaoke = load_kbd(
                                 input_selection.current_file_path, karaoke, cutscene_box)
@@ -952,7 +966,8 @@ def main():
                 if (event.user_type == UI_DROP_DOWN_MENU_CHANGED and event.ui_object_id == '#language_picker'):
                     config.set("CONFIG", "LANGUAGE", str(
                         language_picker.selected_option))
-                    switch_language(language_picker.selected_option, params=[undo_button, load_kpm_button, save_kpm_button, cutscene_label, start_label, vert_label, cue_label, cuesheet_label, note_button_label, note_type_label, note_type_picker, end_label, menu_bar, manager])
+                    switch_language(language_picker.selected_option, params=[undo_button, load_kpm_button, save_kpm_button, cutscene_label, start_label,
+                                                                             vert_label, cue_label, cuesheet_label, note_button_label, note_type_label, note_type_picker, end_label, menu_bar, manager])
                 if event.user_type == UI_CONFIRMATION_DIALOG_CONFIRMED:  # reset event
                     if gui_button_mode == 'Reset':
                         gui_button_mode = None

@@ -25,7 +25,7 @@ Nooltega saab liigutada scrollbari.
 * Muusika mängimine - Play/Pause nupp, liigutab scrollbari, kast laulu ajaga
 * Help kasti tekst kirjutada
 * Surface suurust vähendada (lõpus olevad nupud lähevad algusesse)
-* Kasutada kpm moodulit, et sealt lugeda cutscene start time 
+* Veel keeli
 
 ## Viited
 https://github.com/SutandoTsukai181/PyBinaryReader

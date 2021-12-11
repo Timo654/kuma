@@ -1,6 +1,10 @@
 from binary_reader import BinaryReader
 
 
+def game_to_ms(pos):
+    """Converts time from Yakuza time to milliseconds"""
+    return float(pos / 3)
+
 def read_note_type(note_type):
     """Gets the note type ID and returns it as string."""
     if note_type == 0:
@@ -28,7 +32,6 @@ def write_file(data, filename, cutscene_start=0):
     """Writes the kbd from dict to the specified filename.\n
     The first parameter is a dict containin info read from kbd,\n
     the second parameter is the filename and third is the cutscene start time (by default 0) from KPM"""
-
     # writing the notes
     max_score = 0  # counting the maximum possible score
     max_cutscene_score = 0  
@@ -53,7 +56,7 @@ def write_file(data, filename, cutscene_start=0):
             max_score += 30
         if i > 19:
             max_score += 5  # combo bonus per note
-        if cutscene_start > note['Start position']:
+        if cutscene_start * 1000 > game_to_ms(note['Start position']):
             max_cutscene_score = max_score
 
     # writing the header

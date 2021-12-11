@@ -235,8 +235,10 @@ def load_kpm(file, cutscene_box, refresh=1):
         data = kpm.read_file(file)
     except(ValueError):
         print(_('Unable to read file.'))
+        return False
     except(PermissionError):
         print(_('Unable to open file.'))
+        return False
     else:
         if refresh:
             cutscene_box.set_text(
@@ -259,8 +261,10 @@ def load_kbd(file, karaoke, cutscene_box):
         data = kbd.read_file(file)
     except(ValueError):
         print(_('Unable to read file.'))
+        return karaoke, None
     except(PermissionError):
         print(_('Unable to open file.'))
+        return karaoke, None
     else:
         karaoke = Karaoke()  # reset data
         for note in data['Notes']:
@@ -284,7 +288,7 @@ def load_kbd(file, karaoke, cutscene_box):
                     file.stem.split('_')[0] + '_param.kpm')
         if Path(kpm_file).exists():
             load_kpm(kpm_file, cutscene_box)
-    return karaoke
+    return karaoke, True
 
 
 def write_kbd(file, karaoke, cutscene_box):
@@ -439,7 +443,7 @@ def update_text(params):
     params[9].set_text(_('Note type'))
     params[11].set_text(_('End position'))
     update_dropdown(params[10], mode='update all', new_list=[_('Regular'), _('Hold'), _(
-        'Rapid'), _('End')], index=params[10].options_list.index(params[10].selected_option))
+        'Rapid')], index=params[10].options_list.index(params[10].selected_option))
     menu_data = {'#file_menu': {'display_name': _('File'),
                                 'items':
                                 {
@@ -584,7 +588,7 @@ def main():
                                  starting_option=assets['Button prompts'][current_controller][1][0],
                                  relative_rect=pygame.Rect(1090, 365, 150, 30),
                                  manager=manager, object_id='#note_picker')
-    note_types = [_('Regular'), _('Hold'), _('Rapid'), _('End')]
+    note_types = [_('Regular'), _('Hold'), _('Rapid')]
     note_type_picker = UIDropDownMenu(options_list=note_types,
                                       starting_option=note_types[0],
                                       relative_rect=pygame.Rect(
@@ -799,7 +803,7 @@ def main():
                     if not currently_edited:
                         if karaoke.In_grid(pos[0], pos[1]):
                             if karaoke.items[pos[0]][pos[1]] != None:
-                                if karaoke.items[pos[0]][pos[1]].id < 4:
+                                if karaoke.items[pos[0]][pos[1]].id < 4 and karaoke.items[pos[0]][pos[1]].note_type < 3:
                                     currently_edited = karaoke.items[pos[0]][pos[1]]
                                     for dropdown in dropdowns:
                                         dropdown.show()
@@ -814,8 +818,8 @@ def main():
 
                     else:
                         if karaoke.In_grid(pos[0], pos[1]):
-                            if karaoke.items[pos[0]][pos[1]] != currently_edited and karaoke.items[pos[0]][pos[1]] != None:
-                                if karaoke.items[pos[0]][pos[1]].id < 4:
+                            if karaoke.items[pos[0]][pos[1]] != currently_edited and karaoke.items[pos[0]][pos[1]] != None :
+                                if karaoke.items[pos[0]][pos[1]].id < 4 and karaoke.items[pos[0]][pos[1]].note_type < 3:
                                     save_before_closing(
                                         currently_edited, boxes, dropdowns, karaoke)
                                     currently_edited = karaoke.items[pos[0]][pos[1]]
@@ -920,14 +924,15 @@ def main():
                         if event.ui_element == input_selection.ok_button:
                             gui_button_mode = None
                             open_file = input_selection.current_file_path
-                            config.set("PATHS", "Input", str(
-                                input_selection.current_file_path))
                             if currently_edited:
                                 stop_editing(boxes, box_labels,
                                              dropdowns, undo_button)
                                 currently_edited = None
-                            karaoke = load_kbd(
+                            karaoke, can_save = load_kbd(
                                 input_selection.current_file_path, karaoke, cutscene_box)
+                            if can_save:
+                                config.set("PATHS", "Input", str(
+                                input_selection.current_file_path))
                             currently_edited = None
 
                     if gui_button_mode == 'Output':
@@ -941,10 +946,11 @@ def main():
 
                     if gui_button_mode == 'KPM_Input':
                         if event.ui_element == kpm_input_selection.ok_button:
-                            config.set("PATHS", "KPM_Input", str(
-                                kpm_input_selection.current_file_path))
                             kpm_data = load_kpm(
                                 kpm_input_selection.current_file_path, cutscene_box)
+                            if kpm_data:
+                                config.set("PATHS", "KPM_Input", str(
+                                kpm_input_selection.current_file_path))
                     if gui_button_mode == 'KPM_Output':
                         if event.ui_element == kpm_output_selection.ok_button:
                             config.set("PATHS", "KPM_Output", str(

@@ -646,7 +646,9 @@ def main():
                             if exit_loop:
                                 break
                         note_loc = i * (karaoke.box_size +
-                                        karaoke.border) + karaoke.x
+                                        karaoke.border) + 2 * karaoke.x - screen.get_width()
+                        if note_loc < 0:
+                            note_loc = 0
                         scrollbar.set_current_value(note_loc)
 
                 if event.key == pygame.K_DELETE:

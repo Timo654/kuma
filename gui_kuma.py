@@ -238,10 +238,11 @@ def load_kpm(file, cutscene_box, refresh=1):
 
 
 def save_kpm(file, cutscene_box, data):
-    if Path.exists(file): #TODO - verify that file is actually KPM
+    if Path.exists(file):  # TODO - verify that file is actually KPM
         data = load_kpm(file, cutscene_box, refresh=0)
     elif data != None:
-        data['Parameters'][0]['Cutscene start time'] = float(cutscene_box.get_text())
+        data['Parameters'][0]['Cutscene start time'] = float(
+            cutscene_box.get_text())
         kpm.write_file(data, file)
         print('KPM written to', file)
 
@@ -272,7 +273,8 @@ def load_kbd(file, karaoke, cutscene_box):
                                      note['Note type'], note['Start position'] + progress_value))
                 karaoke.Add(Item(
                     end_pos, note['Vertical position'], note['Button type'], 'End', note['End position']))
-        kpm_file = (str(file.parent) + '\\' + file.stem.split('_')[0] + '_param.kpm')
+        kpm_file = (str(file.parent) + '\\' +
+                    file.stem.split('_')[0] + '_param.kpm')
         if Path(kpm_file).exists:
             load_kpm(kpm_file, cutscene_box)
     return karaoke

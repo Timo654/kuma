@@ -49,7 +49,7 @@ def read_file(input_file):
     # reading the file header
     data['Header']['Magic'] = kpm.read_str(4)  # read 4 characters
     if data['Header']['Magic'] != 'MRPK':  # in case it's not a valid file
-        raise Exception('Not a valid DE karaoke file.')
+        raise ValueError('Not a valid DE karaoke file.')
     kpm.seek(4, 1)  # unused, filler, skipping this
     data['Header']['Version'] = kpm.read_uint32()
     kpm.seek(4, 1)  # file size without header, we're skipping this

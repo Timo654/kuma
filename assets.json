@@ -1,5 +1,5 @@
 {
-  "Texture folder": ".\\assets\\textures",
+  "Texture folder": ".\\ui\\textures",
   "Sheet texture": "sheet.png",
   "Line texture": "line.png",
   "Button prompts": {

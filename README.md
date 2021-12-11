@@ -23,7 +23,7 @@ Nooltega saab liigutada scrollbari.
 
 ## TODO list
 * Muusika mängimine - Play/Pause nupp, liigutab scrollbari, kast laulu ajaga
-* Help nupp
+* Help kasti tekst kirjutada
 * Surface suurust vähendada (lõpus olevad nupud lähevad algusesse)
 * Kasutada kpm moodulit, et sealt lugeda cutscene start time 
 
@@ -31,3 +31,5 @@ Nooltega saab liigutada scrollbari.
 https://github.com/SutandoTsukai181/PyBinaryReader
 
 https://github.com/CapitanRetraso/Yakuza-010-Editor-Templates/blob/main/Dragon%20Engine/minigame/de_karaoke_kbd.bt
+
+https://github.com/MyreMylar/pygame_paint

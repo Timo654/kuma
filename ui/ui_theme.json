@@ -1,0 +1,44 @@
+{
+    "menu_bar":
+    {
+        "misc":
+        {
+            "shape": "rectangle",
+            "shadow_width": "0",
+            "border_width": "1",
+            "shape_corner_radius": "2"
+        }
+    },
+    "menu_bar.button":
+    {
+        "misc":
+        {
+            "shadow_width": "0",
+            "border_width": "0"
+        }
+    },
+    "menu_bar.selection_list":
+    {
+        "misc":
+        {
+            "shadow_width": "0"
+        }
+    },
+    "menu_bar.selection_list.button":
+    {
+        "misc":
+        {
+            "text_horiz_alignment": "left",
+            "text_horiz_alignment_padding": "5"
+        }
+    },
+    "#small_header_label":
+    {
+        "font":
+        {
+            "name": "fira_code",
+            "size": "14",
+            "bold": "1"
+        }
+    }
+}

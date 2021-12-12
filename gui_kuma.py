@@ -12,6 +12,7 @@ import json
 import configparser
 import gettext
 import locale
+import mutagen
 
 VERSION = "0.9.0"
 TRANSLATORS = 'Timo654, ketrub'
@@ -56,6 +57,8 @@ if not config.has_section("PATHS"):
                f'{str(Path().resolve())}\\input_file.kpm')
     config.set("PATHS", "KPM_Output",
                f'{str(Path().resolve())}\\output_file.kpm')
+    config.set("PATHS", "Music",
+               f'{str(Path().resolve())}\\audio.ogg')
 
 # initialize pygame stuff
 pygame.init()
@@ -447,7 +450,21 @@ def stop_editing(boxes, box_labels, dropdowns, undo_button):
         undo_button.hide()
 
 
+def load_song(filename, play_button, pause_button):
+    try:
+        pygame.mixer.music.load(filename)
+        play_button.enable()
+        pause_button.enable()
+        song = mutagen.File(filename)
+        length = round(song.info.length * 1000)
+        print(length)
+    except(pygame.error):
+        print('Failed to load file')
+        return False, -1
+    return True, length
 # language related functions
+
+
 def switch_language(language, params=None, boot=False):
     lang_code = assets['Languages'][language]
     lang = gettext.translation(
@@ -457,6 +474,32 @@ def switch_language(language, params=None, boot=False):
     if not boot:
         print(_('Language changed.'))
         update_text(params)
+
+
+def get_menu_data():
+    return {'#file_menu': {'display_name': _('File'),
+                           'items':
+                           {
+        '#new': {'display_name': _('New...')},
+        '#open': {'display_name': _('Open...')},
+        '#save': {'display_name': _('Save')},
+        '#save_as': {'display_name': _('Save As...')}
+    },
+    },
+        '#music_menu': {'display_name': _('Music'),
+                        'items':
+                        {
+            '#load_song': {'display_name': _('Load song...')}
+        },
+    },
+        '#help_menu': {'display_name': _('Help'),
+                       'items':
+                       {
+            '#how_to_use': {'display_name': _('How to use')},
+            '#about': {'display_name': _('About')}
+        }
+    }
+    }
 
 
 def update_text(params):
@@ -473,23 +516,7 @@ def update_text(params):
     params[11].set_text(_('End position'))
     update_dropdown(params[10], mode='update all', new_list=[_('Regular'), _('Hold'), _(
         'Rapid')], index=params[10].options_list.index(params[10].selected_option))
-    menu_data = {'#file_menu': {'display_name': _('File'),
-                                'items':
-                                {
-                                    '#new': {'display_name': _('New...')},
-                                    '#open': {'display_name': _('Open...')},
-                                    '#save': {'display_name': _('Save')},
-                                    '#save_as': {'display_name': _('Save As...')}
-    }
-    },
-        '#help_menu': {'display_name': _('Help'),
-                                    'items':
-                                        {
-                                            '#how_to_use': {'display_name': _('How to use')},
-                                            '#about': {'display_name': _('About')}
-        }
-    }
-    }
+    menu_data = get_menu_data()
     params[12].set_text(menu_data)
 
 
@@ -502,7 +529,7 @@ def main():
     if current_language not in languages:
         current_language = languages[0]
 
-    scr_size = (1600, 480)
+    scr_size = (1600, 490)
     screen = pygame.display.set_mode((scr_size))
     karaoke = Karaoke()
     # FIXME - some notes overflow to the start, minor visual issue.
@@ -515,23 +542,7 @@ def main():
     # ui manager
     manager = UIManager(scr_size, theme_path='assets/ui_theme.json')
     # menu bar related things, menu bar from https://github.com/MyreMylar/pygame_paint
-    menu_data = {'#file_menu': {'display_name': _('File'),
-                                'items':
-                                {
-                                    '#new': {'display_name': _('New...')},
-                                    '#open': {'display_name': _('Open...')},
-                                    '#save': {'display_name': _('Save')},
-                                    '#save_as': {'display_name': _('Save As...')}
-    }
-    },
-        '#help_menu': {'display_name': _('Help'),
-                                    'items':
-                                        {
-                                            '#how_to_use': {'display_name': _('How to use')},
-                                            '#about': {'display_name': _('About')}
-        }
-    }
-    }
+    menu_data = get_menu_data()
     menu_bar = UIMenuBar(relative_rect=pygame.Rect(0, 0, scr_size[0], 25),
                          menu_item_data=menu_data,
                          manager=manager)
@@ -549,16 +560,26 @@ def main():
                                text=_('Save time'),
                                manager=manager)
 
+    play_button = UIButton(relative_rect=pygame.Rect((175, 400), (30, 30)),
+                           text='▶',
+                           manager=manager)
+    pause_button = UIButton(relative_rect=pygame.Rect((175, 425), (30, 30)),
+                            text='▌▌',
+                            manager=manager)  # TODO - see if we can find a nicer alternative
+    # disable when no audio file
+    play_button.disable()
+    pause_button.disable()
+
     # dropdown menus
     button_picker = UIDropDownMenu(options_list=controllers,
                                    starting_option=current_controller,
-                                   relative_rect=pygame.Rect(100, 0, 200, 25),
+                                   relative_rect=pygame.Rect(150, 0, 200, 25),
                                    manager=manager, object_id='#button_picker')
 
     language_picker = UIDropDownMenu(options_list=languages,
                                      starting_option=current_language,
                                      relative_rect=pygame.Rect(
-                                         300, 0, 150, 25),
+                                         350, 0, 150, 25),
                                      manager=manager, object_id='#language_picker')
 
     note_picker = UIDropDownMenu(options_list=assets['Button prompts'][current_controller][1],
@@ -593,6 +614,10 @@ def main():
     cuesheet_box = UITextEntryLine(relative_rect=pygame.Rect(
         (935, 365), (150, 50)), manager=manager)
 
+    music_box = UITextEntryLine(relative_rect=pygame.Rect(
+        (10, 425), (150, 50)), manager=manager)
+    music_box.set_text(str(0))
+
     boxes = [start_box, end_box, vert_box, cue_box, cuesheet_box]
 
     for i in range(len(boxes)):
@@ -600,7 +625,7 @@ def main():
             valid_chars.pop()
         boxes[i].set_allowed_characters(valid_chars)
         boxes[i].hide()
-
+    music_box.set_allowed_characters(valid_chars)
     # labels
     cutscene_label = UILabel(pygame.Rect((10, 340), (150, 22)),
                              _("Cutscene start"),
@@ -629,6 +654,9 @@ def main():
     fps_label = UILabel(pygame.Rect((0, 30), (30, 30)),
                         "0",
                         manager=manager)
+    song_label = UILabel(pygame.Rect((10, 400), (150, 22)),
+                         _("Song position"),
+                         manager=manager)
 
     box_labels = [start_label, end_label, vert_label, cue_label,
                   cuesheet_label, note_button_label, note_type_label]
@@ -663,6 +691,7 @@ def main():
     stopped_editing = False
     gui_button_mode = None
     open_file = None
+    audio_start_pos = 0  # audio start position
     key_pressed = None  # none of the arrow keys are pressed right now
     note_id = 0  # note that you get when you want to add one, first is circle
     fill_colour = (44, 52, 58)
@@ -885,6 +914,24 @@ def main():
                         kpm_output_selection.ok_button.set_text(_('OK'))
                         kpm_output_selection.cancel_button.set_text(
                             _('Cancel'))
+                    # music buttons
+                    if event.ui_element == pause_button:
+                        if loaded:
+                            if pygame.mixer.music.get_busy():  # if song is playing
+                                pygame.mixer.music.pause()
+                            elif len(music_box.get_text()) > 0:  # use value from box instead
+                                audio_start_pos = int(music_box.get_text())
+                                pygame.mixer.music.play(
+                                    start=(audio_start_pos / 1000))
+                            else:
+                                pygame.mixer.music.unpause()
+                    if event.ui_element == play_button:
+                        if loaded:
+                            if pygame.mixer.music.get_busy():  # if song is playing
+                                pygame.mixer.music.stop()
+                            else:
+                                audio_start_pos = 0
+                                pygame.mixer.music.play()
 
                     if event.ui_object_id == 'menu_bar.#file_menu_items.#open':
                         gui_button_mode = 'Input'
@@ -910,6 +957,12 @@ def main():
                             output_selection.ok_button.set_text(_('OK'))
                             output_selection.cancel_button.set_text(
                                 _('Cancel'))
+                    if event.ui_object_id == 'menu_bar.#music_menu_items.#load_song':
+                        gui_button_mode = 'Music'
+                        music_selection = UIFileDialog(
+                            rect=pygame.Rect(0, 0, 300, 300), manager=manager, allow_picking_directories=True, allow_existing_files_only=True, window_title=_('Select an audio file (mp3/ogg)'), initial_file_path=Path(config['PATHS']['Music']))
+                        music_selection.ok_button.set_text(_('OK'))
+                        music_selection.cancel_button.set_text(_('Cancel'))
 
                     if event.ui_object_id == 'menu_bar.#file_menu_items.#save_as':
                         gui_button_mode = 'Output'
@@ -983,6 +1036,14 @@ def main():
                             save_kpm(
                                 kpm_output_selection.current_file_path, cutscene_box, kpm_data)
 
+                    if gui_button_mode == 'Music':
+                        if event.ui_element == music_selection.ok_button:
+                            loaded, length = load_song(
+                                music_selection.current_file_path, play_button, pause_button)
+                            if loaded:
+                                config.set("PATHS", "Music", str(
+                                    music_selection.current_file_path))
+
                     if event.ui_element == undo_button:
                         gui_button_mode = 'Undo'
                         undo_note = UIConfirmationDialog(
@@ -1040,6 +1101,16 @@ def main():
                 screen.blit(world2, (0, 0), (trunc_world2_orig, trunc_world))
         else:
             screen.blit(world, (0, 0), (trunc_world_orig, trunc_world))
+
+        if pygame.mixer.music.get_busy():
+            current_time = pygame.mixer.music.get_pos() + audio_start_pos
+            music_box.set_text(str(current_time))
+            # make the scrollbar move when song is playing
+            converted_time = (current_time / 100) * \
+                (karaoke.box_size + karaoke.border)
+            scrollbar.set_current_value(converted_time)
+        pygame.draw.line(screen, (222, 175, 74), (karaoke.x + karaoke.box_size // 2, karaoke.y + 10), (karaoke.x +
+                                                                                                       karaoke.box_size // 2, ((karaoke.box_size + karaoke.border) * karaoke.rows) + 70), width=5)  # helpful line for music
 
         fps_label.set_text(update_fps())
         manager.draw_ui(screen)

@@ -15,8 +15,8 @@ import locale
 import mutagen
 
 VERSION = "0.9.0"
-TRANSLATORS = 'Timo654, ketrub'
-TESTERS = "ketruB, KaarelJ98"
+TRANSLATORS = 'Timo654, ketrub, Mink, jason098'
+TESTERS = "ketrub, KaarelJ98"
 
 asset_file = 'assets.json'
 if Path(asset_file).is_file():
@@ -576,7 +576,7 @@ def main():
                          manager=manager)
 
     # buttons
-    undo_button = UIButton(relative_rect=pygame.Rect((375, 395), (200, 30)),
+    undo_button = UIButton(relative_rect=pygame.Rect((375, 400), (200, 30)),
                            text=_('Undo note changes'),
                            manager=manager)
     undo_button.hide()
@@ -588,10 +588,10 @@ def main():
                                text=_('Save time'),
                                manager=manager)
 
-    play_button = UIButton(relative_rect=pygame.Rect((275, 400), (30, 30)),
+    play_button = UIButton(relative_rect=pygame.Rect((295, 400), (30, 30)),
                            text='▶',
                            manager=manager)
-    pause_button = UIButton(relative_rect=pygame.Rect((305, 400), (30, 30)),
+    pause_button = UIButton(relative_rect=pygame.Rect((325, 400), (30, 30)),
                             text='▌▌',
                             manager=manager)  # TODO - get a nicer alternative for the button
     # hide when no audio file
@@ -686,7 +686,7 @@ def main():
     song_label = UILabel(pygame.Rect((10, 400), (150, 22)),
                          _("Song position"),
                          manager=manager)
-    volume_label = UILabel(pygame.Rect((175, 402), (100, 25)),
+    volume_label = UILabel(pygame.Rect((175, 402), (120, 25)),
                            _("Volume {}").format(
                                round(float(config['CONFIG']['VOLUME']) * 100)),
                            manager=manager)

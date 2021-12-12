@@ -1,0 +1,288 @@
+# SOME DESCRIPTIVE TITLE.
+# Copyright (C) YEAR ORGANIZATION
+# FIRST AUTHOR <EMAIL@ADDRESS>, YEAR.
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: \n"
+"POT-Creation-Date: 2021-12-12 22:31+0200\n"
+"PO-Revision-Date: 2021-12-13 00:03+0200\n"
+"Last-Translator: \n"
+"Language-Team: \n"
+"Language: de\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=2; plural=(n != 1);\n"
+"Generated-By: pygettext.py 1.5\n"
+"X-Generator: Poedit 3.0.1\n"
+
+#: gui_kuma.py:26
+msgid "Asset data missing"
+msgstr "Asset-Daten fehlen"
+
+#: gui_kuma.py:190
+msgid "{min} min"
+msgstr ""
+
+#: gui_kuma.py:193
+msgid "{min} min {sec} s"
+msgstr ""
+
+#: gui_kuma.py:195
+msgid "{sec} s"
+msgstr ""
+
+#: gui_kuma.py:269 gui_kuma.py:297 gui_kuma.py:487
+msgid "Unable to read file."
+msgstr "Datei kann nicht gelesen werden."
+
+#: gui_kuma.py:272 gui_kuma.py:300
+msgid "Unable to open file."
+msgstr "Datei kann nicht geöffnet werden."
+
+#: gui_kuma.py:288
+msgid "KPM written to {}"
+msgstr "KPM geschrieben in {}"
+
+#: gui_kuma.py:365
+msgid "File written to {}"
+msgstr "Datei geschrieben in {}"
+
+#: gui_kuma.py:500
+msgid "Language changed."
+msgstr "Sprache verändert."
+
+#: gui_kuma.py:505
+msgid "File"
+msgstr "Datei"
+
+#: gui_kuma.py:508
+msgid "New..."
+msgstr "Neu..."
+
+#: gui_kuma.py:509
+msgid "Open..."
+msgstr "Öffnen..."
+
+#: gui_kuma.py:510
+msgid "Save"
+msgstr "Speichern"
+
+#: gui_kuma.py:511
+msgid "Save As..."
+msgstr "Speichern unter..."
+
+#: gui_kuma.py:514
+msgid "Music"
+msgstr "Musik"
+
+#: gui_kuma.py:517
+msgid "Load song..."
+msgstr "Song laden..."
+
+#: gui_kuma.py:520 gui_kuma.py:1042
+msgid "Help"
+msgstr "Hilfe"
+
+#: gui_kuma.py:523
+msgid "How to use"
+msgstr "Verwendung"
+
+#: gui_kuma.py:524 gui_kuma.py:1058
+msgid "About"
+msgstr "Über"
+
+#: gui_kuma.py:531 gui_kuma.py:580
+msgid "Undo note changes"
+msgstr "Note zurücksetzen"
+
+#: gui_kuma.py:532 gui_kuma.py:585
+msgid "Load time"
+msgstr "Zeit laden"
+
+#: gui_kuma.py:533 gui_kuma.py:588
+msgid "Save time"
+msgstr "Zeit speichern"
+
+#: gui_kuma.py:534 gui_kuma.py:660
+msgid "Cutscene start"
+msgstr "Videostart"
+
+#: gui_kuma.py:535 gui_kuma.py:663
+msgid "Start position"
+msgstr "Startposition"
+
+#: gui_kuma.py:536 gui_kuma.py:669
+msgid "Vertical position"
+msgstr "Vertikale Position"
+
+#: gui_kuma.py:537 gui_kuma.py:672
+msgid "Cue ID"
+msgstr "Einsatz-ID"
+
+#: gui_kuma.py:538 gui_kuma.py:675
+msgid "Cuesheet ID"
+msgstr "Einsatzplan-ID"
+
+#: gui_kuma.py:539 gui_kuma.py:678
+msgid "Note button"
+msgstr "Notenknopf"
+
+#: gui_kuma.py:540 gui_kuma.py:681
+msgid "Note type"
+msgstr "Notentyp"
+
+#: gui_kuma.py:541 gui_kuma.py:666
+msgid "End position"
+msgstr "Endposition"
+
+#: gui_kuma.py:542 gui_kuma.py:618
+msgid "Hold"
+msgstr "Halt"
+
+#: gui_kuma.py:542 gui_kuma.py:618
+msgid "Rapid"
+msgstr "Rasch"
+
+#: gui_kuma.py:542 gui_kuma.py:618
+msgid "Regular"
+msgstr "Regulär"
+
+#: gui_kuma.py:546 gui_kuma.py:687
+msgid "Song position"
+msgstr "Liedposition"
+
+#: gui_kuma.py:547 gui_kuma.py:690 gui_kuma.py:1065
+msgid "Volume {}"
+msgstr "Lautstärke {}"
+
+#: gui_kuma.py:888
+msgid ""
+"Are you sure you want to remove this note? This change cannot be undone."
+msgstr ""
+"Bist du sicher, dass du diese Note löschen willst? Dies kann nicht "
+"rückgängig gemacht werden."
+
+#: gui_kuma.py:888
+msgid "Delete note"
+msgstr "Note löschen"
+
+#: gui_kuma.py:888 gui_kuma.py:950 gui_kuma.py:957 gui_kuma.py:983
+#: gui_kuma.py:988 gui_kuma.py:994 gui_kuma.py:1000 gui_kuma.py:1007
+#: gui_kuma.py:1014 gui_kuma.py:1118
+msgid "OK"
+msgstr ""
+
+#: gui_kuma.py:889 gui_kuma.py:951 gui_kuma.py:959 gui_kuma.py:984
+#: gui_kuma.py:989 gui_kuma.py:995 gui_kuma.py:1002 gui_kuma.py:1008
+#: gui_kuma.py:1015 gui_kuma.py:1119
+msgid "Cancel"
+msgstr "Abbrechen"
+
+#: gui_kuma.py:949
+msgid "Select a parameter file (kpm)"
+msgstr "Wähle eine Parameterdatei aus (kpm)"
+
+#: gui_kuma.py:956
+msgid "Select an output file (kpm)"
+msgstr "Wähle eine Ausgabedatei aus (kpm)"
+
+#: gui_kuma.py:982
+msgid "Select an input file (kbd)"
+msgstr "Wähle eine Eingabedatei aus (kbd)"
+
+#: gui_kuma.py:988
+msgid ""
+"Are you sure you want to create a new file? Any unsaved changes will be lost."
+msgstr ""
+"Bist du sicher, dass du eine neue Datei erstellen willst? Alle ungesicherten "
+"Änderungen gehen verloren."
+
+#: gui_kuma.py:988 gui_kuma.py:994
+msgid "Create a new file"
+msgstr "Erstelle eine neue Datei"
+
+#: gui_kuma.py:994
+msgid "Are you sure you want to overwrite {}?"
+msgstr "Bist du sicher, dass du {} überschreiben möchtest?"
+
+#: gui_kuma.py:999 gui_kuma.py:1013
+msgid "Select an output file (kbd)"
+msgstr "Wähle eine Ausgabedatei aus (kbd)"
+
+#: gui_kuma.py:1006
+msgid "Select an audio file (mp3/ogg)"
+msgstr "Wähle eine Audiodatei aus (mp3/ogg)"
+
+#: gui_kuma.py:1022
+msgid ""
+"<b>How to use</b><br>---------------<br><b>KUMA - A karaoke editor for "
+"Dragon Engine games.</b><br>To begin using the tool, you can add start by "
+"loading an existing file from <b>File</b> -> <b>Open</b> or just by adding "
+"notes to a new file.<br>You can choose your preferred <b>controller type</b> "
+"and <b>language</b> using the dropdown menus at the top of the screen."
+"<br>When placing a note, the accuracy is <b>100 milliseconds</b>. You can "
+"change the position more accurately in <b>note edit mode.</b><br>You can "
+"play songs by loading them from the <b>Music</b> tab and then pressing the "
+"<b>Play</b> button in the left corner.<br>If you want to save, you can save "
+"by going to <b>File</b> -> <b>Save</b> or <b>Save as...</b> to either create "
+"a new file or overwrite an existing one.<br>---------------<br><br><b>Key "
+"binds</b><br>---------------<br><br><b>Left click</b> - Place and pick up "
+"notes.<br><b>Right click</b> - Change held note type.<br><b>Left Ctrl</b> - "
+"Change held note type to \"Hold\" note.<br><b>Left Shift</b> - Change held "
+"note type to \"Rapid\" note.<br><b>E</b> - Note edit mode. You can "
+"accurately change note timings, position, type and more. Pressing E again "
+"saves the note.<br><b>Arrow keys, Page Up, Page Down</b> - Move the "
+"scrollbar.<br><b>Delete</b> - Removes currently selected/edited note."
+"<br><b>End</b> - Jump to the last note."
+msgstr ""
+"<b>Verwendung</b><br>---------------<br><b>KUMA - Ein Karaoke Editor für "
+"Dragon Engine Spiele.</b><br>Um das Tool zu verwenden, kannst du mit "
+"<b>Datei</b> -> <b>Öffnen</b> eine vorhandene Datei laden, oder einfach "
+"Noten zu einer neuen Datei hinzufügen.<br>Du kannst deinen bevorzugten "
+"<b>Controller-Typ</b> und deine <b>Sprache</b> mit den Dropdown-Menüs oben "
+"auf dem Bildschirm auswählen. <br>Bei der Platzierung einer Note beträgt die "
+"Genauigkeit <b>100 Millisekunden</b>. Du kannst die Position im <b>Noten-"
+"Bearbeitungsmodus</b> genauer ändern.<br>Du kannst Lieder abspielen, indem "
+"du sie im <b>Musik-Tab</b> lädst und die <b>Wiedergabetaste</b> in der "
+"linken Ecke drückst<br>Speichern kannst du mit <b>Datei</b> -> <b>Speichern</"
+"b> oder <b>Speichern unter...</b> um entweder eine neue Datei zu erstellen "
+"oder eine vorhandene zu überschreiben.<br>---------------"
+"<br><br><b>Tastenbelegungen</b><br>---------------<br><br><b>Linksklick</b> "
+"- Noten platzieren und nehmen.<br><b>Rechtsklick</b> - Notentyp ändern."
+"<br><b>Linke Strg</b> - Notentyp nach \"Halt\" ändern.<br><b>Linke "
+"Umschalttaste</b> - Notentyp nach \"Rasch\" ändern.<br><b>E</b> - Noten-"
+"Bearbeitungsmodus. Du kannst genau Notentimings, Position, Typ und mehr "
+"ändern. Erneutes drücken von E speichert die Note.<br><b>Pfeiltasten, Bild "
+"rauf, Bild runter</b> - Bewegt die Scrollleiste.<br><b>Entf</b> - Entfernt "
+"die ausgewählte/bearbeitete Note.<br><b>Ende</b> - Zur letzten Note springen."
+
+#: gui_kuma.py:1043 gui_kuma.py:1059
+msgid "Close"
+msgstr "Schließen"
+
+#: gui_kuma.py:1049
+msgid ""
+"<br><b>KUMA</b><br>---------------<br><br><b>A karaoke editor for Dragon "
+"Engine games.<br><b>Version: </b>{ver}<br><b>Created by: </b>{creators}"
+"<br><b>Icon by: </b>{mink}<br><b>Testers: </b>{testers}<br><b>Translators: </"
+"b>{translators}<br>"
+msgstr ""
+"<br><b>KUMA</b><br>---------------<br><br><b>Ein Karaoke Editor für Dragon "
+"Engine Spiele.<br><b>Version: </b>{ver}<br><b>Erstellt von: </b>{creators}"
+"<br><b>Symbol von: </b>{mink}<br><b>Tester/innen: </b>{testers}"
+"<br><b>Übersetzer/innen: </b>{translators}<br>"
+
+#: gui_kuma.py:1118
+msgid "Are you sure you want to undo changes made to this note?"
+msgstr ""
+"Bist du sicher, dass du Änderungen an dieser Note rückgängig machen willst?"
+
+#: gui_kuma.py:1118
+msgid "Undo changes"
+msgstr "Änderungen rückgängig machen"
+
+#: gui_kuma.py:1155
+msgid "No open file, unable to save!"
+msgstr "Keine offene Datei, kann nicht speichern!"

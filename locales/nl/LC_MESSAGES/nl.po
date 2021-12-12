@@ -1,11 +1,15 @@
+# SOME DESCRIPTIVE TITLE.
+# Copyright (C) YEAR ORGANIZATION
+# FIRST AUTHOR <EMAIL@ADDRESS>, YEAR.
+#
 msgid ""
 msgstr ""
-"Project-Id-Version: KUMA 1.0\n"
+"Project-Id-Version: \n"
 "POT-Creation-Date: 2021-12-12 21:43+0200\n"
-"PO-Revision-Date: 2021-12-12 21:45+0200\n"
+"PO-Revision-Date: 2021-12-12 22:25+0200\n"
 "Last-Translator: \n"
 "Language-Team: \n"
-"Language: et\n"
+"Language: nl\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
@@ -15,7 +19,7 @@ msgstr ""
 
 #: gui_kuma.py:26
 msgid "Asset data missing"
-msgstr "Andmefailid on puudu"
+msgstr "Asset data niet aanwezig"
 
 #: gui_kuma.py:190
 msgid "{min} min"
@@ -31,87 +35,87 @@ msgstr ""
 
 #: gui_kuma.py:269 gui_kuma.py:297 gui_kuma.py:486
 msgid "Unable to read file."
-msgstr "Ei saa faili lugeda."
+msgstr "Kan bestand niet lezen."
 
 #: gui_kuma.py:272 gui_kuma.py:300
 msgid "Unable to open file."
-msgstr "Ei saa faili avada."
+msgstr "Kan bestand niet openen."
 
 #: gui_kuma.py:288
 msgid "KPM written to {}"
-msgstr "KPM kirjutati faili {}"
+msgstr "KPM geschreven naar {}"
 
 #: gui_kuma.py:364
 msgid "File written to {}"
-msgstr "Andmed kirjutati faili {}"
+msgstr "Bestand geschreven naar {}"
 
 #: gui_kuma.py:499
 msgid "Language changed."
-msgstr "Keel muudetud."
+msgstr "Taal veranderd."
 
 #: gui_kuma.py:504
 msgid "File"
-msgstr "Fail"
+msgstr "Bestand"
 
 #: gui_kuma.py:507
 msgid "New..."
-msgstr "Uus..."
+msgstr "Nieuw..."
 
 #: gui_kuma.py:508
 msgid "Open..."
-msgstr "Ava..."
+msgstr "Openen..."
 
 #: gui_kuma.py:509
 msgid "Save"
-msgstr "Salvesta"
+msgstr "Opslaan"
 
 #: gui_kuma.py:510
 msgid "Save As..."
-msgstr "Salvesta nimega..."
+msgstr "Opslaan als..."
 
 #: gui_kuma.py:513
 msgid "Music"
-msgstr "Muusika"
+msgstr "Muziek"
 
 #: gui_kuma.py:516
 msgid "Load song..."
-msgstr "Lae laul..."
+msgstr "Laad track..."
 
 #: gui_kuma.py:519 gui_kuma.py:1038
 msgid "Help"
-msgstr "Abi"
+msgstr ""
 
 #: gui_kuma.py:522
 msgid "How to use"
-msgstr "Kuidas kasutada"
+msgstr "Gebruikershandleiding"
 
 #: gui_kuma.py:523 gui_kuma.py:1054
 msgid "About"
-msgstr "Meie kohta"
+msgstr "Over"
 
 #: gui_kuma.py:530 gui_kuma.py:576
 msgid "Undo note changes"
-msgstr "Lähtesta noot"
+msgstr "Ongedaan maken"
 
 #: gui_kuma.py:531 gui_kuma.py:581
 msgid "Load time"
-msgstr "Lae aeg"
+msgstr "Laad tijd"
 
 #: gui_kuma.py:532 gui_kuma.py:584
 msgid "Save time"
-msgstr "Salvesta aeg"
+msgstr "Opslaan tijd"
 
 #: gui_kuma.py:533 gui_kuma.py:656
 msgid "Cutscene start"
-msgstr "Klipi algus"
+msgstr ""
 
 #: gui_kuma.py:534 gui_kuma.py:659
 msgid "Start position"
-msgstr "Algus"
+msgstr "Start positie"
 
 #: gui_kuma.py:535 gui_kuma.py:665
 msgid "Vertical position"
-msgstr "Vertikaalne asend"
+msgstr "Verticale positie"
 
 #: gui_kuma.py:536 gui_kuma.py:668
 msgid "Cue ID"
@@ -123,92 +127,93 @@ msgstr ""
 
 #: gui_kuma.py:538 gui_kuma.py:674
 msgid "Note button"
-msgstr "Noodi nupp"
+msgstr "Note knop"
 
 #: gui_kuma.py:539 gui_kuma.py:677
 msgid "Note type"
-msgstr "Noodi tüüp"
+msgstr ""
 
 #: gui_kuma.py:540 gui_kuma.py:662
 msgid "End position"
-msgstr "Lõpp"
+msgstr "Eindpositie"
 
 #: gui_kuma.py:541 gui_kuma.py:614
 msgid "Hold"
-msgstr "Hoia"
+msgstr ""
 
 #: gui_kuma.py:541 gui_kuma.py:614
 msgid "Rapid"
-msgstr "Kiire"
+msgstr ""
 
 #: gui_kuma.py:541 gui_kuma.py:614
 msgid "Regular"
-msgstr "Tavaline"
+msgstr ""
 
 #: gui_kuma.py:683
 msgid "Song position"
-msgstr "Laulu positsioon"
+msgstr "Track positie"
 
 #: gui_kuma.py:686 gui_kuma.py:1061
 msgid "Volume {}"
-msgstr "Heli {}"
+msgstr ""
 
 #: gui_kuma.py:884
 msgid ""
 "Are you sure you want to remove this note? This change cannot be undone."
 msgstr ""
-"Kas olete kindel, et soovite noodi kustutada? Seda käsklust ei saa tagasi "
-"võtta."
+"Weet je zeker dat je deze note wil verwijderen? Deze actie kan niet worden "
+"teruggedraaid."
 
 #: gui_kuma.py:884
 msgid "Delete note"
-msgstr "Kustuta noot"
+msgstr "Note verwijderen"
 
 #: gui_kuma.py:884 gui_kuma.py:946 gui_kuma.py:953 gui_kuma.py:979
 #: gui_kuma.py:984 gui_kuma.py:990 gui_kuma.py:996 gui_kuma.py:1003
 #: gui_kuma.py:1010 gui_kuma.py:1114
 msgid "OK"
-msgstr "OK"
+msgstr ""
 
 #: gui_kuma.py:885 gui_kuma.py:947 gui_kuma.py:955 gui_kuma.py:980
 #: gui_kuma.py:985 gui_kuma.py:991 gui_kuma.py:998 gui_kuma.py:1004
 #: gui_kuma.py:1011 gui_kuma.py:1115
 msgid "Cancel"
-msgstr "Katkesta"
+msgstr "Annuleren"
 
 #: gui_kuma.py:945
 msgid "Select a parameter file (kpm)"
-msgstr "Vali parameetri fail (kpm)"
+msgstr "Selecteer een parameter bestand (kpm)"
 
 #: gui_kuma.py:952
 msgid "Select an output file (kpm)"
-msgstr "Vali väljundfail (kpm)"
+msgstr "Selecteer een output bestand (kpm)"
 
 #: gui_kuma.py:978
 msgid "Select an input file (kbd)"
-msgstr "Vali sisendfail (kbd)"
+msgstr "Selecteer een invoerbestand (kbd)"
 
 #: gui_kuma.py:984
 msgid ""
 "Are you sure you want to create a new file? Any unsaved changes will be lost."
 msgstr ""
-"Kas olete kindel, et soovite uue faili teha? Salvestamata muudatused kaovad."
+"Weet je zeker dat je een nieuw bestand wil aanmaken? Niet-opgeslagen "
+"wijzigingen gaan verloren."
 
 #: gui_kuma.py:984 gui_kuma.py:990
 msgid "Create a new file"
-msgstr "Tee uus fail"
+msgstr "Maak een nieuw bestand"
 
 #: gui_kuma.py:990
 msgid "Are you sure you want to overwrite {}?"
-msgstr "Kas olete kindel, et soovite asendada {}?"
+msgstr "Weet u zeker dat u {} wilt overschrijven?"
 
 #: gui_kuma.py:995 gui_kuma.py:1009
 msgid "Select an output file (kbd)"
-msgstr "Vali väljundfail (kbd)"
+msgstr "Selecteer een output bestand (kbd)"
 
 #: gui_kuma.py:1002
 msgid "Select an audio file (mp3/ogg)"
-msgstr "Vali helifail (mp3/ogg)"
+msgstr "Selecteer een audiobestand (mp3/ogg)"
 
 #: gui_kuma.py:1018
 msgid ""
@@ -232,28 +237,30 @@ msgid ""
 "scrollbar.<br><b>Delete</b> - Removes currently selected/edited note."
 "<br><b>End</b> - Jump to the last note."
 msgstr ""
-"<b>Kuidas kasutada</b><br>---------------<br><b>KUMA - Karaoke editor Dragon "
-"Engine mängudele.</b><br>Alustamiseks saad laadida olemasoleva faili valides "
-"ülevalt <b>Fail</b> -> <b>Ava</b> või lihtsalt uude faili noote lisades."
-"<br>Sa saad valida endale sobiva <b>keele</b> ning <b>klahvid</b> menüü "
-"realt.<br>Noote asetades on täpsus <b>100 millisekundit</b>. Positsiooni "
-"saab täpsemini muuta noodi muuterežiimis.<br>Laule saab mängida laadides "
-"ülevalt <b>\"Muusika\"</b> alt mõne laulu ning siis all vasakus nurgas "
-"<b>Start</b> nuppu vajutades.</b><br>Kui soovid salvestada, saad minna "
-"<b>Fail</b> -> <b>Salvesta</b> või <b>Salvesta nimega...</b> ning teha kas "
-"uue faili või asendada olemasolev fail.<br>---------------<br><br><b>Nupud</"
-"b><br>---------------<br><br><b>Vasak klõps</b> - Aseta ja võta üles noote."
-"<br><b>Parem klõps</b> - Muuda käesolevat noodi tüüpi.<br><b>Vasak Ctrl</b> "
-"- Muuda käesolev noot \"Hoia\" noodiks.<br><b>Vasak Shift</b> - Muuda "
-"käesolev noot \"Kiireks\" noodiks.<br><b>E</b> - Noodi muuterežiim. Siin "
-"saab muuta täpselt noodi aegu, positsiooni, tüüpi ja muud. E'd uuesti "
-"vajutades saab noodi salvestada.<br><b>Arrow keys, Page Up, Page Down</b> - "
-"Liiguta kerimisriba.<br><b>Delete</b> - Kustutab hetkel käesoleva/valitud "
-"noodi.<br><b>End</b> - Hüppa viimase noodi juurde."
+"<b>Gebruikershandleiding</b><br>---------------<br><b>KUMA - Een karaoke "
+"editor voor Dragon Engine games.</b><br>Om te beginnen moet u een "
+"bestaandbestand laden van <b>Bestand</b> -> <b>Openen</b> of door notes toe "
+"te voegen in een nieuw bestand.<br>Je kan je <b>controller type</b> en "
+"<b>language</b> door de dropdown menu's te gebruiken boven aan het programma."
+"<br>Wanneer je een note plaatst, is de nauwkeurigheid <b>100 milliseconden</"
+"b>. Je kan de positie nauwkeuriger aanpassen in <b>note edit mode.</b><br> "
+"Je kan tracks afspelen vanuit de <b>Music</b> tab of als je drukt op de "
+"<b>Play</b> knop in de linker hoek.<br>Als je wilt opslaan kan door naar "
+"<b>Bestand</b> -> <b>Opslaan</b> of <b>Opslaan als...</b> te selecteren je "
+"kan een bestaand bestand overscrijven of een nieuw bestand aanmaken."
+"<br>---------------<br><br><b>Key binds</b><br>---------------"
+"<br><br><b>Linker muisknop</b> - Plaats en beweeg notes.<br><b>Rechter "
+"muisknop</b> - Verander held note type.<br><b>Linker Ctrl</b> - Verander "
+"held note type naar \"Hold\" note.<br><b>Linker Shift</b> - Verander "
+"geselecteerde note type naar \"Rapid\" note.<br><b>E</b> - Note edit mode. "
+"Je kan de note timings, positie, type en meer nauwkeurig veranderen. Op E "
+"drukken slaat de note op.<br><b>Pijltoetsen, Page Up, Page Down</b> - Beweeg "
+"de scrollbar.<br><b>Verwijderen</b> - Verwijder huidig geselecteerde note(s)."
+"<br><b>End</b> - Spring naar de laatste note."
 
 #: gui_kuma.py:1039 gui_kuma.py:1055
 msgid "Close"
-msgstr "Sulge"
+msgstr "Sluiten"
 
 #: gui_kuma.py:1045
 msgid ""
@@ -262,45 +269,19 @@ msgid ""
 "<br><b>Icon by: </b>{mink}<br><b>Testers: </b>{testers}<br><b>Translators: </"
 "b>{translators}<br>"
 msgstr ""
-"<br><b>KUMA</b><br>---------------<br>Karaoke editor Dragon Engine "
-"mängudele<br><b>Versioon: </b>{ver}<br><b>Autor: </b>{creators}<br><b>Ikoon: "
-"</b>{mink}<br><b>Testijad: </b>{testers}<br><b>Tõlkijad: </b>{translators}"
-"<br>"
+"<br><b>KUMA</b><br>---------------<br><br><b>Een karaoke editor voor Dragon "
+"Engine games.<br><b>Versie: </b>{ver}<br><b>Gemaakt door: </b>{creators}"
+"<br><b>Icoon door: </b>{mink}<br><b>Testers: </b>{testers}<br><b>Vertalers: "
+"</b>{translators}<br>"
 
 #: gui_kuma.py:1114
 msgid "Are you sure you want to undo changes made to this note?"
-msgstr "Kas olete kindel, et soovite noodi muutused lähtestada?"
+msgstr "Weet je zeker dat je de veranderingen wilt terugdraaien van deze note?"
 
 #: gui_kuma.py:1114
 msgid "Undo changes"
-msgstr "Lähtesta muutused"
+msgstr "Draai veranderingen terug"
 
 #: gui_kuma.py:1151
 msgid "No open file, unable to save!"
-msgstr "Faili pole avatud, ei saa salvestada!"
-
-#~ msgid ""
-#~ "<br><b>How to use</b><br>---------------<br><br><b>Lorem ipsum dolor sit "
-#~ "amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut "
-#~ "labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud "
-#~ "exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. "
-#~ "Duis aute irure dolor in reprehenderit in voluptate velit esse cillum "
-#~ "dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non "
-#~ "proident, sunt in culpa qui officia deserunt mollit anim id est laborum. "
-#~ "</b>"
-#~ msgstr ""
-#~ "<br><b>Kuidas kasutada</b><br>---------------<br><br><b>Lorem ipsum dolor "
-#~ "sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt "
-#~ "ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud "
-#~ "exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. "
-#~ "Duis aute irure dolor in reprehenderit in voluptate velit esse cillum "
-#~ "dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non "
-#~ "proident, sunt in culpa qui officia deserunt mollit anim id est laborum. "
-#~ "</b>"
-
-#~ msgid "End"
-#~ msgstr "Lõpp"
-
-#~ msgid "Language changed, please restart the program to see the changes."
-#~ msgstr ""
-#~ "Keel on vahetatud, palun tehke programmile restart, et muutust näha."
+msgstr "Geen bestand geopend, kan niet opslaan!"

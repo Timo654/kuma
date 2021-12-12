@@ -16,6 +16,7 @@ import mutagen
 
 VERSION = "0.9.0"
 TRANSLATORS = 'Timo654, ketrub'
+TESTERS = "ketruB, KaarelJ98"
 
 asset_file = 'assets.json'
 if Path(asset_file).is_file():
@@ -301,22 +302,23 @@ def load_kbd(file, karaoke, cutscene_box):
     else:
         karaoke = Karaoke()  # reset data
         for note in data['Notes']:
-            start_pos = karaoke.pos_convert(note['Start position'])
-            karaoke.Add(Item(start_pos, note['Vertical position'], note['Button type'], note['Note type'],
-                             note['Start position'], end_pos=note['End position'], cue_id=note['Cue ID'], cuesheet_id=note['Cuesheet ID']))
-            if note['Note type'] != 0:
-                end_pos = karaoke.pos_convert(note['End position'])
-                if note['Note type'] == 1:
-                    note_id = 4
-                else:
-                    note_id = 5
-                progress_value = 0
-                for i in range(start_pos + 1, end_pos):
-                    progress_value += 100
-                    karaoke.Add(Item(i, note['Vertical position'], note_id,
-                                     note['Note type'], note['Start position'] + progress_value))
-                karaoke.Add(Item(
-                    end_pos, note['Vertical position'], note['Button type'], 3, note['End position']))
+            if note['Note type'] < 3:
+                start_pos = karaoke.pos_convert(note['Start position'])
+                karaoke.Add(Item(start_pos, note['Vertical position'], note['Button type'], note['Note type'],
+                                 note['Start position'], end_pos=note['End position'], cue_id=note['Cue ID'], cuesheet_id=note['Cuesheet ID']))
+                if note['Note type'] != 0:
+                    end_pos = karaoke.pos_convert(note['End position'])
+                    if note['Note type'] == 1:
+                        note_id = 4
+                    else:
+                        note_id = 5
+                    progress_value = 0
+                    for i in range(start_pos + 1, end_pos):
+                        progress_value += 100
+                        karaoke.Add(Item(i, note['Vertical position'], note_id,
+                                         note['Note type'], note['Start position'] + progress_value))
+                    karaoke.Add(Item(
+                        end_pos, note['Vertical position'], note['Button type'], 3, note['End position']))
         kpm_file = f"{str(file.parent)}\\{file.stem.split('_')[0]}_param.kpm"
         if Path(kpm_file).exists():
             load_kpm(kpm_file, cutscene_box)
@@ -331,7 +333,7 @@ def write_kbd(file, karaoke, cutscene_box):
         y = 0
         while y < len(karaoke.items[x]):
             if karaoke.items[x][y] != None:
-                if karaoke.items[x][y].id <= 3 and karaoke.items[x][y].note_type != 3:  # if not End
+                if karaoke.items[x][y].id <= 3 and karaoke.items[x][y].note_type < 3:  # if not End
                     current_note = karaoke.items[x][y]
                     note = dict()
                     note['Start position'] = current_note.start_pos
@@ -541,6 +543,9 @@ def update_text(params):
         'Rapid')], index=params[10].options_list.index(params[10].selected_option))
     menu_data = get_menu_data()
     params[12].set_text(menu_data)
+    params[13].set_text(_("Song position"))
+    params[14].set_text(_("Volume {}").format(
+        round(float(config['CONFIG']['VOLUME']) * 100)))
 
 
 def main():
@@ -596,13 +601,13 @@ def main():
     # dropdown menus
     button_picker = UIDropDownMenu(options_list=controllers,
                                    starting_option=current_controller,
-                                   relative_rect=pygame.Rect(150, 0, 200, 25),
+                                   relative_rect=pygame.Rect(170, 0, 200, 25),
                                    manager=manager, object_id='#button_picker')
 
     language_picker = UIDropDownMenu(options_list=languages,
                                      starting_option=current_language,
                                      relative_rect=pygame.Rect(
-                                         350, 0, 150, 25),
+                                         370, 0, 150, 25),
                                      manager=manager, object_id='#language_picker')
 
     note_picker = UIDropDownMenu(options_list=assets['Button prompts'][current_controller][1],
@@ -941,7 +946,7 @@ def main():
                     if event.ui_element == load_kpm_button:
                         gui_button_mode = 'KPM_Input'
                         kpm_input_selection = UIFileDialog(
-                            rect=pygame.Rect(0, 0, 300, 300), manager=manager, allow_picking_directories=True, allow_existing_files_only=True, window_title=_('Select a parametre file (kpm)'), initial_file_path=Path(config['PATHS']['KPM_Input']))
+                            rect=pygame.Rect(0, 0, 300, 300), manager=manager, allow_picking_directories=True, allow_existing_files_only=True, window_title=_('Select a parameter file (kpm)'), initial_file_path=Path(config['PATHS']['KPM_Input']))
                         kpm_input_selection.ok_button.set_text(_('OK'))
                         kpm_input_selection.cancel_button.set_text(_('Cancel'))
 
@@ -1010,38 +1015,45 @@ def main():
                         output_selection.cancel_button.set_text(_('Cancel'))
 
                     if event.ui_object_id == 'menu_bar.#help_menu_items.#how_to_use':
-                        info_window_rect = pygame.Rect(0, 0, 400, 250)
+                        info_window_rect = pygame.Rect(0, 0, 500, 400)
                         info_window_rect.center = screen.get_rect().center
 
                         help_window = UIMessageWindow(rect=info_window_rect,
-                                                      html_message=_('<br><b>How to use</b><br>'
+                                                      html_message=_('<b>How to use</b><br>'
+                                                                     '---------------<br>'
+                                                                     '<b>KUMA - A karaoke editor for Dragon Engine games.</b><br>'
+                                                                     'To begin using the tool, you can add start by loading an existing file from <b>File</b> -> <b>Open</b> or just by adding notes to a new file.<br>'
+                                                                     'You can choose your preferred <b>controller type</b> and <b>language</b> using the dropdown menus at the top of the screen.<br>'
+                                                                     'When placing a note, the accuracy is <b>100 milliseconds</b>. You can change the position more accurately in <b>note edit mode.</b><br>'
+                                                                     'You can play songs by loading them from the <b>Music</b> tab and then pressing the <b>Play</b> button in the left corner.<br>'
+                                                                     'If you want to save, you can save by going to <b>File</b> -> <b>Save</b> or <b>Save as...</b> to either create a new file or overwrite an existing one.<br>'
                                                                      '---------------<br><br>'
-                                                                     '<b>A karaoke editor for Dragon Engine games.</b><br>'
-                                                                     '<b>You can choose your preffed controller type and language using the dropdown menus next to "Help".</b><br>'
-                                                                     '<b>1 square is 100ms. Take that into account when adding notes. You can change the position more accurately in the note edit mode.</b><br>'
-                                                                     '<b>Music tab lets the user add a song from files on PC which makes adding different notes easier. </b><br>'
-                                                                     '<b>Left click - put down and pick up notes.</b><br>'
-                                                                     '<b>Right click - change current note type. </b><br>'
-                                                                     '<b>Left Ctrl - "Hold" note. Hold a button in-game.</b><br>'
-                                                                     '<b>Left Shift - "Rapid" note. Rapidly press a button in-game.</b><br>'
-                                                                     '<b>E - change note parameters. Including start and end time, type and button, vertical position. Pressing E again saves the note.</b><br>'
-                                                                     '<b>Arrow keys(<-, ->) - move scrollbar </b><br>'
-                                                                     '<b>Delete button - removes currently selected note and also when in note edit mode</b><br>'
-                                                                     '<b>End button - jump to the last note </b><br>'),
+                                                                     '<b>Key binds</b><br>'
+                                                                     '---------------<br><br>'
+                                                                     '<b>Left click</b> - Place and pick up notes.<br>'
+                                                                     '<b>Right click</b> - Change held note type.<br>'
+                                                                     '<b>Left Ctrl</b> - Change held note type to "Hold" note.<br>'
+                                                                     '<b>Left Shift</b> - Change held note type to "Rapid" note.<br>'
+                                                                     '<b>E</b> - Note edit mode. You can accurately change note timings, position, type and more. Pressing E again saves the note.<br>'
+                                                                     '<b>Arrow keys, Page Up, Page Down</b> - Move the scrollbar.<br>'
+                                                                     '<b>Delete</b> - Removes currently selected/edited note.<br>'
+                                                                     '<b>End</b> - Jump to the last note.'),
                                                       manager=manager,
                                                       window_title=_('Help'))
                         help_window.dismiss_button.set_text(_('Close'))
 
                     if event.ui_object_id == 'menu_bar.#help_menu_items.#about':
-                        about_window_rect = pygame.Rect(0, 0, 400, 250)
+                        about_window_rect = pygame.Rect(0, 0, 400, 300)
                         about_window_rect.center = screen.get_rect().center
                         about_window = UIMessageWindow(rect=about_window_rect,
                                                        html_message=_('<br><b>KUMA</b><br>'
                                                                       '---------------<br><br>'
                                                                       '<b>A karaoke editor for Dragon Engine games.<br>'
                                                                       '<b>Version: </b>{ver}<br>'
-                                                                      '<b>Created by: </b>Timo654<br>'
-                                                                      '<b>Translations: </b>{translators}<br>').format(ver=VERSION, translators=TRANSLATORS),
+                                                                      '<b>Created by: </b>{creators}<br>'
+                                                                      '<b>Icon by: </b>{mink}<br>'
+                                                                      '<b>Testers: </b>{testers}<br>'
+                                                                      '<b>Translators: </b>{translators}<br>').format(ver=VERSION, mink='Mink', creators='Timo654', testers=TESTERS, translators=TRANSLATORS),
                                                        manager=manager,
                                                        window_title=_('About'))
                         about_window.dismiss_button.set_text(_('Close'))
@@ -1115,7 +1127,7 @@ def main():
                     config.set("CONFIG", "LANGUAGE", str(
                         language_picker.selected_option))
                     switch_language(language_picker.selected_option, params=[undo_button, load_kpm_button, save_kpm_button, cutscene_label, start_label,
-                                                                             vert_label, cue_label, cuesheet_label, note_button_label, note_type_label, note_type_picker, end_label, menu_bar, manager])
+                                                                             vert_label, cue_label, cuesheet_label, note_button_label, note_type_label, note_type_picker, end_label, menu_bar, song_label, volume_label])
                 if event.user_type == UI_CONFIRMATION_DIALOG_CONFIRMED:  # reset event
                     if gui_button_mode == 'Reset':
                         gui_button_mode = None

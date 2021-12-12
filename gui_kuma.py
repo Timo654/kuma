@@ -548,6 +548,21 @@ def update_text(params):
         round(float(config['CONFIG']['VOLUME']) * 100)))
 
 
+def save_file(open_file, manager):
+    if open_file != None:
+        gui_button_mode = 'Save'
+        save = UIConfirmationDialog(
+        rect=pygame.Rect(0, 0, 300, 300), manager=manager, action_long_desc=_("Are you sure you want to overwrite {}?").format(open_file.name), window_title=_('Create a new file'), action_short_name=_('OK'))
+        save.cancel_button.set_text(_('Cancel'))
+        return gui_button_mode, None
+    else:
+        gui_button_mode = 'Output'
+        output_selection = UIFileDialog(
+        rect=pygame.Rect(0, 0, 300, 300), manager=manager, allow_picking_directories=True, window_title=_('Select an output file (kbd)'), initial_file_path=Path(config['PATHS']['Output']))
+        output_selection.ok_button.set_text(_('OK'))
+        output_selection.cancel_button.set_text(_('Cancel'))
+        return gui_button_mode, output_selection
+
 def main():
     switch_language(config['CONFIG']['LANGUAGE'], boot=True)
     current_controller = config['CONFIG']['BUTTONS']
@@ -889,7 +904,10 @@ def main():
                         delete_note.cancel_button.set_text(_('Cancel'))
 
                     selected = None  # deletes selected note
-                if event.key == pygame.K_LCTRL:
+                keys = pygame.key.get_pressed()
+                if keys[pygame.K_LCTRL] and keys[pygame.K_s]:
+                    gui_button_mode, output_selection = save_file(open_file, manager)
+                if event.key == pygame.K_LALT:
                     note_id = 4
                     selected = Item(0, 0, note_id, 'Hold', 0)  # add item
                 if event.key == pygame.K_LSHIFT:
@@ -988,18 +1006,7 @@ def main():
                             rect=pygame.Rect(0, 0, 300, 300), manager=manager, action_long_desc=_('Are you sure you want to create a new file? Any unsaved changes will be lost.'), window_title=_('Create a new file'), action_short_name=_('OK'))
                         reset_all.cancel_button.set_text(_('Cancel'))
                     if event.ui_object_id == 'menu_bar.#file_menu_items.#save':
-                        if open_file != None:
-                            gui_button_mode = 'Save'
-                            save = UIConfirmationDialog(
-                                rect=pygame.Rect(0, 0, 300, 300), manager=manager, action_long_desc=_("Are you sure you want to overwrite {}?").format(open_file.name), window_title=_('Create a new file'), action_short_name=_('OK'))
-                            save.cancel_button.set_text(_('Cancel'))
-                        else:
-                            gui_button_mode = 'Output'
-                            output_selection = UIFileDialog(
-                                rect=pygame.Rect(0, 0, 300, 300), manager=manager, allow_picking_directories=True, window_title=_('Select an output file (kbd)'), initial_file_path=Path(config['PATHS']['Output']))
-                            output_selection.ok_button.set_text(_('OK'))
-                            output_selection.cancel_button.set_text(
-                                _('Cancel'))
+                        gui_button_mode, output_selection = save_file(open_file, manager)
                     if event.ui_object_id == 'menu_bar.#music_menu_items.#load_song':
                         gui_button_mode = 'Music'
                         music_selection = UIFileDialog(
@@ -1032,7 +1039,7 @@ def main():
                                                                      '---------------<br><br>'
                                                                      '<b>Left click</b> - Place and pick up notes.<br>'
                                                                      '<b>Right click</b> - Change held note type.<br>'
-                                                                     '<b>Left Ctrl</b> - Change held note type to "Hold" note.<br>'
+                                                                     '<b>Left Alt</b> - Change held note type to "Hold" note.<br>'
                                                                      '<b>Left Shift</b> - Change held note type to "Rapid" note.<br>'
                                                                      '<b>E</b> - Note edit mode. You can accurately change note timings, position, type and more. Pressing E again saves the note.<br>'
                                                                      '<b>Arrow keys, Page Up, Page Down</b> - Move the scrollbar.<br>'

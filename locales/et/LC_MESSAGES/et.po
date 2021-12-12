@@ -1,8 +1,8 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: KUMA 1.0\n"
-"POT-Creation-Date: 2021-12-11 23:25+0200\n"
-"PO-Revision-Date: 2021-12-11 23:26+0200\n"
+"POT-Creation-Date: 2021-12-12 19:26+0200\n"
+"PO-Revision-Date: 2021-12-12 19:27+0200\n"
 "Last-Translator: \n"
 "Language-Team: \n"
 "Language: et\n"
@@ -13,210 +13,226 @@ msgstr ""
 "Generated-By: pygettext.py 1.5\n"
 "X-Generator: Poedit 3.0.1\n"
 
-#: gui_kuma.py:23
+#: gui_kuma.py:25
 msgid "Asset data missing"
 msgstr "Andmefailid on puudu"
 
-#: gui_kuma.py:136
+#: gui_kuma.py:189
 msgid "{min} min"
 msgstr ""
 
-#: gui_kuma.py:139
+#: gui_kuma.py:192
 msgid "{min} min {sec} s"
 msgstr ""
 
-#: gui_kuma.py:141
+#: gui_kuma.py:194
 msgid "{sec} s"
 msgstr ""
 
-#: gui_kuma.py:234 gui_kuma.py:258
+#: gui_kuma.py:268 gui_kuma.py:296 gui_kuma.py:485
 msgid "Unable to read file."
 msgstr "Ei saa faili lugeda."
 
-#: gui_kuma.py:236 gui_kuma.py:260
+#: gui_kuma.py:271 gui_kuma.py:299
 msgid "Unable to open file."
 msgstr "Ei saa faili avada."
 
-#: gui_kuma.py:251
+#: gui_kuma.py:287
 msgid "KPM written to {}"
 msgstr "KPM kirjutati faili {}"
 
-#: gui_kuma.py:324
+#: gui_kuma.py:363
 msgid "File written to {}"
 msgstr "Andmed kirjutati faili {}"
 
-#: gui_kuma.py:423 gui_kuma.py:508
-msgid "Undo note changes"
-msgstr "Lähtesta noot"
-
-#: gui_kuma.py:424 gui_kuma.py:522
-msgid "Load time"
-msgstr "Lae aeg"
-
-#: gui_kuma.py:425 gui_kuma.py:525
-msgid "Save time"
-msgstr "Salvesta aeg"
-
-#: gui_kuma.py:426 gui_kuma.py:529
-msgid "Cutscene start"
-msgstr "Klipi algus"
-
-#: gui_kuma.py:427 gui_kuma.py:533
-msgid "Start position"
-msgstr "Algus"
-
-#: gui_kuma.py:428 gui_kuma.py:539
-msgid "Vertical position"
-msgstr "Vertikaalne asend"
-
-#: gui_kuma.py:429 gui_kuma.py:542
-msgid "Cue ID"
-msgstr ""
-
-#: gui_kuma.py:430 gui_kuma.py:545
-msgid "Cuesheet ID"
-msgstr ""
-
-#: gui_kuma.py:431 gui_kuma.py:548
-msgid "Note button"
-msgstr "Noodi nupp"
-
-#: gui_kuma.py:432 gui_kuma.py:551
-msgid "Note type"
-msgstr "Noodi tüüp"
-
-#: gui_kuma.py:433 gui_kuma.py:536
-msgid "End position"
-msgstr "Lõpp"
-
-#: gui_kuma.py:434 gui_kuma.py:576
-msgid "End"
-msgstr "Lõpp"
-
-#: gui_kuma.py:434 gui_kuma.py:576
-msgid "Hold"
-msgstr "Hoia"
-
-#: gui_kuma.py:434 gui_kuma.py:576
-msgid "Rapid"
-msgstr "Kiire"
-
-#: gui_kuma.py:434 gui_kuma.py:576
-msgid "Regular"
-msgstr "Tavaline"
-
-#: gui_kuma.py:435 gui_kuma.py:486
-msgid "File"
-msgstr "Fail"
-
-#: gui_kuma.py:438 gui_kuma.py:489
-msgid "New..."
-msgstr "Uus..."
-
-#: gui_kuma.py:439 gui_kuma.py:490
-msgid "Open..."
-msgstr "Ava..."
-
-#: gui_kuma.py:440 gui_kuma.py:491
-msgid "Save"
-msgstr "Salvesta"
-
-#: gui_kuma.py:441 gui_kuma.py:492
-msgid "Save As..."
-msgstr "Salvesta nimega..."
-
-#: gui_kuma.py:444 gui_kuma.py:495 gui_kuma.py:888
-msgid "Help"
-msgstr "Abi"
-
-#: gui_kuma.py:447 gui_kuma.py:498
-msgid "How to use"
-msgstr "Kuidas kasutada"
-
-#: gui_kuma.py:448 gui_kuma.py:499 gui_kuma.py:902
-msgid "About"
-msgstr "Meie kohta"
-
-#: gui_kuma.py:461
+#: gui_kuma.py:498
 msgid "Language changed."
 msgstr "Keel muudetud."
 
-#: gui_kuma.py:776
+#: gui_kuma.py:503
+msgid "File"
+msgstr "Fail"
+
+#: gui_kuma.py:506
+msgid "New..."
+msgstr "Uus..."
+
+#: gui_kuma.py:507
+msgid "Open..."
+msgstr "Ava..."
+
+#: gui_kuma.py:508
+msgid "Save"
+msgstr "Salvesta"
+
+#: gui_kuma.py:509
+msgid "Save As..."
+msgstr "Salvesta nimega..."
+
+#: gui_kuma.py:512
+msgid "Music"
+msgstr "Muusika"
+
+#: gui_kuma.py:515
+msgid "Load song..."
+msgstr "Lae laul..."
+
+#: gui_kuma.py:518 gui_kuma.py:1032
+msgid "Help"
+msgstr "Abi"
+
+#: gui_kuma.py:521
+msgid "How to use"
+msgstr "Kuidas kasutada"
+
+#: gui_kuma.py:522 gui_kuma.py:1046
+msgid "About"
+msgstr "Meie kohta"
+
+#: gui_kuma.py:529 gui_kuma.py:575
+msgid "Undo note changes"
+msgstr "Lähtesta noot"
+
+#: gui_kuma.py:530 gui_kuma.py:580
+msgid "Load time"
+msgstr "Lae aeg"
+
+#: gui_kuma.py:531 gui_kuma.py:583
+msgid "Save time"
+msgstr "Salvesta aeg"
+
+#: gui_kuma.py:532 gui_kuma.py:655
+msgid "Cutscene start"
+msgstr "Klipi algus"
+
+#: gui_kuma.py:533 gui_kuma.py:658
+msgid "Start position"
+msgstr "Algus"
+
+#: gui_kuma.py:534 gui_kuma.py:664
+msgid "Vertical position"
+msgstr "Vertikaalne asend"
+
+#: gui_kuma.py:535 gui_kuma.py:667
+msgid "Cue ID"
+msgstr ""
+
+#: gui_kuma.py:536 gui_kuma.py:670
+msgid "Cuesheet ID"
+msgstr ""
+
+#: gui_kuma.py:537 gui_kuma.py:673
+msgid "Note button"
+msgstr "Noodi nupp"
+
+#: gui_kuma.py:538 gui_kuma.py:676
+msgid "Note type"
+msgstr "Noodi tüüp"
+
+#: gui_kuma.py:539 gui_kuma.py:661
+msgid "End position"
+msgstr "Lõpp"
+
+#: gui_kuma.py:540 gui_kuma.py:613
+msgid "Hold"
+msgstr "Hoia"
+
+#: gui_kuma.py:540 gui_kuma.py:613
+msgid "Rapid"
+msgstr "Kiire"
+
+#: gui_kuma.py:540 gui_kuma.py:613
+msgid "Regular"
+msgstr "Tavaline"
+
+#: gui_kuma.py:682
+msgid "Song position"
+msgstr "Laulu positsioon"
+
+#: gui_kuma.py:685 gui_kuma.py:1053
+msgid "Volume {}"
+msgstr "Heli {}"
+
+#: gui_kuma.py:883
 msgid ""
 "Are you sure you want to remove this note? This change cannot be undone."
 msgstr ""
 "Kas olete kindel, et soovite noodi kustutada? Seda käsklust ei saa tagasi "
 "võtta."
 
-#: gui_kuma.py:776
+#: gui_kuma.py:883
 msgid "Delete note"
 msgstr "Kustuta noot"
 
-#: gui_kuma.py:776 gui_kuma.py:838 gui_kuma.py:845 gui_kuma.py:852
-#: gui_kuma.py:857 gui_kuma.py:863 gui_kuma.py:869 gui_kuma.py:876
-#: gui_kuma.py:944
+#: gui_kuma.py:883 gui_kuma.py:945 gui_kuma.py:952 gui_kuma.py:978
+#: gui_kuma.py:983 gui_kuma.py:989 gui_kuma.py:995 gui_kuma.py:1002
+#: gui_kuma.py:1009 gui_kuma.py:1106
 msgid "OK"
 msgstr "OK"
 
-#: gui_kuma.py:777 gui_kuma.py:839 gui_kuma.py:846 gui_kuma.py:853
-#: gui_kuma.py:858 gui_kuma.py:864 gui_kuma.py:870 gui_kuma.py:877
-#: gui_kuma.py:945
+#: gui_kuma.py:884 gui_kuma.py:946 gui_kuma.py:954 gui_kuma.py:979
+#: gui_kuma.py:984 gui_kuma.py:990 gui_kuma.py:997 gui_kuma.py:1003
+#: gui_kuma.py:1010 gui_kuma.py:1107
 msgid "Cancel"
 msgstr "Katkesta"
 
-#: gui_kuma.py:837
+#: gui_kuma.py:944
 msgid "Select a parametre file (kpm)"
 msgstr "Vali parameetri fail (kpm)"
 
-#: gui_kuma.py:844
+#: gui_kuma.py:951
 msgid "Select an output file (kpm)"
 msgstr "Vali väljundfail (kpm)"
 
-#: gui_kuma.py:851
+#: gui_kuma.py:977
 msgid "Select an input file (kbd)"
 msgstr "Vali sisendfail (kbd)"
 
-#: gui_kuma.py:857
+#: gui_kuma.py:983
 msgid ""
 "Are you sure you want to create a new file? Any unsaved changes will be lost."
 msgstr ""
 "Kas olete kindel, et soovite uue faili teha? Salvestamata muudatused kaovad."
 
-#: gui_kuma.py:857 gui_kuma.py:863
+#: gui_kuma.py:983 gui_kuma.py:989
 msgid "Create a new file"
 msgstr "Tee uus fail"
 
-#: gui_kuma.py:863
+#: gui_kuma.py:989
 msgid "Are you sure you want to overwrite {}?"
 msgstr "Kas olete kindel, et soovite asendada {}?"
 
-#: gui_kuma.py:868 gui_kuma.py:875
+#: gui_kuma.py:994 gui_kuma.py:1008
 msgid "Select an output file (kbd)"
 msgstr "Vali väljundfail (kbd)"
 
-#: gui_kuma.py:884
-msgid ""
-"<br><b>How to use</b><br>---------------<br><br><b>Lorem ipsum dolor sit "
-"amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut "
-"labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud "
-"exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis "
-"aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu "
-"fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt "
-"in culpa qui officia deserunt mollit anim id est laborum. </b>"
-msgstr ""
-"<br><b>Kuidas kasutada</b><br>---------------<br><br><b>Lorem ipsum dolor "
-"sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut "
-"labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud "
-"exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis "
-"aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu "
-"fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt "
-"in culpa qui officia deserunt mollit anim id est laborum. </b>"
+#: gui_kuma.py:1001
+msgid "Select an audio file (mp3/ogg)"
+msgstr "Vali helifail (mp3/ogg)"
 
-#: gui_kuma.py:889 gui_kuma.py:903
+#: gui_kuma.py:1017
+msgid ""
+"<br><b>How to use</b><br>---------------<br><br><b>A karaoke editor for "
+"Dragon Engine games.</b><br><b>You can choose your preffed controller type "
+"and language using the dropdown menus next to \"Help\".</b><br><b>1 square "
+"is 100ms. Take that into account when adding notes. You can change the "
+"position more accurately in the note edit mode.</b><br><b>Music tab lets the "
+"user add a song from files on PC which makes adding different notes easier. "
+"</b><br><b>Left click - put down and pick up notes.</b><br><b>Right click - "
+"change current note type. </b><br><b>Left Ctrl - \"Hold\" note. Hold a "
+"button in-game.</b><br><b>Left Shift - \"Rapid\" note. Rapidly press a "
+"button in-game.</b><br><b>E - change note parameters. Including start and "
+"end time, type and button, vertical position. Pressing E again saves the "
+"note.</b><br><b>Arrow keys(<-, ->) - move scrollbar </b><br><b>Delete button "
+"- removes currently selected note and also when in note edit mode</"
+"b><br><b>End button - jump to the last note </b><br>"
+msgstr ""
+
+#: gui_kuma.py:1033 gui_kuma.py:1047
 msgid "Close"
 msgstr "Sulge"
 
-#: gui_kuma.py:895
+#: gui_kuma.py:1039
 msgid ""
 "<br><b>KUMA</b><br>---------------<br><br><b>A karaoke editor for Dragon "
 "Engine games.<br><b>Version: </b>{ver}<br><b>Created by: </"
@@ -226,17 +242,39 @@ msgstr ""
 "mängudele<br><b>Versioon: </b>{ver}<br><b>Autor: </b>Timo654<br><b>Tõlkijad: "
 "</b>{translators}<br>"
 
-#: gui_kuma.py:944
+#: gui_kuma.py:1106
 msgid "Are you sure you want to undo changes made to this note?"
 msgstr "Kas olete kindel, et soovite noodi muutused lähtestada?"
 
-#: gui_kuma.py:944
+#: gui_kuma.py:1106
 msgid "Undo changes"
 msgstr "Lähtesta muutused"
 
-#: gui_kuma.py:977
+#: gui_kuma.py:1143
 msgid "No open file, unable to save!"
 msgstr "Faili pole avatud, ei saa salvestada!"
+
+#~ msgid ""
+#~ "<br><b>How to use</b><br>---------------<br><br><b>Lorem ipsum dolor sit "
+#~ "amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut "
+#~ "labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud "
+#~ "exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. "
+#~ "Duis aute irure dolor in reprehenderit in voluptate velit esse cillum "
+#~ "dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non "
+#~ "proident, sunt in culpa qui officia deserunt mollit anim id est laborum. "
+#~ "</b>"
+#~ msgstr ""
+#~ "<br><b>Kuidas kasutada</b><br>---------------<br><br><b>Lorem ipsum dolor "
+#~ "sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt "
+#~ "ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud "
+#~ "exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. "
+#~ "Duis aute irure dolor in reprehenderit in voluptate velit esse cillum "
+#~ "dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non "
+#~ "proident, sunt in culpa qui officia deserunt mollit anim id est laborum. "
+#~ "</b>"
+
+#~ msgid "End"
+#~ msgstr "Lõpp"
 
 #~ msgid "Language changed, please restart the program to see the changes."
 #~ msgstr ""

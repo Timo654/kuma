@@ -68,6 +68,7 @@ clock = pygame.time.Clock()
 pygame.display.set_caption('KUMA')
 pygame_icon = pygame.image.load(f"{assets['Texture folder']}\\icon_small.png")
 pygame.display.set_icon(pygame_icon)
+pygame.mixer.music.set_volume(float(config["CONFIG"]["VOLUME"]))
 
 
 # class for a item, just holds the surface and can resize it
@@ -160,6 +161,18 @@ class Karaoke:
     # remove an item
     def Remove(self, x, y):
         self.items[x][y] = None
+
+    def Remove_long(self, x, y, y_pos=None, new_end_pos=0):
+        note = self.items[x][y]
+        if y_pos == None:
+            y_pos = note.y
+        old_end_pos = self.pos_convert(note.end_pos)
+        start_pos = self.pos_convert(note.start_pos)
+        for i in range(old_end_pos + 1, new_end_pos, -1):
+            if i == start_pos:
+                break
+            self.Remove(i, y_pos)
+        note = None
 
     # check whether the mouse in in the grid
     def In_grid(self, x, y):
@@ -387,7 +400,7 @@ def update_fps():  # fps counter from https://pythonprogramming.altervista.org/p
 
 
 def save_before_closing(note, boxes, dropdowns, karaoke):
-    # TODO - clean
+    vert_changed = False
     if len(boxes[0].get_text()) > 0:
         new_pos = ms_to_game(float(boxes[0].get_text()))
         if karaoke.pos_convert(new_pos) <= len(karaoke.items):
@@ -397,6 +410,9 @@ def save_before_closing(note, boxes, dropdowns, karaoke):
             karaoke.items[note.x][note.y] = note
     if len(boxes[2].get_text()) > 0:
         if int(boxes[2].get_text()) < karaoke.rows:
+            if note.y != int(boxes[2].get_text()):
+                vert_changed = True
+                old_pos = note.y
             karaoke.items[note.x][note.y] = None
             note.y = int(boxes[2].get_text())
             karaoke.items[note.x][note.y] = note
@@ -408,21 +424,23 @@ def save_before_closing(note, boxes, dropdowns, karaoke):
     note.note_type = dropdowns[1].options_list.index(
         dropdowns[1].selected_option)
     note.surface = items[note.id]
-
     if len(boxes[1].get_text()) > 0:
         if note.note_type != 0:
             end_pos = ms_to_game(float(boxes[1].get_text()))
         else:
             end_pos = 0
-        if end_pos < note.end_pos:
-            old_end_pos = karaoke.pos_convert(note.end_pos)
-            new_end_pos = karaoke.pos_convert(end_pos)
-            start_pos = karaoke.pos_convert(note.start_pos)
-            for i in range(old_end_pos + 1, new_end_pos, -1):
-                if i == start_pos:
-                    break
-                karaoke.Remove(i, note.y)
-
+        if end_pos < note.end_pos or vert_changed:
+            if vert_changed:
+                y_pos = old_pos
+                new_end_pos = 0
+            else:
+                y_pos = note.y
+                new_end_pos = karaoke.pos_convert(end_pos)
+            karaoke.Remove_long(note.x, note.y, y_pos=y_pos,
+                                new_end_pos=new_end_pos)
+            if vert_changed:
+                y_pos = note.y
+                end_pos = ms_to_game(float(boxes[1].get_text()))
         if end_pos > note.start_pos:
             note.end_pos = end_pos
             start_pos = karaoke.pos_convert(note.start_pos)
@@ -436,7 +454,6 @@ def save_before_closing(note, boxes, dropdowns, karaoke):
                 progress_value += 100
                 karaoke.Add(Item(i, note.y, note_id,
                                  note.note_type, note.start_pos + progress_value))
-
             karaoke.Add(
                 Item(end_pos, note.y, note.id, 3, note.end_pos))  # note type 3 is hold/rapid end, not an actual thing in the game
         else:
@@ -462,11 +479,10 @@ def load_song(filename, music_elements):
         pygame.mixer.music.load(filename)
         song = mutagen.File(filename)
         length = round(song.info.length * 1000)
-        print(length)
     except(pygame.error):
         for element in music_elements:
             element.hide()
-        print('Failed to load file')
+        print(_('Unable to read file.'))
         return False, -1
     return True, length
 # language related functions
@@ -666,8 +682,9 @@ def main():
                          _("Song position"),
                          manager=manager)
     volume_label = UILabel(pygame.Rect((175, 402), (100, 25)),
-                         _("Volume {}").format(round(float(config['CONFIG']['VOLUME']) * 100)),
-                         manager=manager)
+                           _("Volume {}").format(
+                               round(float(config['CONFIG']['VOLUME']) * 100)),
+                           manager=manager)
 
     box_labels = [start_label, end_label, vert_label, cue_label,
                   cuesheet_label, note_button_label, note_type_label]
@@ -697,12 +714,14 @@ def main():
                                    value_range=(0, scrollbar_size),
                                    manager=manager)
 
-    #volume slider
+    # volume slider
     volume_slider = UIHorizontalSlider(relative_rect=pygame.Rect((175, 430), (160, 25)),
-                                   start_value=100,
-                                   value_range=(0, 100),
-                                   manager=manager, object_id="#volume_slider")
-    music_elements = [song_label, volume_label, play_button, pause_button, volume_slider, music_box]
+                                       start_value=round(
+                                           float(config['CONFIG']['VOLUME']) * 100),
+                                       value_range=(0, 100),
+                                       manager=manager, object_id="#volume_slider")
+    music_elements = [song_label, volume_label,
+                      play_button, pause_button, volume_slider, music_box]
     for item in music_elements:
         item.hide()
     # what the player is currently editing
@@ -1008,7 +1027,7 @@ def main():
                                                                      '<b>E - change note parameters. Including start and end time, type and button, vertical position. Pressing E again saves the note.</b><br>'
                                                                      '<b>Arrow keys(<-, ->) - move scrollbar </b><br>'
                                                                      '<b>Delete button - removes currently selected note and also when in note edit mode</b><br>'
-                                                                     '<b>End button - jump to the last note </b><br>'),                
+                                                                     '<b>End button - jump to the last note </b><br>'),
                                                       manager=manager,
                                                       window_title=_('Help'))
                         help_window.dismiss_button.set_text(_('Close'))
@@ -1031,7 +1050,8 @@ def main():
                     volume_value = volume_slider.get_current_value() / 100
                     pygame.mixer.music.set_volume(volume_value)
                     config.set("CONFIG", "VOLUME", str(volume_value))
-                    volume_label.set_text(_('Volume {}').format(volume_slider.get_current_value()))
+                    volume_label.set_text(_('Volume {}').format(
+                        volume_slider.get_current_value()))
 
                 if event.user_type == UI_BUTTON_PRESSED:
                     if gui_button_mode == 'Input':
@@ -1109,6 +1129,9 @@ def main():
                         update_text_boxes(currently_edited,
                                           boxes, dropdowns)
                     if gui_button_mode == 'Delete':
+                        if currently_edited.note_type != 0:
+                            karaoke.Remove_long(
+                                currently_edited.x, currently_edited.y)
                         karaoke.Remove(currently_edited.x, currently_edited.y)
                         stop_editing(boxes, box_labels, dropdowns, undo_button)
                         currently_edited = None

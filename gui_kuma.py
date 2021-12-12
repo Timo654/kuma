@@ -1007,7 +1007,7 @@ def main():
                                                                      '<b>Left Shift - "Rapid" note. Rapidly press a button in-game.</b><br>'
                                                                      '<b>E - change note parameters. Including start and end time, type and button, vertical position. Pressing E again saves the note.</b><br>'
                                                                      '<b>Arrow keys(<-, ->) - move scrollbar </b><br>'
-                                                                     '<b>Delete button - removes currently selected note also when in note edit mode</b><br>'
+                                                                     '<b>Delete button - removes currently selected note and also when in note edit mode</b><br>'
                                                                      '<b>End button - jump to the last note </b><br>'),                
                                                       manager=manager,
                                                       window_title=_('Help'))

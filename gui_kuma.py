@@ -1,6 +1,6 @@
 # based on https://github.com/TheBigKahuna353/Inventory_system and https://github.com/ppizarror/pygame-menu/blob/master/pygame_menu/examples/other/scrollbar.py
 import pygame
-from pygame_gui import UIManager, UI_BUTTON_START_PRESS, UI_BUTTON_PRESSED, UI_DROP_DOWN_MENU_CHANGED, UI_CONFIRMATION_DIALOG_CONFIRMED
+from pygame_gui import UIManager, UI_BUTTON_START_PRESS, UI_BUTTON_PRESSED, UI_DROP_DOWN_MENU_CHANGED, UI_CONFIRMATION_DIALOG_CONFIRMED, UI_HORIZONTAL_SLIDER_MOVED
 from pygame_gui.windows import UIFileDialog, UIConfirmationDialog, UIMessageWindow
 from pygame_gui.elements import UIDropDownMenu, UILabel, UIButton, UITextEntryLine, UIHorizontalSlider
 import modules.kbd_reader as kbd
@@ -49,6 +49,7 @@ if not config.has_section("CONFIG"):
     config.set("CONFIG", "FPS", str(60))
     config.set("CONFIG", "BUTTONS", controllers[0])
     config.set("CONFIG", "LANGUAGE", get_default_language())
+    config.set("CONFIG", "VOLUME", str(1))
 if not config.has_section("PATHS"):
     config.add_section("PATHS")
     config.set("PATHS", "Input", f'{str(Path().resolve())}\\input_file.kbd')
@@ -65,6 +66,8 @@ pygame.init()
 font = pygame.font.SysFont("FiraCode", 22)
 clock = pygame.time.Clock()
 pygame.display.set_caption('KUMA')
+pygame_icon = pygame.image.load(f"{assets['Texture folder']}\\icon_small.png")
+pygame.display.set_icon(pygame_icon)
 
 
 # class for a item, just holds the surface and can resize it
@@ -450,15 +453,19 @@ def stop_editing(boxes, box_labels, dropdowns, undo_button):
         undo_button.hide()
 
 
-def load_song(filename, play_button, pause_button):
+def load_song(filename, music_elements):
+    if pygame.mixer.music.get_busy():
+        pygame.mixer.music.stop()
     try:
+        for element in music_elements:
+            element.show()
         pygame.mixer.music.load(filename)
-        play_button.enable()
-        pause_button.enable()
         song = mutagen.File(filename)
         length = round(song.info.length * 1000)
         print(length)
     except(pygame.error):
+        for element in music_elements:
+            element.hide()
         print('Failed to load file')
         return False, -1
     return True, length
@@ -548,7 +555,7 @@ def main():
                          manager=manager)
 
     # buttons
-    undo_button = UIButton(relative_rect=pygame.Rect((315, 395), (200, 30)),
+    undo_button = UIButton(relative_rect=pygame.Rect((375, 395), (200, 30)),
                            text=_('Undo note changes'),
                            manager=manager)
     undo_button.hide()
@@ -560,15 +567,15 @@ def main():
                                text=_('Save time'),
                                manager=manager)
 
-    play_button = UIButton(relative_rect=pygame.Rect((175, 400), (30, 30)),
+    play_button = UIButton(relative_rect=pygame.Rect((275, 400), (30, 30)),
                            text='▶',
                            manager=manager)
-    pause_button = UIButton(relative_rect=pygame.Rect((175, 425), (30, 30)),
+    pause_button = UIButton(relative_rect=pygame.Rect((305, 400), (30, 30)),
                             text='▌▌',
-                            manager=manager)  # TODO - see if we can find a nicer alternative
-    # disable when no audio file
-    play_button.disable()
-    pause_button.disable()
+                            manager=manager)  # TODO - get a nicer alternative for the button
+    # hide when no audio file
+    play_button.hide()
+    pause_button.hide()
 
     # dropdown menus
     button_picker = UIDropDownMenu(options_list=controllers,
@@ -626,6 +633,7 @@ def main():
         boxes[i].set_allowed_characters(valid_chars)
         boxes[i].hide()
     music_box.set_allowed_characters(valid_chars)
+
     # labels
     cutscene_label = UILabel(pygame.Rect((10, 340), (150, 22)),
                              _("Cutscene start"),
@@ -657,6 +665,9 @@ def main():
     song_label = UILabel(pygame.Rect((10, 400), (150, 22)),
                          _("Song position"),
                          manager=manager)
+    volume_label = UILabel(pygame.Rect((175, 402), (100, 25)),
+                         _("Volume {}").format(round(float(config['CONFIG']['VOLUME']) * 100)),
+                         manager=manager)
 
     box_labels = [start_label, end_label, vert_label, cue_label,
                   cuesheet_label, note_button_label, note_type_label]
@@ -686,6 +697,14 @@ def main():
                                    value_range=(0, scrollbar_size),
                                    manager=manager)
 
+    #volume slider
+    volume_slider = UIHorizontalSlider(relative_rect=pygame.Rect((175, 430), (160, 25)),
+                                   start_value=100,
+                                   value_range=(0, 100),
+                                   manager=manager, object_id="#volume_slider")
+    music_elements = [song_label, volume_label, play_button, pause_button, volume_slider, music_box]
+    for item in music_elements:
+        item.hide()
     # what the player is currently editing
     currently_edited = None
     stopped_editing = False
@@ -997,6 +1016,12 @@ def main():
                                                        window_title=_('About'))
                         about_window.dismiss_button.set_text(_('Close'))
 
+                if event.user_type == UI_HORIZONTAL_SLIDER_MOVED and event.ui_object_id == '#volume_slider':
+                    volume_value = volume_slider.get_current_value() / 100
+                    pygame.mixer.music.set_volume(volume_value)
+                    config.set("CONFIG", "VOLUME", str(volume_value))
+                    volume_label.set_text(_('Volume {}').format(volume_slider.get_current_value()))
+
                 if event.user_type == UI_BUTTON_PRESSED:
                     if gui_button_mode == 'Input':
                         if event.ui_element == input_selection.ok_button:
@@ -1039,7 +1064,7 @@ def main():
                     if gui_button_mode == 'Music':
                         if event.ui_element == music_selection.ok_button:
                             loaded, length = load_song(
-                                music_selection.current_file_path, play_button, pause_button)
+                                music_selection.current_file_path, music_elements)
                             if loaded:
                                 config.set("PATHS", "Music", str(
                                     music_selection.current_file_path))

@@ -978,7 +978,18 @@ def main():
                         help_window = UIMessageWindow(rect=info_window_rect,
                                                       html_message=_('<br><b>How to use</b><br>'
                                                                      '---------------<br><br>'
-                                                                     '<b>Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum. </b>'),
+                                                                     '<b>A karaoke editor for Dragon Engine games.</b><br>'
+                                                                     '<b>You can choose your preffed controller type and language using the dropdown menus next to "Help".</b><br>'
+                                                                     '<b>1 square is 100ms. Take that into account when adding notes. You can change the position more accurately in the note edit mode.</b><br>'
+                                                                     '<b>Music tab lets the user add a song from files on PC which makes adding different notes easier. </b><br>'
+                                                                     '<b>Left click - put down and pick up notes.</b><br>'
+                                                                     '<b>Right click - change current note type. </b><br>'
+                                                                     '<b>Left Ctrl - "Hold" note. Hold a button in-game.</b><br>'
+                                                                     '<b>Left Shift - "Rapid" note. Rapidly press a button in-game.</b><br>'
+                                                                     '<b>E - change note parameters. Including start and end time, type and button, vertical position. Pressing E again saves the note.</b><br>'
+                                                                     '<b>Arrow keys(<-, ->) - move scrollbar </b><br>'
+                                                                     '<b>Delete button - removes currently selected note also when in note edit mode</b><br>'
+                                                                     '<b>End button - jump to the last note </b><br>'),                
                                                       manager=manager,
                                                       window_title=_('Help'))
                         help_window.dismiss_button.set_text(_('Close'))

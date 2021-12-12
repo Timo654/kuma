@@ -13,8 +13,9 @@ import configparser
 import gettext
 import locale
 
-VERSION = "1.0.0"
+VERSION = "0.9.0"
 TRANSLATORS = 'Timo654, ketrub'
+
 asset_file = 'assets.json'
 if Path(asset_file).is_file():
     with open(asset_file, 'r') as json_file:
@@ -25,6 +26,8 @@ else:
 texture_path = assets['Texture folder']
 controllers = [key for key in assets['Button prompts']]
 languages = [key for key in assets['Languages']]
+
+# get default language
 
 
 def get_default_language():
@@ -47,18 +50,20 @@ if not config.has_section("CONFIG"):
     config.set("CONFIG", "LANGUAGE", get_default_language())
 if not config.has_section("PATHS"):
     config.add_section("PATHS")
-    config.set("PATHS", "Input", str(Path().resolve()) + '\\input_file.kbd')
-    config.set("PATHS", "Output", str(Path().resolve()) + '\\output_file.kbd')
-    config.set("PATHS", "KPM_Input", str(
-        Path().resolve()) + '\\input_file.kpm')
-    config.set("PATHS", "KPM_Output", str(
-        Path().resolve()) + '\\output_file.kpm')
+    config.set("PATHS", "Input", f'{str(Path().resolve())}\\input_file.kbd')
+    config.set("PATHS", "Output", f'{str(Path().resolve())}\\output_file.kbd')
+    config.set("PATHS", "KPM_Input",
+               f'{str(Path().resolve())}\\input_file.kpm')
+    config.set("PATHS", "KPM_Output",
+               f'{str(Path().resolve())}\\output_file.kpm')
 
 # initialize pygame stuff
 pygame.init()
 font = pygame.font.SysFont("FiraCode", 22)
 clock = pygame.time.Clock()
 pygame.display.set_caption('KUMA')
+
+
 # class for a item, just holds the surface and can resize it
 
 
@@ -130,6 +135,32 @@ class Karaoke:
                     world.blit(self.items[x + surface2_offset]
                                [y].resize(self.box_size), rect)
 
+    # get the square that the mouse is over
+    def Get_pos(self, scroll):
+        mouse = pygame.mouse.get_pos()
+        x = scroll + mouse[0] - self.x  # adjust for scrollbar
+        y = mouse[1] - self.y
+        # 1000 comes from testing
+        if x > int(((self.col * self.box_size) + (self.col + self.border)) / 2) + 1000:
+            x -= 15
+        x = x//(self.box_size + self.border)
+        y = y//(self.box_size + self.border)
+        return (x, y)
+
+    # add an item
+    def Add(self, Item):
+        self.items[Item.x][Item.y] = Item
+
+    # remove an item
+    def Remove(self, x, y):
+        self.items[x][y] = None
+
+    # check whether the mouse in in the grid
+    def In_grid(self, x, y):
+        if (x < 0) or (y < 0) or (x >= self.col) or (y >= self.rows):
+            return False
+        return True
+
     def format_time(self, i):
         # display current time, 100 ms each square
         seconds = i // self.scale
@@ -143,18 +174,7 @@ class Karaoke:
         else:
             return _("{sec} s").format(sec=seconds)
 
-    # get the square that the mouse is over
-    def Get_pos(self, scroll):
-        mouse = pygame.mouse.get_pos()
-        x = scroll + mouse[0] - self.x  # adjust for scrollbar
-        y = mouse[1] - self.y
-        # 1000 comes from testing
-        if x > int(((self.col * self.box_size) + (self.col + self.border)) / 2) + 1000:
-            x -= 15
-        x = x//(self.box_size + self.border)
-        y = y//(self.box_size + self.border)
-        return (x, y)
-
+    # convert positions
     def pos_convert(self, pos):
         return normal_round(((pos / 3000) * self.scale))
 
@@ -163,36 +183,13 @@ class Karaoke:
     def pos_to_game(self, pos):
         return normal_round((pos / self.scale) * 3000)
 
-    # add an item
-    def Add(self, Item):
-        self.items[Item.x][Item.y] = Item
-
-    def Remove(self, x, y):
-        self.items[x][y] = None
-
-    # check whether the mouse in in the grid
-    def In_grid(self, x, y):
-        if (x < 0) or (y < 0) or (x >= self.col) or (y >= self.rows):
-            return False
-        return True
-
-
-# https://python-forum.io/thread-403.html
-
-
-def strip_from_sheet(sheet, start, size, columns, rows):
-    frames = []
-    for j in range(rows):
-        for i in range(columns):
-            location = (start[0]+size[0]*i, start[1]+size[1]*j)
-            frames.append(sheet.subsurface(pygame.Rect(location, size)))
-    return frames
+# Loading textures
 
 
 def load_item_tex(button_type, karaoke, selected, dropdown):
     global items
     # load note textures
-    tex_name = texture_path + '\\' + assets['Button prompts'][button_type][0]
+    tex_name = f"{texture_path}\\{assets['Button prompts'][button_type][0]}"
     image = pygame.image.load(tex_name).convert_alpha()
     buttons = strip_from_sheet(image, (0, 0), (122, 122), 2, 2)
     items = [pygame.Surface((122, 122), pygame.SRCALPHA) for _ in range(6)]
@@ -215,11 +212,18 @@ def load_item_tex(button_type, karaoke, selected, dropdown):
     update_dropdown(dropdown, mode='update all', new_list=assets['Button prompts']
                     [button_type][1], index=dropdown.options_list.index(dropdown.selected_option))
 
+# https://python-forum.io/thread-403.html
 
-def normal_round(n):  # https://stackoverflow.com/questions/33019698/how-to-properly-round-up-half-float-numbers
-    if n - floor(n) < 0.5:
-        return floor(n)
-    return ceil(n)
+
+def strip_from_sheet(sheet, start, size, columns, rows):
+    frames = []
+    for j in range(rows):
+        for i in range(columns):
+            location = (start[0]+size[0]*i, start[1]+size[1]*j)
+            frames.append(sheet.subsurface(pygame.Rect(location, size)))
+    return frames
+
+# various time conversions
 
 
 def game_to_ms(pos):
@@ -228,6 +232,14 @@ def game_to_ms(pos):
 
 def ms_to_game(pos):
     return normal_round(pos * 3)
+
+
+def normal_round(n):  # https://stackoverflow.com/questions/33019698/how-to-properly-round-up-half-float-numbers
+    if n - floor(n) < 0.5:
+        return floor(n)
+    return ceil(n)
+
+# KPM code
 
 
 def load_kpm(file, cutscene_box, refresh=1):
@@ -247,13 +259,15 @@ def load_kpm(file, cutscene_box, refresh=1):
 
 
 def save_kpm(file, cutscene_box, data):
-    if Path.exists(file):  # TODO - verify that file is actually KPM
+    if Path.exists(file):
         data = load_kpm(file, cutscene_box, refresh=0)
     elif data != None:
         data['Parameters'][0]['Cutscene start time'] = float(
             cutscene_box.get_text())
         kpm.write_file(data, file)
         print(_("KPM written to {}").format(file))
+
+# KBD code
 
 
 def load_kbd(file, karaoke, cutscene_box):
@@ -284,8 +298,7 @@ def load_kbd(file, karaoke, cutscene_box):
                                      note['Note type'], note['Start position'] + progress_value))
                 karaoke.Add(Item(
                     end_pos, note['Vertical position'], note['Button type'], 3, note['End position']))
-        kpm_file = (str(file.parent) + '\\' +
-                    file.stem.split('_')[0] + '_param.kpm')
+        kpm_file = f"{str(file.parent)}\\{file.stem.split('_')[0]}_param.kpm"
         if Path(kpm_file).exists():
             load_kpm(kpm_file, cutscene_box)
     return karaoke, True
@@ -330,10 +343,7 @@ def write_kbd(file, karaoke, cutscene_box):
     kbd.write_file(data, file, cutscene_start=float(cutscene_box.get_text()))
     print(_("File written to {}").format(file))
 
-
-def update_fps():  # fps counter from https://pythonprogramming.altervista.org/pygame-how-to-display-the-frame-rate-fps-on-the-screen/
-    fps = str(int(clock.get_fps()))
-    return fps
+# update values
 
 
 def update_text_boxes(note, boxes, dropdowns):
@@ -346,6 +356,28 @@ def update_text_boxes(note, boxes, dropdowns):
     update_dropdown(dropdowns[0], mode='update selection', index=note.id)
     update_dropdown(dropdowns[1], mode='update selection',
                     index=note.note_type)
+
+
+# new_list is a list and option is list index
+def update_dropdown(dropdown, mode, new_list=list(), index=0):
+    if mode == 'update all':
+        dropdown.options_list = new_list
+        dropdown.menu_states['expanded'].options_list = new_list
+        dropdown.menu_states['expanded'].rebuild()
+    if (mode == 'update selection') or (mode == 'update all'):
+        option = dropdown.options_list[index]
+        dropdown.selected_option = option
+        dropdown.menu_states['closed'].selected_option = option
+        dropdown.menu_states['closed'].finish()
+        dropdown.menu_states['closed'].start()
+    dropdown.rebuild()
+
+
+def update_fps():  # fps counter from https://pythonprogramming.altervista.org/pygame-how-to-display-the-frame-rate-fps-on-the-screen/
+    fps = str(int(clock.get_fps()))
+    return fps
+
+# save parameter when stopping editing
 
 
 def save_before_closing(note, boxes, dropdowns, karaoke):
@@ -405,21 +437,6 @@ def save_before_closing(note, boxes, dropdowns, karaoke):
             note.end_pos = 0
 
 
-# new_list is a list and option is list index
-def update_dropdown(dropdown, mode, new_list=list(), index=0):
-    if mode == 'update all':
-        dropdown.options_list = new_list
-        dropdown.menu_states['expanded'].options_list = new_list
-        dropdown.menu_states['expanded'].rebuild()
-    if (mode == 'update selection') or (mode == 'update all'):
-        option = dropdown.options_list[index]
-        dropdown.selected_option = option
-        dropdown.menu_states['closed'].selected_option = option
-        dropdown.menu_states['closed'].finish()
-        dropdown.menu_states['closed'].start()
-    dropdown.rebuild()
-
-
 def stop_editing(boxes, box_labels, dropdowns, undo_button):
     for box in boxes:
         box.hide()  # disable text boxes
@@ -428,6 +445,18 @@ def stop_editing(boxes, box_labels, dropdowns, undo_button):
         for dropdown in dropdowns:
             dropdown.hide()
         undo_button.hide()
+
+
+# language related functions
+def switch_language(language, params=None, boot=False):
+    lang_code = assets['Languages'][language]
+    lang = gettext.translation(
+        lang_code, localedir='locales', languages=[lang_code])
+    lang.install()
+    _ = lang.gettext
+    if not boot:
+        print(_('Language changed.'))
+        update_text(params)
 
 
 def update_text(params):
@@ -464,17 +493,6 @@ def update_text(params):
     params[12].set_text(menu_data)
 
 
-def switch_language(language, params=None, boot=False):
-    lang_code = assets['Languages'][language]
-    lang = gettext.translation(
-        lang_code, localedir='locales', languages=[lang_code])
-    lang.install()
-    _ = lang.gettext
-    if not boot:
-        print(_('Language changed.'))
-        update_text(params)
-
-
 def main():
     switch_language(config['CONFIG']['LANGUAGE'], boot=True)
     current_controller = config['CONFIG']['BUTTONS']
@@ -494,9 +512,9 @@ def main():
     world2 = pygame.Surface(
         (accurate_size - world.get_width(), int(scr_size[1])), pygame.SRCALPHA, 32)
 
-    # TODO - sort the buttons in a logical order
-    # menu bar from https://github.com/MyreMylar/pygame_paint
+    # ui manager
     manager = UIManager(scr_size, theme_path='assets/ui_theme.json')
+    # menu bar related things, menu bar from https://github.com/MyreMylar/pygame_paint
     menu_data = {'#file_menu': {'display_name': _('File'),
                                 'items':
                                 {
@@ -518,10 +536,20 @@ def main():
                          menu_item_data=menu_data,
                          manager=manager)
 
+    # buttons
     undo_button = UIButton(relative_rect=pygame.Rect((315, 395), (200, 30)),
                            text=_('Undo note changes'),
                            manager=manager)
     undo_button.hide()
+
+    load_kpm_button = UIButton(relative_rect=pygame.Rect((175, 340), (120, 30)),
+                               text=_('Load time'),
+                               manager=manager)
+    save_kpm_button = UIButton(relative_rect=pygame.Rect((175, 365), (120, 30)),
+                               text=_('Save time'),
+                               manager=manager)
+
+    # dropdown menus
     button_picker = UIDropDownMenu(options_list=controllers,
                                    starting_option=current_controller,
                                    relative_rect=pygame.Rect(100, 0, 200, 25),
@@ -533,17 +561,50 @@ def main():
                                          300, 0, 150, 25),
                                      manager=manager, object_id='#language_picker')
 
-    load_kpm_button = UIButton(relative_rect=pygame.Rect((175, 340), (120, 30)),
-                               text=_('Load time'),
-                               manager=manager)
-    save_kpm_button = UIButton(relative_rect=pygame.Rect((175, 365), (120, 30)),
-                               text=_('Save time'),
-                               manager=manager)
+    note_picker = UIDropDownMenu(options_list=assets['Button prompts'][current_controller][1],
+                                 starting_option=assets['Button prompts'][current_controller][1][0],
+                                 relative_rect=pygame.Rect(1090, 365, 150, 30),
+                                 manager=manager, object_id='#note_picker')
 
+    note_types = [_('Regular'), _('Hold'), _('Rapid')]
+    note_type_picker = UIDropDownMenu(options_list=note_types,
+                                      starting_option=note_types[0],
+                                      relative_rect=pygame.Rect(
+                                          1245, 365, 150, 30),
+                                      manager=manager, object_id='#type_picker')
+
+    dropdowns = [note_picker, note_type_picker]  # hide some dropdowns
+    for dropdown in dropdowns:
+        dropdown.hide()
+
+    # textboxes
+    valid_chars = [str(x) for x in range(0, 10)] + ['.']
+    cutscene_box = UITextEntryLine(relative_rect=pygame.Rect(
+        (10, 365), (150, 50)), manager=manager)
+    cutscene_box.set_text(str(0))
+    start_box = UITextEntryLine(relative_rect=pygame.Rect(
+        (315, 365), (150, 50)), manager=manager)
+    end_box = UITextEntryLine(relative_rect=pygame.Rect(
+        (470, 365), (150, 50)), manager=manager)
+    vert_box = UITextEntryLine(relative_rect=pygame.Rect(
+        (625, 365), (150, 50)), manager=manager)
+    cue_box = UITextEntryLine(relative_rect=pygame.Rect(
+        (780, 365), (150, 50)), manager=manager)
+    cuesheet_box = UITextEntryLine(relative_rect=pygame.Rect(
+        (935, 365), (150, 50)), manager=manager)
+
+    boxes = [start_box, end_box, vert_box, cue_box, cuesheet_box]
+
+    for i in range(len(boxes)):
+        if i == 2:
+            valid_chars.pop()
+        boxes[i].set_allowed_characters(valid_chars)
+        boxes[i].hide()
+
+    # labels
     cutscene_label = UILabel(pygame.Rect((10, 340), (150, 22)),
                              _("Cutscene start"),
                              manager=manager)
-
     start_label = UILabel(pygame.Rect((315, 340), (150, 22)),
                           _("Start position"),
                           manager=manager)
@@ -565,65 +626,29 @@ def main():
     note_type_label = UILabel(pygame.Rect((1245, 340), (150, 22)),
                               _("Note type"),
                               manager=manager)
-
     fps_label = UILabel(pygame.Rect((0, 30), (30, 30)),
                         "0",
                         manager=manager)
 
-    valid_chars = [str(x) for x in range(0, 10)] + ['.']
-    cutscene_box = UITextEntryLine(relative_rect=pygame.Rect(
-        (10, 365), (150, 50)), manager=manager)
-    cutscene_box.set_text(str(0))
-    start_box = UITextEntryLine(relative_rect=pygame.Rect(
-        (315, 365), (150, 50)), manager=manager)
-    end_box = UITextEntryLine(relative_rect=pygame.Rect(
-        (470, 365), (150, 50)), manager=manager)
-    vert_box = UITextEntryLine(relative_rect=pygame.Rect(
-        (625, 365), (150, 50)), manager=manager)
-    cue_box = UITextEntryLine(relative_rect=pygame.Rect(
-        (780, 365), (150, 50)), manager=manager)
-    cuesheet_box = UITextEntryLine(relative_rect=pygame.Rect(
-        (935, 365), (150, 50)), manager=manager)
-    note_picker = UIDropDownMenu(options_list=assets['Button prompts'][current_controller][1],
-                                 starting_option=assets['Button prompts'][current_controller][1][0],
-                                 relative_rect=pygame.Rect(1090, 365, 150, 30),
-                                 manager=manager, object_id='#note_picker')
-    note_types = [_('Regular'), _('Hold'), _('Rapid')]
-    note_type_picker = UIDropDownMenu(options_list=note_types,
-                                      starting_option=note_types[0],
-                                      relative_rect=pygame.Rect(
-                                          1245, 365, 150, 30),
-                                      manager=manager, object_id='#type_picker')
+    box_labels = [start_label, end_label, vert_label, cue_label,
+                  cuesheet_label, note_button_label, note_type_label]
+    for label in box_labels:
+        label.hide()
 
     # what the player is holding
     selected = None
     load_item_tex(current_controller, karaoke,
                   selected, note_picker)  # load button textures
-    dropdowns = [note_picker, note_type_picker]
-    for dropdown in dropdowns:
-        dropdown.hide()
+
     # load sheet textures and scale them
-    sheet_tex = texture_path + '\\' + assets['Sheet texture']
-    line_tex = texture_path + '\\' + assets['Line texture']
+    sheet_tex = f"{texture_path}\\{assets['Sheet texture']}"
+    line_tex = f"{texture_path}\\{assets['Line texture']}"
     sheet_bg = pygame.image.load(sheet_tex).convert()
     line_bg = pygame.image.load(line_tex).convert()
     line_bg = pygame.transform.scale(
         line_bg, (2, (karaoke.box_size + karaoke.border) * karaoke.rows))
     sheet_bg = pygame.transform.scale(
         sheet_bg, (karaoke.box_size + karaoke.border, (karaoke.box_size + karaoke.border) * karaoke.rows))
-
-    boxes = [start_box, end_box, vert_box, cue_box, cuesheet_box]
-    box_labels = [start_label, end_label, vert_label, cue_label,
-                  cuesheet_label, note_button_label, note_type_label]
-
-    for i in range(len(boxes)):
-        if i == 2:
-            valid_chars.pop()
-        boxes[i].set_allowed_characters(valid_chars)
-        boxes[i].hide()
-
-    for label in box_labels:
-        label.hide()
 
     # Horizontal ScrollBar
     thick_h = 30
@@ -818,7 +843,7 @@ def main():
 
                     else:
                         if karaoke.In_grid(pos[0], pos[1]):
-                            if karaoke.items[pos[0]][pos[1]] != currently_edited and karaoke.items[pos[0]][pos[1]] != None :
+                            if karaoke.items[pos[0]][pos[1]] != currently_edited and karaoke.items[pos[0]][pos[1]] != None:
                                 if karaoke.items[pos[0]][pos[1]].id < 4 and karaoke.items[pos[0]][pos[1]].note_type < 3:
                                     save_before_closing(
                                         currently_edited, boxes, dropdowns, karaoke)
@@ -932,7 +957,7 @@ def main():
                                 input_selection.current_file_path, karaoke, cutscene_box)
                             if can_save:
                                 config.set("PATHS", "Input", str(
-                                input_selection.current_file_path))
+                                    input_selection.current_file_path))
                             currently_edited = None
 
                     if gui_button_mode == 'Output':
@@ -950,7 +975,7 @@ def main():
                                 kpm_input_selection.current_file_path, cutscene_box)
                             if kpm_data:
                                 config.set("PATHS", "KPM_Input", str(
-                                kpm_input_selection.current_file_path))
+                                    kpm_input_selection.current_file_path))
                     if gui_button_mode == 'KPM_Output':
                         if event.ui_element == kpm_output_selection.ok_button:
                             config.set("PATHS", "KPM_Output", str(

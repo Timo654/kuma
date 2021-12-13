@@ -564,10 +564,19 @@ def save_file(open_file, manager):
         return gui_button_mode, output_selection
 
 def song_pos_to_scroll(position, karaoke):
-    return (position / 100) * (karaoke.box_size + karaoke.border)
+    if position > 198250:
+        diff = 0
+    else:
+        diff = -50
+    return ((position + diff) / 100) * (karaoke.box_size + karaoke.border)
+
 
 def scroll_to_song_pos(position, karaoke):
-    return int((position * 100) / (karaoke.box_size + karaoke.border) + 50)
+    new_pos = int((position * 100) / (karaoke.box_size + karaoke.border))
+    if new_pos > 198250:
+        return new_pos
+    else:
+        return new_pos + 50
 
 def main():
     switch_language(config['CONFIG']['LANGUAGE'], boot=True)

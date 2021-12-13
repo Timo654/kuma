@@ -1,4 +1,4 @@
-# based on https://github.com/TheBigKahuna353/Inventory_system and https://github.com/ppizarror/pygame-menu/blob/master/pygame_menu/examples/other/scrollbar.py
+
 import pygame
 from pygame_gui import UIManager, UI_BUTTON_START_PRESS, UI_BUTTON_PRESSED, UI_DROP_DOWN_MENU_CHANGED, UI_CONFIRMATION_DIALOG_CONFIRMED, UI_HORIZONTAL_SLIDER_MOVED, UI_TEXT_ENTRY_CHANGED
 from pygame_gui.windows import UIFileDialog, UIConfirmationDialog, UIMessageWindow
@@ -14,9 +14,19 @@ import gettext
 import locale
 import mutagen
 
-VERSION = "0.9.0"
+VERSION = "v0.9.0"
 TRANSLATORS = 'Timo654, ketrub, Mink, jason098, Capitán Retraso'
 TESTERS = "ketrub, KaarelJ98"
+print("""
+   _     _      _     _      _     _      _     _   
+  (c).-.(c)    (c).-.(c)    (c).-.(c)    (c).-.(c)  
+   / ._. \      / ._. \      / ._. \      / ._. \   
+ __\( Y )/__  __\( Y )/__  __\( Y )/__  __\( Y )/__ 
+(_.-/'-'\-._)(_.-/'-'\-._)(_.-/'-'\-._)(_.-/'-'\-._)
+   || K ||      || U ||      || M ||      || A ||   
+ _.' `-' '._  _.' `-' '._  _.' `-' '._  _.' `-' '._ 
+(.-./`-'\.-.)(.-./`-'\.-.)(.-./`-'\.-.)(.-./`-'\.-.)
+ `-'     `-'  `-'     `-'  `-'     `-'  `-'     `-'   """ + VERSION + '\n\n')
 
 asset_file = 'assets.json'
 if Path(asset_file).is_file():
@@ -258,6 +268,22 @@ def normal_round(n):  # https://stackoverflow.com/questions/33019698/how-to-prop
     if n - floor(n) < 0.5:
         return floor(n)
     return ceil(n)
+
+
+def song_pos_to_scroll(position, karaoke):
+    if position > 198250 or position < 50:
+        diff = 0
+    else:
+        diff = -50
+    return ((position + diff) / 100) * (karaoke.box_size + karaoke.border)
+
+
+def scroll_to_song_pos(position, karaoke):
+    new_pos = int((position * 100) / (karaoke.box_size + karaoke.border))
+    if new_pos > 198250:
+        return new_pos
+    else:
+        return new_pos + 50
 
 # KPM code
 
@@ -563,20 +589,6 @@ def save_file(open_file, manager):
         output_selection.cancel_button.set_text(_('Cancel'))
         return gui_button_mode, output_selection
 
-def song_pos_to_scroll(position, karaoke):
-    if position > 198250:
-        diff = 0
-    else:
-        diff = -50
-    return ((position + diff) / 100) * (karaoke.box_size + karaoke.border)
-
-
-def scroll_to_song_pos(position, karaoke):
-    new_pos = int((position * 100) / (karaoke.box_size + karaoke.border))
-    if new_pos > 198250:
-        return new_pos
-    else:
-        return new_pos + 50
 
 def main():
     switch_language(config['CONFIG']['LANGUAGE'], boot=True)
@@ -1077,12 +1089,13 @@ def main():
                                                        manager=manager,
                                                        window_title=_('About'))
                         about_window.dismiss_button.set_text(_('Close'))
-    
+
                 if event.user_type == UI_TEXT_ENTRY_CHANGED and event.ui_object_id == "#song_position":
                     if not pygame.mixer.get_busy():
                         new_value = music_box.get_text()
-                        if len(new_value) > 0: 
-                            new_pos = int(song_pos_to_scroll(int(music_box.get_text()), karaoke))
+                        if len(new_value) > 0:
+                            new_pos = int(song_pos_to_scroll(
+                                int(music_box.get_text()), karaoke))
                             scrollbar.set_current_value(new_pos)
 
                 if event.user_type == UI_HORIZONTAL_SLIDER_MOVED and event.ui_object_id == '#volume_slider':
@@ -1213,7 +1226,8 @@ def main():
         if scrollbar_moved:
             if loaded and not pygame.mixer.music.get_busy():
                 # change the time when scrolling
-                converted_scroll = scroll_to_song_pos(scrollbar.get_current_value(), karaoke)
+                converted_scroll = scroll_to_song_pos(
+                    scrollbar.get_current_value(), karaoke)
                 if converted_scroll > length:
                     converted_scroll = length
                 music_box.set_text(str(converted_scroll))

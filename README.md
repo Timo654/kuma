@@ -30,3 +30,7 @@ https://github.com/SutandoTsukai181/PyBinaryReader
 https://github.com/CapitanRetraso/Yakuza-010-Editor-Templates/blob/main/Dragon%20Engine/minigame/de_karaoke_kbd.bt
 
 https://github.com/MyreMylar/pygame_paint
+
+https://github.com/TheBigKahuna353/Inventory_system
+
+https://github.com/ppizarror/pygame-menu/blob/master/pygame_menu/examples/other/scrollbar.py

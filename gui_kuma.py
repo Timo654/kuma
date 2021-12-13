@@ -54,7 +54,7 @@ def get_default_language():
 settings_file = 'KUMA_settings.ini'
 config = configparser.ConfigParser()
 if Path(settings_file).is_file():
-    config.read(settings_file)
+    config.read(settings_file, encoding='UTF-8')
 if not config.has_section("CONFIG"):
     config.add_section("CONFIG")
     config.set("CONFIG", "FPS", str(60))
@@ -499,6 +499,7 @@ def stop_editing(boxes, box_labels, dropdowns, undo_button):
 
 
 def load_song(filename, music_elements):
+    pygame.mixer.music.unload()
     if pygame.mixer.music.get_busy():
         pygame.mixer.music.stop()
     try:
@@ -853,7 +854,7 @@ def main():
         events = pygame.event.get()
         for event in events:
             if event.type == pygame.QUIT:
-                with open(settings_file, 'w') as configfile:  # save config
+                with open(settings_file, 'w', encoding='UTF-8') as configfile:  # save config
                     config.write(configfile)
                 exit()
 

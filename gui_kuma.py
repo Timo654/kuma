@@ -14,8 +14,10 @@ import gettext
 import locale
 import mutagen
 
+#general info
 VERSION = "v0.9.0"
-TRANSLATORS = 'Timo654, ketrub, Mink, jason098, Capitán Retraso'
+CREATORS = 'Timo654'
+TRANSLATORS = 'Timo654, ketrub, Mink, jason098, Capitán Retraso, Kent, Edness, JustAnyone'
 TESTERS = "ketrub, KaarelJ98"
 print("""
    _     _      _     _      _     _      _     _   
@@ -619,15 +621,15 @@ def main():
                          manager=manager)
 
     # buttons
-    undo_button = UIButton(relative_rect=pygame.Rect((425, 400), (200, 30)),
+    undo_button = UIButton(relative_rect=pygame.Rect((385, 400), (220, 30)),
                            text=_('Undo note changes'),
                            manager=manager)
     undo_button.hide()
 
-    load_kpm_button = UIButton(relative_rect=pygame.Rect((225, 340), (120, 30)),
+    load_kpm_button = UIButton(relative_rect=pygame.Rect((225, 340), (150, 30)),
                                text=_('Load time'),
                                manager=manager)
-    save_kpm_button = UIButton(relative_rect=pygame.Rect((225, 365), (120, 30)),
+    save_kpm_button = UIButton(relative_rect=pygame.Rect((225, 365), (150, 30)),
                                text=_('Save time'),
                                manager=manager)
 
@@ -638,25 +640,25 @@ def main():
     # dropdown menus
     button_picker = UIDropDownMenu(options_list=controllers,
                                    starting_option=current_controller,
-                                   relative_rect=pygame.Rect(180, 0, 200, 25),
+                                   relative_rect=pygame.Rect(190, 0, 200, 25),
                                    manager=manager, object_id='#button_picker')
 
     language_picker = UIDropDownMenu(options_list=languages,
                                      starting_option=current_language,
                                      relative_rect=pygame.Rect(
-                                         380, 0, 150, 25),
+                                         390, 0, 150, 25),
                                      manager=manager, object_id='#language_picker')
 
     note_picker = UIDropDownMenu(options_list=assets['Button prompts'][current_controller][1],
                                  starting_option=assets['Button prompts'][current_controller][1][0],
-                                 relative_rect=pygame.Rect(1140, 365, 150, 30),
+                                 relative_rect=pygame.Rect(1180, 365, 150, 30),
                                  manager=manager, object_id='#note_picker')
 
     note_types = [_('Regular'), _('Hold'), _('Rapid')]
     note_type_picker = UIDropDownMenu(options_list=note_types,
                                       starting_option=note_types[0],
                                       relative_rect=pygame.Rect(
-                                          1295, 365, 200, 30),
+                                          1335, 365, 200, 30),
                                       manager=manager, object_id='#type_picker')
 
     dropdowns = [note_picker, note_type_picker]  # hide some dropdowns
@@ -669,15 +671,15 @@ def main():
         (10, 365), (200, 50)), manager=manager)
     cutscene_box.set_text(str(0))
     start_box = UITextEntryLine(relative_rect=pygame.Rect(
-        (365, 365), (150, 50)), manager=manager)
+        (385, 365), (150, 50)), manager=manager)
     end_box = UITextEntryLine(relative_rect=pygame.Rect(
-        (520, 365), (150, 50)), manager=manager)
+        (540, 365), (150, 50)), manager=manager)
     vert_box = UITextEntryLine(relative_rect=pygame.Rect(
-        (675, 365), (150, 50)), manager=manager)
+        (695, 365), (170, 50)), manager=manager)
     cue_box = UITextEntryLine(relative_rect=pygame.Rect(
-        (830, 365), (150, 50)), manager=manager)
+        (870, 365), (150, 50)), manager=manager)
     cuesheet_box = UITextEntryLine(relative_rect=pygame.Rect(
-        (985, 365), (150, 50)), manager=manager)
+        (1025, 365), (150, 50)), manager=manager)
 
     music_box = UITextEntryLine(relative_rect=pygame.Rect(
         (10, 425), (200, 50)), manager=manager, object_id="#song_position")
@@ -696,25 +698,25 @@ def main():
     cutscene_label = UILabel(pygame.Rect((10, 340), (200, 22)),
                              _("Cutscene start"),
                              manager=manager)
-    start_label = UILabel(pygame.Rect((365, 340), (150, 22)),
+    start_label = UILabel(pygame.Rect((385, 340), (150, 22)),
                           _("Start position"),
                           manager=manager)
-    end_label = UILabel(pygame.Rect((520, 340), (150, 22)),
+    end_label = UILabel(pygame.Rect((540, 340), (150, 22)),
                         _("End position"),
                         manager=manager)
-    vert_label = UILabel(pygame.Rect((675, 340), (150, 22)),
+    vert_label = UILabel(pygame.Rect((695, 340), (170, 22)),
                          _("Vertical position"),
                          manager=manager)
-    cue_label = UILabel(pygame.Rect((830, 340), (150, 22)),
+    cue_label = UILabel(pygame.Rect((870, 340), (150, 22)),
                         _("Cue ID"),
                         manager=manager)
-    cuesheet_label = UILabel(pygame.Rect((985, 340), (150, 22)),
+    cuesheet_label = UILabel(pygame.Rect((1025, 340), (150, 22)),
                              _("Cuesheet ID"),
                              manager=manager)
-    note_button_label = UILabel(pygame.Rect((1140, 340), (150, 22)),
+    note_button_label = UILabel(pygame.Rect((1180, 340), (150, 22)),
                                 _("Note button"),
                                 manager=manager)
-    note_type_label = UILabel(pygame.Rect((1295, 340), (200, 22)),
+    note_type_label = UILabel(pygame.Rect((1335, 340), (200, 22)),
                               _("Note type"),
                               manager=manager)
     fps_label = UILabel(pygame.Rect((0, 30), (30, 30)),
@@ -1086,7 +1088,7 @@ def main():
                                                                       '<b>Created by: </b>{creators}<br>'
                                                                       '<b>Icon by: </b>{mink}<br>'
                                                                       '<b>Testers: </b>{testers}<br>'
-                                                                      '<b>Translators: </b>{translators}<br>').format(ver=VERSION, mink='Mink', creators='Timo654', testers=TESTERS, translators=TRANSLATORS),
+                                                                      '<b>Translators: </b>{translators}<br>').format(ver=VERSION, mink='Mink', creators=CREATORS, testers=TESTERS, translators=TRANSLATORS),
                                                        manager=manager,
                                                        window_title=_('About'))
                         about_window.dismiss_button.set_text(_('Close'))

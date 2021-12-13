@@ -3,7 +3,7 @@ import json
 from pathlib import Path
 asset_file = 'assets.json'
 if Path(asset_file).is_file():
-    with open(asset_file, 'r') as json_file:
+    with open(asset_file, 'r', encoding='UTF-8') as json_file:
         assets = json.load(json_file)
 else:
     assets = dict()

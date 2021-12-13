@@ -6,225 +6,223 @@ msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "POT-Creation-Date: 2021-12-13 15:56+0200\n"
-"PO-Revision-Date: 2021-12-13 21:10+0200\n"
+"PO-Revision-Date: 2021-12-13 20:57+0200\n"
 "Last-Translator: \n"
 "Language-Team: \n"
-"Language: nl\n"
+"Language: lv\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"Plural-Forms: nplurals=2; plural=(n != 1);\n"
+"Plural-Forms: nplurals=3; plural=(n%10==0 || (n%100>=11 && n%100<=19) ? 0 : n"
+"%10==1 && n%100!=11 ? 1 : 2);\n"
 "Generated-By: pygettext.py 1.5\n"
 "X-Generator: Poedit 3.0.1\n"
 
 #: gui_kuma.py:36
 msgid "Asset data missing"
-msgstr "Asset data niet aanwezig"
+msgstr "Trūkst līdzekļu datu"
 
 #: gui_kuma.py:200
 msgid "{min} min"
-msgstr ""
+msgstr "{min} min."
 
 #: gui_kuma.py:203
 msgid "{min} min {sec} s"
-msgstr ""
+msgstr "{min} min. {sec} sek."
 
 #: gui_kuma.py:205
 msgid "{sec} s"
-msgstr ""
+msgstr "{sec} sek."
 
 #: gui_kuma.py:295 gui_kuma.py:323 gui_kuma.py:514
 msgid "Unable to read file."
-msgstr "Kan bestand niet lezen."
+msgstr "Nevar nolasīt failu."
 
 #: gui_kuma.py:298 gui_kuma.py:326
 msgid "Unable to open file."
-msgstr "Kan bestand niet openen."
+msgstr "Nevar atvērt failu"
 
 #: gui_kuma.py:314
 msgid "KPM written to {}"
-msgstr "KPM geschreven naar {}"
+msgstr "KPM saglabāts uz {}"
 
 #: gui_kuma.py:391
 msgid "File written to {}"
-msgstr "Bestand geschreven naar {}"
+msgstr "Fails saglabāts uz {}"
 
 #: gui_kuma.py:527
 msgid "Language changed."
-msgstr "Taal veranderd."
+msgstr "Valoda nomainīta."
 
 #: gui_kuma.py:532
 msgid "File"
-msgstr "Bestand"
+msgstr "Fails"
 
 #: gui_kuma.py:535
 msgid "New..."
-msgstr "Nieuw..."
+msgstr "Jauns..."
 
 #: gui_kuma.py:536
 msgid "Open..."
-msgstr "Openen..."
+msgstr "Atvērt..."
 
 #: gui_kuma.py:537
 msgid "Save"
-msgstr "Opslaan"
+msgstr "Saglabāt"
 
 #: gui_kuma.py:538
 msgid "Save As..."
-msgstr "Opslaan als..."
+msgstr "Saglabāt kā..."
 
 #: gui_kuma.py:541
 msgid "Music"
-msgstr "Muziek"
+msgstr "Mūzika"
 
 #: gui_kuma.py:544
 msgid "Load song..."
-msgstr "Laad track..."
+msgstr "Ielādēt dziesmu...."
 
 #: gui_kuma.py:547 gui_kuma.py:1075
 msgid "Help"
-msgstr ""
+msgstr "Palīgs"
 
 #: gui_kuma.py:550
 msgid "How to use"
-msgstr "Gebruikershandleiding"
+msgstr "Kā izmantot"
 
 #: gui_kuma.py:551 gui_kuma.py:1091
 msgid "About"
-msgstr "Over"
+msgstr "Par"
 
 #: gui_kuma.py:558 gui_kuma.py:623
 msgid "Undo note changes"
-msgstr "Ongedaan maken"
+msgstr "Atsaukt nošu izmaiņas"
 
 #: gui_kuma.py:559 gui_kuma.py:628
 msgid "Load time"
-msgstr "Laad tijd"
+msgstr "Ielādēt laiku"
 
 #: gui_kuma.py:560 gui_kuma.py:631
 msgid "Save time"
-msgstr "Opslaan tijd"
+msgstr "Saglabāt laiku"
 
 #: gui_kuma.py:561 gui_kuma.py:697
 msgid "Cutscene start"
-msgstr ""
+msgstr "Sižeta sākums"
 
 #: gui_kuma.py:562 gui_kuma.py:700
 msgid "Start position"
-msgstr "Start positie"
+msgstr "Sākuma pozīcija"
 
 #: gui_kuma.py:563 gui_kuma.py:706
 msgid "Vertical position"
-msgstr "Verticale positie"
+msgstr "Vertikālā pozīcija"
 
 #: gui_kuma.py:564 gui_kuma.py:709
 msgid "Cue ID"
-msgstr ""
+msgstr "Cue ID"
 
 #: gui_kuma.py:565 gui_kuma.py:712
 msgid "Cuesheet ID"
-msgstr ""
+msgstr "Cuesheet ID"
 
 #: gui_kuma.py:566 gui_kuma.py:715
 msgid "Note button"
-msgstr "Note knop"
+msgstr "Nošu poga"
 
 #: gui_kuma.py:567 gui_kuma.py:718
 msgid "Note type"
-msgstr ""
+msgstr "Nošu tips"
 
 #: gui_kuma.py:568 gui_kuma.py:703
 msgid "End position"
-msgstr "Eindpositie"
+msgstr "Beigu pozīcija"
 
 #: gui_kuma.py:569 gui_kuma.py:655
 msgid "Hold"
-msgstr ""
+msgstr "Paildzināts"
 
 #: gui_kuma.py:569 gui_kuma.py:655
 msgid "Rapid"
-msgstr ""
+msgstr "Straujš"
 
 #: gui_kuma.py:569 gui_kuma.py:655
 msgid "Regular"
-msgstr ""
+msgstr "Parasts"
 
 #: gui_kuma.py:573 gui_kuma.py:724
 msgid "Song position"
-msgstr "Track positie"
+msgstr "Dziesmas vieta"
 
 #: gui_kuma.py:574 gui_kuma.py:727 gui_kuma.py:1106
 msgid "Volume {}"
-msgstr ""
+msgstr "Skaļums {}"
 
 #: gui_kuma.py:582
 msgid "Are you sure you want to overwrite {}?"
-msgstr "Weet u zeker dat u {} wilt overschrijven?"
+msgstr "Vai tiešām vēlaties pārrakstīt {}?"
 
 #: gui_kuma.py:582
 msgid "Save file"
-msgstr "Bestand opslaan"
+msgstr "Saglabāt failu"
 
 #: gui_kuma.py:582 gui_kuma.py:589 gui_kuma.py:928 gui_kuma.py:994
 #: gui_kuma.py:1001 gui_kuma.py:1026 gui_kuma.py:1031 gui_kuma.py:1040
 #: gui_kuma.py:1047 gui_kuma.py:1161
 msgid "OK"
-msgstr ""
+msgstr "Labi"
 
 #: gui_kuma.py:583 gui_kuma.py:590 gui_kuma.py:929 gui_kuma.py:995
 #: gui_kuma.py:1003 gui_kuma.py:1027 gui_kuma.py:1032 gui_kuma.py:1041
 #: gui_kuma.py:1048 gui_kuma.py:1162
 msgid "Cancel"
-msgstr "Annuleren"
+msgstr "Atcelt"
 
 #: gui_kuma.py:588 gui_kuma.py:1046
 msgid "Select an output file (kbd)"
-msgstr "Selecteer een output bestand (kbd)"
+msgstr "Atlasiet izvades failu (kbd)"
 
 #: gui_kuma.py:928
 msgid ""
 "Are you sure you want to remove this note? This change cannot be undone."
-msgstr ""
-"Weet je zeker dat je deze note wil verwijderen? Deze actie kan niet worden "
-"teruggedraaid."
+msgstr "Vai tiešām vēlaties izdzēst šo noti? Šo izmaiņu nevar atsaukt."
 
 #: gui_kuma.py:928
 msgid "Delete note"
-msgstr "Note verwijderen"
+msgstr "Izdzēst noti"
 
 #: gui_kuma.py:993
 msgid "Select a parameter file (kpm)"
-msgstr "Selecteer een parameter bestand (kpm)"
+msgstr "Atlasiet parametru failu (kpm)"
 
 #: gui_kuma.py:1000
 msgid "Select an output file (kpm)"
-msgstr "Selecteer een output bestand (kpm)"
+msgstr "Atlasiet izvades failu (kpm)"
 
 #: gui_kuma.py:1019
 msgid ""
 "Unable to play the song from the given position, restarting from the "
 "beginning."
-msgstr ""
-"Kan track niet starten op aangegeven positie, zal starten vanaf het begin."
+msgstr "Nevar atskaņot dziesmu no norādītās vietas, atsāk no sākuma."
 
 #: gui_kuma.py:1025
 msgid "Select an input file (kbd)"
-msgstr "Selecteer een invoerbestand (kbd)"
+msgstr "Atlasiet ievades failu (kbd)"
 
 #: gui_kuma.py:1031
 msgid ""
 "Are you sure you want to create a new file? Any unsaved changes will be lost."
 msgstr ""
-"Weet je zeker dat je een nieuw bestand wil aanmaken? Niet-opgeslagen "
-"wijzigingen gaan verloren."
+"Vai tiešām vēlaties izveidot jaunu failu? Visas nesaglabātās izmaiņas tiks "
+"zaudētas."
 
 #: gui_kuma.py:1031
 msgid "Create a new file"
-msgstr "Maak een nieuw bestand"
+msgstr "Izveidot jaunu failu"
 
 #: gui_kuma.py:1039
 msgid "Select an audio file (mp3/ogg)"
-msgstr "Selecteer een audiobestand (mp3/ogg)"
+msgstr "Atlasiet skaņas failu (mp3/ogg)"
 
 #: gui_kuma.py:1055
 msgid ""
@@ -248,30 +246,30 @@ msgid ""
 "scrollbar.<br><b>Delete</b> - Removes currently selected/edited note."
 "<br><b>End</b> - Jump to the last note."
 msgstr ""
-"<b>Gebruikershandleiding</b><br>---------------<br><b>KUMA - Een karaoke "
-"editor voor Dragon Engine games.</b><br>Om te beginnen moet u een "
-"bestaandbestand laden van <b>Bestand</b> -> <b>Openen</b> of door notes toe "
-"te voegen in een nieuw bestand.<br>Je kan je <b>controller type</b> en "
-"<b>language</b> door de dropdown menu's te gebruiken boven aan het programma."
-"<br>Wanneer je een note plaatst, is de nauwkeurigheid <b>100 milliseconden</"
-"b>. Je kan de positie nauwkeuriger aanpassen in <b>note edit mode.</b><br> "
-"Je kan tracks afspelen vanuit de <b>Music</b> tab of als je drukt op de "
-"<b>Play</b> knop in de linker hoek.<br>Als je wilt opslaan kan door naar "
-"<b>Bestand</b> -> <b>Opslaan</b> of <b>Opslaan als...</b> te selecteren je "
-"kan een bestaand bestand overscrijven of een nieuw bestand aanmaken."
-"<br>---------------<br><br><b>Key binds</b><br>---------------"
-"<br><br><b>Linker muisknop</b> - Plaats en beweeg notes.<br><b>Rechter "
-"muisknop</b> - Verander held note type.<br><b>Linker Alt</b> - Verander held "
-"note type naar \"Hold\" note.<br><b>Linker Shift</b> - Verander "
-"geselecteerde note type naar \"Rapid\" note.<br><b>E</b> - Note edit mode. "
-"Je kan de note timings, positie, type en meer nauwkeurig veranderen. Op E "
-"drukken slaat de note op.<br><b>Pijltoetsen, Page Up, Page Down</b> - Beweeg "
-"de scrollbar.<br><b>Verwijderen</b> - Verwijder huidig geselecteerde note(s)."
-"<br><b>End</b> - Spring naar de laatste note."
+"<b>Kā izmantot</b><br>---------------<br><b>KUMA - Karaoke Redaktors priekš "
+"<i>Dragon Engine</i> spēlēm.</b><br>Lai sāktu lietot rīku, varat vispirms "
+"sākt, ielādējot esošu failu ar <b>Fails</b> -> <b>Atvērt</b>, vai vienkārši "
+"liekot notis jaunā failā.<br>Varat izvēlēties sev vēlamo <b>pogu "
+"izkārtojumu</b> un <b>valodu</b>, izmantojot pieejamās izvēlnes ekrāna "
+"augšējā stūrī.<br>Ievietojot noti, tās precizitāte ir <b>100 milisekundes</"
+"b>. Jūs varat precīzak mainīt pozīciju <b>nošu rediģēšanas režīmā.</"
+"b><br>Jūs varat atskaņot dziesmas, ielādējot tās no <b>Mūzikas</b> cilnes un "
+"pēc tam nospiežot pogu <b>Atskaņot</b> kreisajā stūrī..<br>Ja vēlaties "
+"saglabāt, dodaties uz <b>Fails</b> -> <b>Saglabāt</b> vai <b>Saglabāt kā...</"
+"b> lai izveidotu jaunu failu vai pārrakstīt esošu.<br>---------------"
+"<br><br><b>Taustiņi</b><br>---------------<br><br><b>Kreisais klikšķis</b> - "
+"Novietot un pārvietotnotis.<br><b>Labais klikšķis</b> - Mainīt turētās nots "
+"veidu.<br><b>Kreisais Alt</b> - Mainīt turētās nots veidu uz \"paildzinātu\" "
+"noti.<br><b>Kreisais Shift</b> - Mainīt turētās nots veidu uz \"strauju\" "
+"noti.<br><b>E</b> - Nošu rediģēšanas režīms. Varat precīzi mainīt nošu "
+"laiku, vietu, veidu utt. Nospiežot E vēlreiz, nots tiks saglabāta."
+"<br><b>Bultiņu pogas, Page Up, Page Down</b> - Pārvietot ritjoslu."
+"<br><b>Delete</b> - Nodzēš pašlaik atlasīto/rediģēto noti.<br><b>End</b> - "
+"Pariet uz pēdējo noti."
 
 #: gui_kuma.py:1076 gui_kuma.py:1092
 msgid "Close"
-msgstr "Sluiten"
+msgstr "Aizvērt"
 
 #: gui_kuma.py:1082
 msgid ""
@@ -280,19 +278,19 @@ msgid ""
 "<br><b>Icon by: </b>{mink}<br><b>Testers: </b>{testers}<br><b>Translators: </"
 "b>{translators}<br>"
 msgstr ""
-"<br><b>KUMA</b><br>---------------<br><br><b>Een karaoke editor voor Dragon "
-"Engine games.<br><b>Versie: </b>{ver}<br><b>Gemaakt door: </b>{creators}"
-"<br><b>Icoon door: </b>{mink}<br><b>Testers: </b>{testers}<br><b>Vertalers: "
-"</b>{translators}<br>"
+"<br><b>KUMA</b><br>---------------<br><br><b>Karaoke redaktors priekš "
+"<i>Dragon Engine</i> spēlēm.<br><b>Versija: </b>{ver}<br><b>Programmu "
+"veidojis: </b>{creators}<br><b>Ikonu veidojis: </b>{mink}<br><b>Testētāji: </"
+"b>{testers}<br><b>Tulkotāji: </b>{translators}<br>"
 
 #: gui_kuma.py:1161
 msgid "Are you sure you want to undo changes made to this note?"
-msgstr "Weet je zeker dat je de veranderingen wilt terugdraaien van deze note?"
+msgstr "Vai tiešām vēlaties atsaukt šai notij veiktās izmaiņas?"
 
 #: gui_kuma.py:1161
 msgid "Undo changes"
-msgstr "Draai veranderingen terug"
+msgstr "Atsaukt izmaiņas"
 
 #: gui_kuma.py:1198
 msgid "No open file, unable to save!"
-msgstr "Geen bestand geopend, kan niet opslaan!"
+msgstr "Nav atvērta faila, nevar saglabāt!"

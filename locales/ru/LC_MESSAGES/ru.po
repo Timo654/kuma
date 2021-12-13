@@ -1,0 +1,301 @@
+# SOME DESCRIPTIVE TITLE.
+# Copyright (C) YEAR ORGANIZATION
+# FIRST AUTHOR <EMAIL@ADDRESS>, YEAR.
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: \n"
+"POT-Creation-Date: 2021-12-13 15:56+0200\n"
+"PO-Revision-Date: 2021-12-13 20:40+0200\n"
+"Last-Translator: \n"
+"Language-Team: \n"
+"Language: ru\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=3; plural=(n%10==1 && n%100!=11 ? 0 : n%10>=2 && n"
+"%10<=4 && (n%100<12 || n%100>14) ? 1 : 2);\n"
+"Generated-By: pygettext.py 1.5\n"
+"X-Generator: Poedit 3.0.1\n"
+
+#: gui_kuma.py:36
+msgid "Asset data missing"
+msgstr "Ошибка целостности файлов"
+
+#: gui_kuma.py:200
+msgid "{min} min"
+msgstr "{min} мин."
+
+#: gui_kuma.py:203
+msgid "{min} min {sec} s"
+msgstr "{min} мин. {sec} сек."
+
+#: gui_kuma.py:205
+msgid "{sec} s"
+msgstr "{sec} сек."
+
+#: gui_kuma.py:295 gui_kuma.py:323 gui_kuma.py:514
+msgid "Unable to read file."
+msgstr "Произошла ошибка при чтении файла."
+
+#: gui_kuma.py:298 gui_kuma.py:326
+msgid "Unable to open file."
+msgstr "Произошла ошибка про открытии файла."
+
+#: gui_kuma.py:314
+msgid "KPM written to {}"
+msgstr "KPM файл сохранён в {}"
+
+#: gui_kuma.py:391
+msgid "File written to {}"
+msgstr "Файл сохранён в {}"
+
+#: gui_kuma.py:527
+msgid "Language changed."
+msgstr "Язык изменён."
+
+#: gui_kuma.py:532
+msgid "File"
+msgstr "Файл"
+
+#: gui_kuma.py:535
+msgid "New..."
+msgstr "Создать..."
+
+#: gui_kuma.py:536
+msgid "Open..."
+msgstr "Открыть..."
+
+#: gui_kuma.py:537
+msgid "Save"
+msgstr "Сохранить"
+
+#: gui_kuma.py:538
+msgid "Save As..."
+msgstr "Сохранить как..."
+
+#: gui_kuma.py:541
+msgid "Music"
+msgstr "Музыка"
+
+#: gui_kuma.py:544
+msgid "Load song..."
+msgstr "Загрузить трек..."
+
+#: gui_kuma.py:547 gui_kuma.py:1075
+msgid "Help"
+msgstr "Помощь"
+
+#: gui_kuma.py:550
+msgid "How to use"
+msgstr "Как использовать"
+
+#: gui_kuma.py:551 gui_kuma.py:1091
+msgid "About"
+msgstr "О программе"
+
+#: gui_kuma.py:558 gui_kuma.py:623
+msgid "Undo note changes"
+msgstr "Сбросить изменения"
+
+#: gui_kuma.py:559 gui_kuma.py:628
+msgid "Load time"
+msgstr "Загрузить время"
+
+#: gui_kuma.py:560 gui_kuma.py:631
+msgid "Save time"
+msgstr "Сохранить время"
+
+#: gui_kuma.py:561 gui_kuma.py:697
+msgid "Cutscene start"
+msgstr "Старт видео (сек.)"
+
+#: gui_kuma.py:562 gui_kuma.py:700
+msgid "Start position"
+msgstr "Начало"
+
+#: gui_kuma.py:563 gui_kuma.py:706
+msgid "Vertical position"
+msgstr "Вертикальная позиция"
+
+#: gui_kuma.py:564 gui_kuma.py:709
+msgid "Cue ID"
+msgstr "ID трека"
+
+#: gui_kuma.py:565 gui_kuma.py:712
+msgid "Cuesheet ID"
+msgstr "ID таблицы"
+
+#: gui_kuma.py:566 gui_kuma.py:715
+msgid "Note button"
+msgstr "Кнопка ноты"
+
+#: gui_kuma.py:567 gui_kuma.py:718
+msgid "Note type"
+msgstr "Тип ноты"
+
+#: gui_kuma.py:568 gui_kuma.py:703
+msgid "End position"
+msgstr "Конечная позиция"
+
+#: gui_kuma.py:569 gui_kuma.py:655
+msgid "Hold"
+msgstr "Удерживать"
+
+#: gui_kuma.py:569 gui_kuma.py:655
+msgid "Rapid"
+msgstr "Быстро нажимать"
+
+#: gui_kuma.py:569 gui_kuma.py:655
+msgid "Regular"
+msgstr "Обычная"
+
+#: gui_kuma.py:573 gui_kuma.py:724
+msgid "Song position"
+msgstr "Позиция в треке"
+
+#: gui_kuma.py:574 gui_kuma.py:727 gui_kuma.py:1106
+msgid "Volume {}"
+msgstr "Громкость {}"
+
+#: gui_kuma.py:582
+msgid "Are you sure you want to overwrite {}?"
+msgstr "Вы уверены что хотите перезаписать {}?"
+
+#: gui_kuma.py:582
+msgid "Save file"
+msgstr "Сохранить файл"
+
+#: gui_kuma.py:582 gui_kuma.py:589 gui_kuma.py:928 gui_kuma.py:994
+#: gui_kuma.py:1001 gui_kuma.py:1026 gui_kuma.py:1031 gui_kuma.py:1040
+#: gui_kuma.py:1047 gui_kuma.py:1161
+msgid "OK"
+msgstr "Ок"
+
+#: gui_kuma.py:583 gui_kuma.py:590 gui_kuma.py:929 gui_kuma.py:995
+#: gui_kuma.py:1003 gui_kuma.py:1027 gui_kuma.py:1032 gui_kuma.py:1041
+#: gui_kuma.py:1048 gui_kuma.py:1162
+msgid "Cancel"
+msgstr "Отмена"
+
+#: gui_kuma.py:588 gui_kuma.py:1046
+msgid "Select an output file (kbd)"
+msgstr "Выбрать файл для сохранения (kbd)"
+
+#: gui_kuma.py:928
+msgid ""
+"Are you sure you want to remove this note? This change cannot be undone."
+msgstr ""
+"Вы уверены что хотите удалить эту ноту? Это действие невозможно будет "
+"отменить."
+
+#: gui_kuma.py:928
+msgid "Delete note"
+msgstr "Удалить ноту"
+
+#: gui_kuma.py:993
+msgid "Select a parameter file (kpm)"
+msgstr "Загрузить файл параметра (kpm)"
+
+#: gui_kuma.py:1000
+msgid "Select an output file (kpm)"
+msgstr "Выбрать файл для сохранения (kpm)"
+
+#: gui_kuma.py:1019
+msgid ""
+"Unable to play the song from the given position, restarting from the "
+"beginning."
+msgstr ""
+"Ошибка при воиспроизведении трека с указанной позиции, трек будет "
+"воспроизведён с начала."
+
+#: gui_kuma.py:1025
+msgid "Select an input file (kbd)"
+msgstr "Загрузить файл (kbd)"
+
+#: gui_kuma.py:1031
+msgid ""
+"Are you sure you want to create a new file? Any unsaved changes will be lost."
+msgstr ""
+"Вы действительно хотите создать новый файл? Все несохранённые изменения "
+"будут утеряны."
+
+#: gui_kuma.py:1031
+msgid "Create a new file"
+msgstr "Создать новый файл"
+
+#: gui_kuma.py:1039
+msgid "Select an audio file (mp3/ogg)"
+msgstr "Загрузить аудио файл (mp3/ogg)"
+
+#: gui_kuma.py:1055
+msgid ""
+"<b>How to use</b><br>---------------<br><b>KUMA - A karaoke editor for "
+"Dragon Engine games.</b><br>To begin using the tool, you can add start by "
+"loading an existing file from <b>File</b> -> <b>Open</b> or just by adding "
+"notes to a new file.<br>You can choose your preferred <b>controller type</b> "
+"and <b>language</b> using the dropdown menus at the top of the screen."
+"<br>When placing a note, the accuracy is <b>100 milliseconds</b>. You can "
+"change the position more accurately in <b>note edit mode.</b><br>You can "
+"play songs by loading them from the <b>Music</b> tab and then pressing the "
+"<b>Play</b> button in the left corner.<br>If you want to save, you can save "
+"by going to <b>File</b> -> <b>Save</b> or <b>Save as...</b> to either create "
+"a new file or overwrite an existing one.<br>---------------<br><br><b>Key "
+"binds</b><br>---------------<br><br><b>Left click</b> - Place and pick up "
+"notes.<br><b>Right click</b> - Change held note type.<br><b>Left Alt</b> - "
+"Change held note type to \"Hold\" note.<br><b>Left Shift</b> - Change held "
+"note type to \"Rapid\" note.<br><b>E</b> - Note edit mode. You can "
+"accurately change note timings, position, type and more. Pressing E again "
+"saves the note.<br><b>Arrow keys, Page Up, Page Down</b> - Move the "
+"scrollbar.<br><b>Delete</b> - Removes currently selected/edited note."
+"<br><b>End</b> - Jump to the last note."
+msgstr ""
+"<b>Как использовать</b><br>---------------<br><b>KUMA - караоке-редактор для "
+"игр на базе Dragon Engine.</b><br> Для начала работы вы можете загрузить уже "
+"существующий файл с помощью <b>Файл</b> -> <b>Открыть</b> или создать новый "
+"файл и начать добавлять ноты в него.<br>Также у вас есть возможность выбрать "
+"<b>тип контроллера</b> и <b>язык программы</b> с помощью верхнего меню опций."
+"<br>При расстановке нот, точность составляет <b>100 миллисекунд</b>. В "
+"<b>режиме редактора нот</b> у вас есть возможность расставить ноты ещё "
+"точнее.<br>Вы можете загржать треки с помощью вкладки <b>Музыка</b> и затем "
+"проигрывать их кнопкой <b>Play</b> в левом углу программы.<br>Чтобы "
+"сохранить файл, во вкладке <b>Файл</b> выберете либо <b>Сохранить</b> чтобы "
+"перезаписать уже существующий файл или <b>Сохранить как...</b> чтобы "
+"сохранить новый файл.<br>---------------<br> <br><b>Горячие клавиши</"
+"b><br>---------------<br> <br><b>Левая клавиша мыши</b> - Поставить или "
+"перенести ноту.<br><b>Правая клавиша мыши</b> - Изменить тип выбранной ноты."
+"<br><b>Левый Alt</b> - Изменить тип выбранной ноты на \"Удерживать\"."
+"<br><b>Левый Shift</b> - Изменить тип выбранной ноты на \"Быстро нажимать\"."
+"<br><b>У на клавиатуре</b> - Режим редактора нот. В нём можно точнее "
+"настроить позицию, тайминги и тип ноты и другое.<br>Повторное нажатие У "
+"сохраняет внесённые в ноту изменения.<br><b>Кнопки стрелочек, Page Up, Page "
+"Down</b> - Двигать полосу прокрутки.<br><b>Delete</b> - Удалить выбранную "
+"ноту.<br><b>End</b> - Перейти к последней ноте."
+
+#: gui_kuma.py:1076 gui_kuma.py:1092
+msgid "Close"
+msgstr "Закрыть"
+
+#: gui_kuma.py:1082
+msgid ""
+"<br><b>KUMA</b><br>---------------<br><br><b>A karaoke editor for Dragon "
+"Engine games.<br><b>Version: </b>{ver}<br><b>Created by: </b>{creators}"
+"<br><b>Icon by: </b>{mink}<br><b>Testers: </b>{testers}<br><b>Translators: </"
+"b>{translators}<br>"
+msgstr ""
+"<b>KUMA - караоке-редактор для игр на базе Dragon Engine.</b><br> "
+"<br><b>Версия: </b>{ver}<br><b>Разработчик: </b>{creators}<br><b>Иконка: </"
+"b>{mink}<br><b>Тестеры: </b>{testers}<br><b>Переводчики: </b>{translators}"
+"<br>"
+
+#: gui_kuma.py:1161
+msgid "Are you sure you want to undo changes made to this note?"
+msgstr "Вы действительно хотите отменить изменения внесённые в эту ноту?"
+
+#: gui_kuma.py:1161
+msgid "Undo changes"
+msgstr "Отменить изменения"
+
+#: gui_kuma.py:1198
+msgid "No open file, unable to save!"
+msgstr "Нет открытого файла, невозможно выполнить сохранение!"

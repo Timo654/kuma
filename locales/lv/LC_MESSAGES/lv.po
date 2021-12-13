@@ -6,7 +6,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "POT-Creation-Date: 2021-12-13 15:56+0200\n"
-"PO-Revision-Date: 2021-12-13 20:57+0200\n"
+"PO-Revision-Date: 2021-12-13 22:37+0200\n"
 "Last-Translator: \n"
 "Language-Team: \n"
 "Language: lv\n"
@@ -40,7 +40,7 @@ msgstr "Nevar nolasīt failu."
 
 #: gui_kuma.py:298 gui_kuma.py:326
 msgid "Unable to open file."
-msgstr "Nevar atvērt failu"
+msgstr "Nevar atvērt failu."
 
 #: gui_kuma.py:314
 msgid "KPM written to {}"
@@ -152,7 +152,7 @@ msgstr "Parasts"
 
 #: gui_kuma.py:573 gui_kuma.py:724
 msgid "Song position"
-msgstr "Dziesmas vieta"
+msgstr "Dziesmas pozīcija"
 
 #: gui_kuma.py:574 gui_kuma.py:727 gui_kuma.py:1106
 msgid "Volume {}"

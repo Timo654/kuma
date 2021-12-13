@@ -14,7 +14,7 @@ import gettext
 import locale
 import mutagen
 
-#general info
+# general info
 VERSION = "v0.9.0"
 CREATORS = 'Timo654'
 TRANSLATORS = 'Timo654, ketrub, Mink, jason098, Capitán Retraso, Kent, Edness, JustAnyone'
@@ -188,7 +188,7 @@ class Karaoke:
 
         # if stuff is before start position
         old_start_pos = self.pos_convert(old_start_pos)
-        if old_start_pos != None and old_start_pos != start_pos:  
+        if old_start_pos != None and old_start_pos != start_pos:
             for i in range(start_pos + 1, old_start_pos, -1):
                 if i != start_pos:
                     self.Remove(i, y_pos)
@@ -462,13 +462,13 @@ def save_before_closing(note, boxes, dropdowns, karaoke):
     # cuesheet id
     if len(boxes[4].get_text()) > 0:
         note.cuesheet_id = int(boxes[4].get_text())
-    #note id
+    # note id
     note.id = dropdowns[0].options_list.index(dropdowns[0].selected_option)
     # note type
     note.note_type = dropdowns[1].options_list.index(
         dropdowns[1].selected_option)
     note.surface = items[note.id]
-    
+
     # end position
     if len(boxes[1].get_text()) > 0:
         if note.note_type != 0:
@@ -879,7 +879,7 @@ def main():
             # delete held button when entering menu bar to prevent accidentally adding notes
             if (event.type == pygame.USEREVENT and
                 event.user_type == UI_BUTTON_START_PRESS and
-                event.ui_element in menu_bar.menu_bar_container.elements):
+                    event.ui_element in menu_bar.menu_bar_container.elements):
                 selected = None
 
             if event.type == pygame.MOUSEBUTTONDOWN:
@@ -1249,7 +1249,7 @@ def main():
         elif play_button.text != "▶":
             play_button.set_text('▶')
         pygame.draw.line(screen, (222, 175, 74), (karaoke.x + karaoke.box_size // 2, karaoke.y + 10), (karaoke.x +
-                         karaoke.box_size // 2, ((karaoke.box_size + karaoke.border) * karaoke.rows) + 70), width=5)  # helpful line for music
+                                                                                                       karaoke.box_size // 2, ((karaoke.box_size + karaoke.border) * karaoke.rows) + 70), width=5)  # helpful line for music
         if scrollbar_moved:
             if loaded and not pygame.mixer.music.get_busy():
                 # change the time when scrolling

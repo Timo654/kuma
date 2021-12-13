@@ -175,7 +175,7 @@ class Karaoke:
     def Remove(self, x, y):
         self.items[x][y] = None
 
-    def Remove_long(self, x, y, y_pos=None, new_end_pos=0):
+    def Remove_long(self, x, y, y_pos=None, old_start_pos=None, new_end_pos=0):
         note = self.items[x][y]
         if y_pos == None:
             y_pos = note.y
@@ -185,6 +185,13 @@ class Karaoke:
             if i == start_pos:
                 break
             self.Remove(i, y_pos)
+
+        # if stuff is before start position
+        old_start_pos = self.pos_convert(old_start_pos)
+        if old_start_pos != None and old_start_pos != start_pos:  
+            for i in range(start_pos + 1, old_start_pos, -1):
+                if i != start_pos:
+                    self.Remove(i, y_pos)
         note = None
 
     # check whether the mouse in in the grid
@@ -431,6 +438,8 @@ def update_fps():  # fps counter from https://pythonprogramming.altervista.org/p
 
 def save_before_closing(note, boxes, dropdowns, karaoke):
     vert_changed = False
+    old_start_pos = note.start_pos
+    # start position
     if len(boxes[0].get_text()) > 0:
         new_pos = ms_to_game(float(boxes[0].get_text()))
         if karaoke.pos_convert(new_pos) <= len(karaoke.items):
@@ -438,6 +447,7 @@ def save_before_closing(note, boxes, dropdowns, karaoke):
             karaoke.items[note.x][note.y] = None
             note.x = karaoke.pos_convert(note.start_pos)
             karaoke.items[note.x][note.y] = note
+    # vertical position
     if len(boxes[2].get_text()) > 0:
         if int(boxes[2].get_text()) < karaoke.rows:
             if note.y != int(boxes[2].get_text()):
@@ -446,27 +456,33 @@ def save_before_closing(note, boxes, dropdowns, karaoke):
             karaoke.items[note.x][note.y] = None
             note.y = int(boxes[2].get_text())
             karaoke.items[note.x][note.y] = note
+    # cue id
     if len(boxes[3].get_text()) > 0:
         note.cue_id = int(boxes[3].get_text())
+    # cuesheet id
     if len(boxes[4].get_text()) > 0:
         note.cuesheet_id = int(boxes[4].get_text())
+    #note id
     note.id = dropdowns[0].options_list.index(dropdowns[0].selected_option)
+    # note type
     note.note_type = dropdowns[1].options_list.index(
         dropdowns[1].selected_option)
     note.surface = items[note.id]
+    
+    # end position
     if len(boxes[1].get_text()) > 0:
         if note.note_type != 0:
             end_pos = ms_to_game(float(boxes[1].get_text()))
         else:
             end_pos = 0
-        if end_pos < note.end_pos or vert_changed:
+        if end_pos < note.end_pos or vert_changed or old_start_pos < note.start_pos:
             if vert_changed:
                 y_pos = old_pos
                 new_end_pos = 0
             else:
                 y_pos = note.y
                 new_end_pos = karaoke.pos_convert(end_pos)
-            karaoke.Remove_long(note.x, note.y, y_pos=y_pos,
+            karaoke.Remove_long(note.x, note.y, y_pos=y_pos, old_start_pos=old_start_pos,
                                 new_end_pos=new_end_pos)
             if vert_changed:
                 y_pos = note.y

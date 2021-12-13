@@ -635,7 +635,6 @@ def main():
     menu_bar = UIMenuBar(relative_rect=pygame.Rect(0, 0, scr_size[0], 25),
                          menu_item_data=menu_data,
                          manager=manager)
-
     # buttons
     undo_button = UIButton(relative_rect=pygame.Rect((385, 400), (220, 30)),
                            text=_('Undo note changes'),
@@ -751,10 +750,8 @@ def main():
     for label in box_labels:
         label.hide()
 
-    # what the player is holding
-    selected = None
     load_item_tex(current_controller, karaoke,
-                  selected, note_picker)  # load button textures
+                  None, note_picker)  # load button textures
 
     # load sheet textures and scale them
     sheet_tex = f"{texture_path}\\{assets['Sheet texture']}"
@@ -784,6 +781,9 @@ def main():
                       play_button, volume_slider, music_box]
     for item in music_elements:
         item.hide()
+
+    # what the player is holding
+    selected = None
     # what the player is currently editing
     currently_edited = None
     stopped_editing = False
@@ -875,6 +875,12 @@ def main():
                 with open(settings_file, 'w', encoding='UTF-8') as configfile:  # save config
                     config.write(configfile)
                 exit()
+
+            # delete held button when entering menu bar to prevent accidentally adding notes
+            if (event.type == pygame.USEREVENT and
+                event.user_type == UI_BUTTON_START_PRESS and
+                event.ui_element in menu_bar.menu_bar_container.elements):
+                selected = None
 
             if event.type == pygame.MOUSEBUTTONDOWN:
                 # if right clicked, get a note

@@ -579,7 +579,7 @@ def save_file(open_file, manager):
     if open_file != None:
         gui_button_mode = 'Save'
         save = UIConfirmationDialog(
-            rect=pygame.Rect(0, 0, 300, 300), manager=manager, action_long_desc=_("Are you sure you want to overwrite {}?").format(open_file.name), window_title=_('Create a new file'), action_short_name=_('OK'))
+            rect=pygame.Rect(0, 0, 300, 300), manager=manager, action_long_desc=_("Are you sure you want to overwrite {}?").format(open_file.name), window_title=_('Save file'), action_short_name=_('OK'))
         save.cancel_button.set_text(_('Cancel'))
         return gui_button_mode, None
     else:
@@ -1222,8 +1222,10 @@ def main():
             # make the scrollbar move when song is playing
             converted_time = song_pos_to_scroll(current_time, karaoke)
             scrollbar.set_current_value(converted_time)
+        elif play_button.text != "▶":
+            play_button.set_text('▶')
         pygame.draw.line(screen, (222, 175, 74), (karaoke.x + karaoke.box_size // 2, karaoke.y + 10), (karaoke.x +
-                                                                                                       karaoke.box_size // 2, ((karaoke.box_size + karaoke.border) * karaoke.rows) + 70), width=5)  # helpful line for music
+                         karaoke.box_size // 2, ((karaoke.box_size + karaoke.border) * karaoke.rows) + 70), width=5)  # helpful line for music
         if scrollbar_moved:
             if loaded and not pygame.mixer.music.get_busy():
                 # change the time when scrolling

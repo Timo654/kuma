@@ -37,7 +37,7 @@ while running:
         assets['Button prompts'][controller_name].append(button_names)
 
 
-with open(asset_file, 'w') as f:
-    json.dump(assets, f, indent=2)
+with open(asset_file, 'w', encoding='UTF-8') as f:
+    json.dump(assets, f, indent=2, ensure_ascii=False)
 
 print('Asset list saved.')

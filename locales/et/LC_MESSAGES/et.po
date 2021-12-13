@@ -1,8 +1,8 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: KUMA 1.0\n"
-"POT-Creation-Date: 2021-12-13 00:41+0200\n"
-"PO-Revision-Date: 2021-12-13 00:57+0200\n"
+"POT-Creation-Date: 2021-12-13 10:55+0200\n"
+"PO-Revision-Date: 2021-12-13 10:55+0200\n"
 "Last-Translator: \n"
 "Language-Team: \n"
 "Language: et\n"
@@ -77,7 +77,7 @@ msgstr "Muusika"
 msgid "Load song..."
 msgstr "Lae laul..."
 
-#: gui_kuma.py:520 gui_kuma.py:1049
+#: gui_kuma.py:520 gui_kuma.py:1053
 msgid "Help"
 msgstr "Abi"
 
@@ -85,19 +85,19 @@ msgstr "Abi"
 msgid "How to use"
 msgstr "Kuidas kasutada"
 
-#: gui_kuma.py:524 gui_kuma.py:1065
+#: gui_kuma.py:524 gui_kuma.py:1069
 msgid "About"
 msgstr "Meie kohta"
 
-#: gui_kuma.py:531 gui_kuma.py:595
+#: gui_kuma.py:531 gui_kuma.py:601
 msgid "Undo note changes"
 msgstr "Lähtesta noot"
 
-#: gui_kuma.py:532 gui_kuma.py:600
+#: gui_kuma.py:532 gui_kuma.py:606
 msgid "Load time"
 msgstr "Lae aeg"
 
-#: gui_kuma.py:533 gui_kuma.py:603
+#: gui_kuma.py:533 gui_kuma.py:609
 msgid "Save time"
 msgstr "Salvesta aeg"
 
@@ -149,7 +149,7 @@ msgstr "Tavaline"
 msgid "Song position"
 msgstr "Laulu positsioon"
 
-#: gui_kuma.py:547 gui_kuma.py:705 gui_kuma.py:1072
+#: gui_kuma.py:547 gui_kuma.py:705 gui_kuma.py:1083
 msgid "Volume {}"
 msgstr "Heli {}"
 
@@ -157,60 +157,66 @@ msgstr "Heli {}"
 msgid "Are you sure you want to overwrite {}?"
 msgstr "Kas olete kindel, et soovite asendada {}?"
 
-#: gui_kuma.py:555 gui_kuma.py:562 gui_kuma.py:903 gui_kuma.py:968
-#: gui_kuma.py:975 gui_kuma.py:1001 gui_kuma.py:1006 gui_kuma.py:1014
-#: gui_kuma.py:1021 gui_kuma.py:1125
+#: gui_kuma.py:555 gui_kuma.py:562 gui_kuma.py:906 gui_kuma.py:972
+#: gui_kuma.py:979 gui_kuma.py:1004 gui_kuma.py:1009 gui_kuma.py:1018
+#: gui_kuma.py:1025 gui_kuma.py:1138
 msgid "OK"
 msgstr "OK"
 
-#: gui_kuma.py:555 gui_kuma.py:1006
+#: gui_kuma.py:555 gui_kuma.py:1009
 msgid "Create a new file"
 msgstr "Tee uus fail"
 
-#: gui_kuma.py:556 gui_kuma.py:563 gui_kuma.py:904 gui_kuma.py:969
-#: gui_kuma.py:977 gui_kuma.py:1002 gui_kuma.py:1007 gui_kuma.py:1015
-#: gui_kuma.py:1022 gui_kuma.py:1126
+#: gui_kuma.py:556 gui_kuma.py:563 gui_kuma.py:907 gui_kuma.py:973
+#: gui_kuma.py:981 gui_kuma.py:1005 gui_kuma.py:1010 gui_kuma.py:1019
+#: gui_kuma.py:1026 gui_kuma.py:1139
 msgid "Cancel"
 msgstr "Katkesta"
 
-#: gui_kuma.py:561 gui_kuma.py:1020
+#: gui_kuma.py:561 gui_kuma.py:1024
 msgid "Select an output file (kbd)"
 msgstr "Vali väljundfail (kbd)"
 
-#: gui_kuma.py:903
+#: gui_kuma.py:906
 msgid ""
 "Are you sure you want to remove this note? This change cannot be undone."
 msgstr ""
 "Kas olete kindel, et soovite noodi kustutada? Seda käsklust ei saa tagasi "
 "võtta."
 
-#: gui_kuma.py:903
+#: gui_kuma.py:906
 msgid "Delete note"
 msgstr "Kustuta noot"
 
-#: gui_kuma.py:967
+#: gui_kuma.py:971
 msgid "Select a parameter file (kpm)"
 msgstr "Vali parameetri fail (kpm)"
 
-#: gui_kuma.py:974
+#: gui_kuma.py:978
 msgid "Select an output file (kpm)"
 msgstr "Vali väljundfail (kpm)"
 
-#: gui_kuma.py:1000
+#: gui_kuma.py:997
+msgid ""
+"Unable to play the song from the given position, restarting from the "
+"beginning."
+msgstr "Ei suutnud laulu mängida antud positsioonist, alustan algusest."
+
+#: gui_kuma.py:1003
 msgid "Select an input file (kbd)"
 msgstr "Vali sisendfail (kbd)"
 
-#: gui_kuma.py:1006
+#: gui_kuma.py:1009
 msgid ""
 "Are you sure you want to create a new file? Any unsaved changes will be lost."
 msgstr ""
 "Kas olete kindel, et soovite uue faili teha? Salvestamata muudatused kaovad."
 
-#: gui_kuma.py:1013
+#: gui_kuma.py:1017
 msgid "Select an audio file (mp3/ogg)"
 msgstr "Vali helifail (mp3/ogg)"
 
-#: gui_kuma.py:1029
+#: gui_kuma.py:1033
 msgid ""
 "<b>How to use</b><br>---------------<br><b>KUMA - A karaoke editor for "
 "Dragon Engine games.</b><br>To begin using the tool, you can add start by "
@@ -251,11 +257,11 @@ msgstr ""
 "kerimisriba.<br><b>Delete</b> - Kustutab hetkel käesoleva/valitud noodi."
 "<br><b>End</b> - Hüppa viimase noodi juurde."
 
-#: gui_kuma.py:1050 gui_kuma.py:1066
+#: gui_kuma.py:1054 gui_kuma.py:1070
 msgid "Close"
 msgstr "Sulge"
 
-#: gui_kuma.py:1056
+#: gui_kuma.py:1060
 msgid ""
 "<br><b>KUMA</b><br>---------------<br><br><b>A karaoke editor for Dragon "
 "Engine games.<br><b>Version: </b>{ver}<br><b>Created by: </b>{creators}"
@@ -267,15 +273,15 @@ msgstr ""
 "</b>{mink}<br><b>Testijad: </b>{testers}<br><b>Tõlkijad: </b>{translators}"
 "<br>"
 
-#: gui_kuma.py:1125
+#: gui_kuma.py:1138
 msgid "Are you sure you want to undo changes made to this note?"
 msgstr "Kas olete kindel, et soovite noodi muutused lähtestada?"
 
-#: gui_kuma.py:1125
+#: gui_kuma.py:1138
 msgid "Undo changes"
 msgstr "Lähtesta muutused"
 
-#: gui_kuma.py:1162
+#: gui_kuma.py:1175
 msgid "No open file, unable to save!"
 msgstr "Faili pole avatud, ei saa salvestada!"
 

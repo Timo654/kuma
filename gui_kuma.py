@@ -1,6 +1,6 @@
 # based on https://github.com/TheBigKahuna353/Inventory_system and https://github.com/ppizarror/pygame-menu/blob/master/pygame_menu/examples/other/scrollbar.py
 import pygame
-from pygame_gui import UIManager, UI_BUTTON_START_PRESS, UI_BUTTON_PRESSED, UI_DROP_DOWN_MENU_CHANGED, UI_CONFIRMATION_DIALOG_CONFIRMED, UI_HORIZONTAL_SLIDER_MOVED
+from pygame_gui import UIManager, UI_BUTTON_START_PRESS, UI_BUTTON_PRESSED, UI_DROP_DOWN_MENU_CHANGED, UI_CONFIRMATION_DIALOG_CONFIRMED, UI_HORIZONTAL_SLIDER_MOVED, UI_TEXT_ENTRY_CHANGED
 from pygame_gui.windows import UIFileDialog, UIConfirmationDialog, UIMessageWindow
 from pygame_gui.elements import UIDropDownMenu, UILabel, UIButton, UITextEntryLine, UIHorizontalSlider
 import modules.kbd_reader as kbd
@@ -15,12 +15,12 @@ import locale
 import mutagen
 
 VERSION = "0.9.0"
-TRANSLATORS = 'Timo654, ketrub, Mink, jason098'
+TRANSLATORS = 'Timo654, ketrub, Mink, jason098, Capitán Retraso'
 TESTERS = "ketrub, KaarelJ98"
 
 asset_file = 'assets.json'
 if Path(asset_file).is_file():
-    with open(asset_file, 'r') as json_file:
+    with open(asset_file, 'r', encoding='UTF-8') as json_file:
         assets = json.load(json_file)
 else:
     raise Exception(_('Asset data missing'))
@@ -552,16 +552,22 @@ def save_file(open_file, manager):
     if open_file != None:
         gui_button_mode = 'Save'
         save = UIConfirmationDialog(
-        rect=pygame.Rect(0, 0, 300, 300), manager=manager, action_long_desc=_("Are you sure you want to overwrite {}?").format(open_file.name), window_title=_('Create a new file'), action_short_name=_('OK'))
+            rect=pygame.Rect(0, 0, 300, 300), manager=manager, action_long_desc=_("Are you sure you want to overwrite {}?").format(open_file.name), window_title=_('Create a new file'), action_short_name=_('OK'))
         save.cancel_button.set_text(_('Cancel'))
         return gui_button_mode, None
     else:
         gui_button_mode = 'Output'
         output_selection = UIFileDialog(
-        rect=pygame.Rect(0, 0, 300, 300), manager=manager, allow_picking_directories=True, window_title=_('Select an output file (kbd)'), initial_file_path=Path(config['PATHS']['Output']))
+            rect=pygame.Rect(0, 0, 300, 300), manager=manager, allow_picking_directories=True, window_title=_('Select an output file (kbd)'), initial_file_path=Path(config['PATHS']['Output']))
         output_selection.ok_button.set_text(_('OK'))
         output_selection.cancel_button.set_text(_('Cancel'))
         return gui_button_mode, output_selection
+
+def song_pos_to_scroll(position, karaoke):
+    return (position / 100) * (karaoke.box_size + karaoke.border)
+
+def scroll_to_song_pos(position, karaoke):
+    return int((position * 100) / (karaoke.box_size + karaoke.border) + 50)
 
 def main():
     switch_language(config['CONFIG']['LANGUAGE'], boot=True)
@@ -591,50 +597,44 @@ def main():
                          manager=manager)
 
     # buttons
-    undo_button = UIButton(relative_rect=pygame.Rect((375, 400), (200, 30)),
+    undo_button = UIButton(relative_rect=pygame.Rect((425, 400), (200, 30)),
                            text=_('Undo note changes'),
                            manager=manager)
     undo_button.hide()
 
-    load_kpm_button = UIButton(relative_rect=pygame.Rect((175, 340), (120, 30)),
+    load_kpm_button = UIButton(relative_rect=pygame.Rect((225, 340), (120, 30)),
                                text=_('Load time'),
                                manager=manager)
-    save_kpm_button = UIButton(relative_rect=pygame.Rect((175, 365), (120, 30)),
+    save_kpm_button = UIButton(relative_rect=pygame.Rect((225, 365), (120, 30)),
                                text=_('Save time'),
                                manager=manager)
 
-    play_button = UIButton(relative_rect=pygame.Rect((295, 400), (30, 30)),
+    play_button = UIButton(relative_rect=pygame.Rect((355, 400), (30, 30)),
                            text='▶',
                            manager=manager)
-    pause_button = UIButton(relative_rect=pygame.Rect((325, 400), (30, 30)),
-                            text='▌▌',
-                            manager=manager)  # TODO - get a nicer alternative for the button
-    # hide when no audio file
-    play_button.hide()
-    pause_button.hide()
 
     # dropdown menus
     button_picker = UIDropDownMenu(options_list=controllers,
                                    starting_option=current_controller,
-                                   relative_rect=pygame.Rect(170, 0, 200, 25),
+                                   relative_rect=pygame.Rect(180, 0, 200, 25),
                                    manager=manager, object_id='#button_picker')
 
     language_picker = UIDropDownMenu(options_list=languages,
                                      starting_option=current_language,
                                      relative_rect=pygame.Rect(
-                                         370, 0, 150, 25),
+                                         380, 0, 150, 25),
                                      manager=manager, object_id='#language_picker')
 
     note_picker = UIDropDownMenu(options_list=assets['Button prompts'][current_controller][1],
                                  starting_option=assets['Button prompts'][current_controller][1][0],
-                                 relative_rect=pygame.Rect(1090, 365, 150, 30),
+                                 relative_rect=pygame.Rect(1140, 365, 150, 30),
                                  manager=manager, object_id='#note_picker')
 
     note_types = [_('Regular'), _('Hold'), _('Rapid')]
     note_type_picker = UIDropDownMenu(options_list=note_types,
                                       starting_option=note_types[0],
                                       relative_rect=pygame.Rect(
-                                          1245, 365, 150, 30),
+                                          1295, 365, 200, 30),
                                       manager=manager, object_id='#type_picker')
 
     dropdowns = [note_picker, note_type_picker]  # hide some dropdowns
@@ -644,21 +644,21 @@ def main():
     # textboxes
     valid_chars = [str(x) for x in range(0, 10)] + ['.']
     cutscene_box = UITextEntryLine(relative_rect=pygame.Rect(
-        (10, 365), (150, 50)), manager=manager)
+        (10, 365), (200, 50)), manager=manager)
     cutscene_box.set_text(str(0))
     start_box = UITextEntryLine(relative_rect=pygame.Rect(
-        (315, 365), (150, 50)), manager=manager)
+        (365, 365), (150, 50)), manager=manager)
     end_box = UITextEntryLine(relative_rect=pygame.Rect(
-        (470, 365), (150, 50)), manager=manager)
+        (520, 365), (150, 50)), manager=manager)
     vert_box = UITextEntryLine(relative_rect=pygame.Rect(
-        (625, 365), (150, 50)), manager=manager)
+        (675, 365), (150, 50)), manager=manager)
     cue_box = UITextEntryLine(relative_rect=pygame.Rect(
-        (780, 365), (150, 50)), manager=manager)
+        (830, 365), (150, 50)), manager=manager)
     cuesheet_box = UITextEntryLine(relative_rect=pygame.Rect(
-        (935, 365), (150, 50)), manager=manager)
+        (985, 365), (150, 50)), manager=manager)
 
     music_box = UITextEntryLine(relative_rect=pygame.Rect(
-        (10, 425), (150, 50)), manager=manager)
+        (10, 425), (200, 50)), manager=manager, object_id="#song_position")
     music_box.set_text(str(0))
 
     boxes = [start_box, end_box, vert_box, cue_box, cuesheet_box]
@@ -671,37 +671,37 @@ def main():
     music_box.set_allowed_characters(valid_chars)
 
     # labels
-    cutscene_label = UILabel(pygame.Rect((10, 340), (150, 22)),
+    cutscene_label = UILabel(pygame.Rect((10, 340), (200, 22)),
                              _("Cutscene start"),
                              manager=manager)
-    start_label = UILabel(pygame.Rect((315, 340), (150, 22)),
+    start_label = UILabel(pygame.Rect((365, 340), (150, 22)),
                           _("Start position"),
                           manager=manager)
-    end_label = UILabel(pygame.Rect((470, 340), (150, 22)),
+    end_label = UILabel(pygame.Rect((520, 340), (150, 22)),
                         _("End position"),
                         manager=manager)
-    vert_label = UILabel(pygame.Rect((625, 340), (150, 22)),
+    vert_label = UILabel(pygame.Rect((675, 340), (150, 22)),
                          _("Vertical position"),
                          manager=manager)
-    cue_label = UILabel(pygame.Rect((780, 340), (150, 22)),
+    cue_label = UILabel(pygame.Rect((830, 340), (150, 22)),
                         _("Cue ID"),
                         manager=manager)
-    cuesheet_label = UILabel(pygame.Rect((935, 340), (150, 22)),
+    cuesheet_label = UILabel(pygame.Rect((985, 340), (150, 22)),
                              _("Cuesheet ID"),
                              manager=manager)
-    note_button_label = UILabel(pygame.Rect((1090, 340), (150, 22)),
+    note_button_label = UILabel(pygame.Rect((1140, 340), (150, 22)),
                                 _("Note button"),
                                 manager=manager)
-    note_type_label = UILabel(pygame.Rect((1245, 340), (150, 22)),
+    note_type_label = UILabel(pygame.Rect((1295, 340), (200, 22)),
                               _("Note type"),
                               manager=manager)
     fps_label = UILabel(pygame.Rect((0, 30), (30, 30)),
                         "0",
                         manager=manager)
-    song_label = UILabel(pygame.Rect((10, 400), (150, 22)),
+    song_label = UILabel(pygame.Rect((10, 400), (200, 22)),
                          _("Song position"),
                          manager=manager)
-    volume_label = UILabel(pygame.Rect((175, 402), (120, 25)),
+    volume_label = UILabel(pygame.Rect((225, 402), (130, 25)),
                            _("Volume {}").format(
                                round(float(config['CONFIG']['VOLUME']) * 100)),
                            manager=manager)
@@ -732,16 +732,16 @@ def main():
     scrollbar = UIHorizontalSlider(relative_rect=pygame.Rect(-3, scr_size[1] - thick_h + 2, 1605, thick_h),
                                    start_value=0,
                                    value_range=(0, scrollbar_size),
-                                   manager=manager)
+                                   manager=manager, object_id='#scrollbar')
 
     # volume slider
-    volume_slider = UIHorizontalSlider(relative_rect=pygame.Rect((175, 430), (160, 25)),
+    volume_slider = UIHorizontalSlider(relative_rect=pygame.Rect((225, 430), (160, 25)),
                                        start_value=round(
                                            float(config['CONFIG']['VOLUME']) * 100),
                                        value_range=(0, 100),
                                        manager=manager, object_id="#volume_slider")
     music_elements = [song_label, volume_label,
-                      play_button, pause_button, volume_slider, music_box]
+                      play_button, volume_slider, music_box]
     for item in music_elements:
         item.hide()
     # what the player is currently editing
@@ -749,6 +749,8 @@ def main():
     stopped_editing = False
     gui_button_mode = None
     open_file = None
+    scrollbar_moved = False  # has scrollbar been moved yet
+    loaded = False  # is audio file loaded
     audio_start_pos = 0  # audio start position
     key_pressed = None  # none of the arrow keys are pressed right now
     note_id = 0  # note that you get when you want to add one, first is circle
@@ -789,12 +791,13 @@ def main():
         mousex += scrollbar_value  # adjust for scrollbar
 
         if key_pressed:
-            diff = 10 + scrollbar_add
+            scrollbar_moved = True
             scrollbar_add += 1
+            diff = scrollbar_add // 4
             if key_pressed == 'right':
                 if scrollbar.get_current_value() + diff <= scrollbar_size:
                     scrollbar.set_current_value(
-                        scrollbar.get_current_value() + diff)
+                        scrollbar.get_current_value() + scrollbar_add)
                 else:
                     scrollbar.set_current_value(scrollbar_size)
             elif key_pressed == 'left':
@@ -862,18 +865,18 @@ def main():
                 if event.key in [pygame.K_RIGHT, pygame.K_PAGEUP]:
                     key_pressed = 'right'
                     scrollbar_add = 0
-                    if scrollbar.get_current_value() + 10 <= scrollbar_size:
+                    if scrollbar.get_current_value() + 1 <= scrollbar_size:
                         scrollbar.set_current_value(
-                            scrollbar.get_current_value() + 10)
+                            scrollbar.get_current_value() + 1)
                     else:
                         scrollbar.set_current_value(scrollbar_size)
 
                 if event.key in [pygame.K_LEFT, pygame.K_PAGEDOWN]:
                     key_pressed = 'left'
                     scrollbar_add = 0
-                    if scrollbar.get_current_value() - 10 >= 0:
+                    if scrollbar.get_current_value() - 1 >= 0:
                         scrollbar.set_current_value(
-                            scrollbar.get_current_value() - 10)
+                            scrollbar.get_current_value() - 1)
                     else:
                         scrollbar.set_current_value(0)
 
@@ -906,7 +909,8 @@ def main():
                     selected = None  # deletes selected note
                 keys = pygame.key.get_pressed()
                 if keys[pygame.K_LCTRL] and keys[pygame.K_s]:
-                    gui_button_mode, output_selection = save_file(open_file, manager)
+                    gui_button_mode, output_selection = save_file(
+                        open_file, manager)
                 if event.key == pygame.K_LALT:
                     note_id = 4
                     selected = Item(0, 0, note_id, 'Hold', 0)  # add item
@@ -976,24 +980,23 @@ def main():
                         kpm_output_selection.cancel_button.set_text(
                             _('Cancel'))
                     # music buttons
-                    if event.ui_element == pause_button:
-                        if loaded:
-                            if pygame.mixer.music.get_busy():  # if song is playing
-                                pygame.mixer.music.pause()
-                            elif len(music_box.get_text()) > 0:  # use value from box instead
-                                audio_start_pos = int(music_box.get_text())
-                                pygame.mixer.music.play(
-                                    start=(audio_start_pos / 1000))
-                            else:
-                                pygame.mixer.music.unpause()
                     if event.ui_element == play_button:
                         if loaded:
                             if pygame.mixer.music.get_busy():  # if song is playing
+                                play_button.set_text('▶')
                                 pygame.mixer.music.stop()
                             else:
-                                audio_start_pos = 0
-                                pygame.mixer.music.play()
-
+                                audio_start_pos = int(music_box.get_text())
+                                # TODO - get a nicer button
+                                play_button.set_text('▌▌')
+                                try:
+                                    pygame.mixer.music.play(
+                                        start=(audio_start_pos / 1000))
+                                except(pygame.error):  # Position not implemented for music type
+                                    print(
+                                        _('Unable to play the song from the given position, restarting from the beginning.'))
+                                    audio_start_pos = 0
+                                    pygame.mixer.music.play()
                     if event.ui_object_id == 'menu_bar.#file_menu_items.#open':
                         gui_button_mode = 'Input'
                         input_selection = UIFileDialog(
@@ -1006,7 +1009,8 @@ def main():
                             rect=pygame.Rect(0, 0, 300, 300), manager=manager, action_long_desc=_('Are you sure you want to create a new file? Any unsaved changes will be lost.'), window_title=_('Create a new file'), action_short_name=_('OK'))
                         reset_all.cancel_button.set_text(_('Cancel'))
                     if event.ui_object_id == 'menu_bar.#file_menu_items.#save':
-                        gui_button_mode, output_selection = save_file(open_file, manager)
+                        gui_button_mode, output_selection = save_file(
+                            open_file, manager)
                     if event.ui_object_id == 'menu_bar.#music_menu_items.#load_song':
                         gui_button_mode = 'Music'
                         music_selection = UIFileDialog(
@@ -1064,6 +1068,13 @@ def main():
                                                        manager=manager,
                                                        window_title=_('About'))
                         about_window.dismiss_button.set_text(_('Close'))
+    
+                if event.user_type == UI_TEXT_ENTRY_CHANGED and event.ui_object_id == "#song_position":
+                    if not pygame.mixer.get_busy():
+                        new_value = music_box.get_text()
+                        if len(new_value) > 0: 
+                            new_pos = int(song_pos_to_scroll(int(music_box.get_text()), karaoke))
+                            scrollbar.set_current_value(new_pos)
 
                 if event.user_type == UI_HORIZONTAL_SLIDER_MOVED and event.ui_object_id == '#volume_slider':
                     volume_value = volume_slider.get_current_value() / 100
@@ -1071,6 +1082,8 @@ def main():
                     config.set("CONFIG", "VOLUME", str(volume_value))
                     volume_label.set_text(_('Volume {}').format(
                         volume_slider.get_current_value()))
+                if event.ui_object_id == '#scrollbar':
+                    scrollbar_moved = True
 
                 if event.user_type == UI_BUTTON_PRESSED:
                     if gui_button_mode == 'Input':
@@ -1184,11 +1197,18 @@ def main():
             current_time = pygame.mixer.music.get_pos() + audio_start_pos
             music_box.set_text(str(current_time))
             # make the scrollbar move when song is playing
-            converted_time = (current_time / 100) * \
-                (karaoke.box_size + karaoke.border)
+            converted_time = song_pos_to_scroll(current_time, karaoke)
             scrollbar.set_current_value(converted_time)
         pygame.draw.line(screen, (222, 175, 74), (karaoke.x + karaoke.box_size // 2, karaoke.y + 10), (karaoke.x +
                                                                                                        karaoke.box_size // 2, ((karaoke.box_size + karaoke.border) * karaoke.rows) + 70), width=5)  # helpful line for music
+        if scrollbar_moved:
+            if loaded and not pygame.mixer.music.get_busy():
+                # change the time when scrolling
+                converted_scroll = scroll_to_song_pos(scrollbar.get_current_value(), karaoke)
+                if converted_scroll > length:
+                    converted_scroll = length
+                music_box.set_text(str(converted_scroll))
+            scrollbar_moved = False
 
         fps_label.set_text(update_fps())
         manager.draw_ui(screen)

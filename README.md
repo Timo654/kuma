@@ -13,7 +13,7 @@ Vaja on PyBinaryReader'it, mutagen'i, pygame'i ja pygame-gui'd, saab installida 
 
 Parema klõpsuga saab muuta käesolevat nooti. Noote saab üles korjata vasaku klõpsuga.
 
-"Left Ctrl" annab "Hold" noote ja "Left Shift" annab "Rapid" noote.
+"Left Alt" annab "Hold" noote ja "Left Shift" annab "Rapid" noote.
 
 "Delete" kustutab käesoleva noodi.
 
@@ -22,7 +22,6 @@ Parema klõpsuga saab muuta käesolevat nooti. Noote saab üles korjata vasaku k
 Nooltega saab liigutada scrollbari.
 
 ## TODO list
-* Help kasti tekst kirjutada
 * Surface suurust vähendada (lõpus olevad nupud lähevad algusesse)
 
 ## Viited

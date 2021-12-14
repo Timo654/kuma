@@ -59,7 +59,7 @@ if Path(settings_file).is_file():
     config.read(settings_file, encoding='UTF-8')
 if not config.has_section("CONFIG"):
     config.add_section("CONFIG")
-    config.set("CONFIG", "FPS", str(60))
+    config.set("CONFIG", "FPS", str(100))
     config.set("CONFIG", "BUTTONS", controllers[0])
     config.set("CONFIG", "LANGUAGE", get_default_language())
     config.set("CONFIG", "VOLUME", str(1))
@@ -73,6 +73,15 @@ if not config.has_section("PATHS"):
                f'{str(Path().resolve())}\\output_file.kpm')
     config.set("PATHS", "Music",
                f'{str(Path().resolve())}\\audio.ogg')
+if not config.has_section("ADV. SETTINGS"):
+    config.add_section("ADV. SETTINGS")
+    config.set("ADV. SETTINGS", "NOTE",
+               "DO NOT TOUCH THESE SETTINGS IF YOU DO NOT KNOW WHAT YOU'RE DOING, PLEASE.")
+    config.set("ADV. SETTINGS", "NOTE2",
+               "Scale is 1000 divided by scale. When editing column and surface values, make sure the column count divides by surface count.")
+    config.set("ADV. SETTINGS", "COLUMNS", str(10000))
+    config.set("ADV. SETTINGS", "SURFACES", str(8))
+    config.set("ADV. SETTINGS", "SCALE", str(20))
 
 # initialize pygame stuff
 pygame.init()
@@ -110,13 +119,15 @@ class Item:
 class Karaoke:
     def __init__(self):
         self.rows = 8
-        self.col = 5000  # increasing this increases memory usage. only use values that can be divided by 2, please
+        # increasing this increases memory usage. only use values that can be divided by 2, please
+        self.col = int(config['ADV. SETTINGS']['COLUMNS'])
         self.items = [[None for _ in range(self.rows)]
                       for _ in range(self.col)]
         self.box_size = 30
         self.x = 50
         self.y = 50
-        self.scale = 10  # 1/10 second, so 100 ms per square
+        # 1/10 second, so 100 ms per square
+        self.scale = int(config['ADV. SETTINGS']['SCALE'])
         self.border = 3
 
     # draw everything
@@ -141,7 +152,7 @@ class Karaoke:
         for i in range(col_start, col_end):
             world.blit(sheet_bg, (x_coord + (33 * (i)),
                                   self.y + self.box_size / 2))
-            if (i + surface2_offset) % 20 == 0:
+            if (i + surface2_offset) % (self.scale * 2) == 0:  # each 2 seconds
                 current_time = self.format_time(i + surface2_offset)
                 time_text = font.render(current_time, 1, pygame.Color("grey"))
                 world.blit(time_text, (x_coord + (33 * (i)), 30))
@@ -223,6 +234,22 @@ class Karaoke:
     def pos_to_game(self, pos):
         return normal_round((pos / self.scale) * 3000)
 
+    def song_pos_to_scroll(self, position, world_width):
+        scale = 1000 // self.scale
+        new_pos = (position / scale) * (self.box_size + self.border)
+        if new_pos > world_width:
+            # 1.5x note is difference for other surfaces
+            return int(((position - (scale * 1.5)) / scale) * (self.box_size + self.border))
+        else:
+            return int(new_pos)
+
+    def scroll_to_song_pos(self, position, world_width):
+        scale = 1000 // self.scale
+        new_pos = int((position * (scale)) / (self.box_size + self.border))
+        if new_pos < world_width:
+            return new_pos
+        else:
+            return int(new_pos + (scale * 1.5))
 # Loading textures
 
 
@@ -280,21 +307,6 @@ def normal_round(n):  # https://stackoverflow.com/questions/33019698/how-to-prop
     return ceil(n)
 
 
-def song_pos_to_scroll(position, karaoke, world_width):
-    new_pos = ((position) / 100) * (karaoke.box_size + karaoke.border)
-    if new_pos > world_width:
-        return ((position - 150) / 100) * (karaoke.box_size + karaoke.border)
-    else:
-        return new_pos
-
-
-def scroll_to_song_pos(position, karaoke, world_width):
-    new_pos = int((position * 100) / (karaoke.box_size + karaoke.border))
-    if new_pos < world_width:
-        return new_pos
-    else:
-        return new_pos + 150
-
 # KPM code
 
 
@@ -350,7 +362,7 @@ def load_kbd(file, karaoke, cutscene_box):
                         note_id = 5
                     progress_value = 0
                     for i in range(start_pos + 1, end_pos):
-                        progress_value += 100
+                        progress_value += (1000 // karaoke.scale)
                         karaoke.Add(Item(i, note['Vertical position'], note_id,
                                          note['Note type'], note['Start position'] + progress_value))
                     karaoke.Add(Item(
@@ -498,7 +510,7 @@ def save_before_closing(note, boxes, dropdowns, karaoke):
                 note_id = 5
             progress_value = 0
             for i in range(start_pos + 1, end_pos):
-                progress_value += 100
+                progress_value += (1000 // karaoke.scale)
                 karaoke.Add(Item(i, note.y, note_id,
                                  note.note_type, note.start_pos + progress_value))
             karaoke.Add(
@@ -624,8 +636,9 @@ def main():
     karaoke = Karaoke()
     # FIXME - some notes overflow to the start, minor visual issue.
     accurate_size = (karaoke.col) * (karaoke.box_size + karaoke.border)
-    world_count = 10  # must be able to divide column count, otherwise it will break
-    # test
+    # number of surfaces, must be able to divide column count, otherwise it will break
+    world_count = int(config['ADV. SETTINGS']['SURFACES'])
+
     if karaoke.col % world_count != 0:
         raise ValueError(
             'Karaoke column amount not dividable by surface count! Please change the values.')
@@ -716,7 +729,7 @@ def main():
             valid_chars.pop()
         boxes[i].set_allowed_characters(valid_chars)
         boxes[i].hide()
-    music_box.set_allowed_characters(valid_chars)
+    # music_box.set_allowed_characters(valid_chars)
 
     # labels
     cutscene_label = UILabel(pygame.Rect((10, 340), (200, 22)),
@@ -814,9 +827,9 @@ def main():
         scrollbar_value = scrollbar.get_current_value()
 
         # draw the screen
-        surface_nr = int(scrollbar_value / worlds[0].get_width())  # 0
+        surface_nr = int(scrollbar_value / worlds[0].get_width())
         next_surface = int(
-            (scrollbar_value + screen.get_width() + 50) / worlds[0].get_width())  # 1
+            (scrollbar_value + screen.get_width() + 50) / worlds[0].get_width())
         # draw surfaces
         if surface_nr != next_surface and world_count > next_surface:
             world_end = worlds[0].get_width(
@@ -1050,7 +1063,11 @@ def main():
                                 play_button.set_text('▶')
                                 pygame.mixer.music.stop()
                             else:
-                                audio_start_pos = int(music_box.get_text())
+                                if len(music_box.get_text()) > 0:
+                                    audio_start_pos = int(music_box.get_text())
+                                else:
+                                    audio_start_pos = 0
+
                                 # TODO - get a nicer pause button
                                 play_button.set_text('▌▌')
                                 try:
@@ -1137,8 +1154,8 @@ def main():
                     if not pygame.mixer.get_busy():
                         new_value = music_box.get_text()
                         if len(new_value) > 0:
-                            new_pos = int(song_pos_to_scroll(
-                                int(music_box.get_text()), karaoke, worlds[0].get_width()))
+                            new_pos = karaoke.song_pos_to_scroll(
+                                int(music_box.get_text()), worlds[0].get_width())
                             scrollbar.set_current_value(new_pos)
 
                 if event.user_type == UI_HORIZONTAL_SLIDER_MOVED and event.ui_object_id == '#volume_slider':
@@ -1259,8 +1276,8 @@ def main():
             current_time = pygame.mixer.music.get_pos() + audio_start_pos
             music_box.set_text(str(current_time))
             # make the scrollbar move when song is playing
-            converted_time = song_pos_to_scroll(
-                current_time, karaoke, worlds[0].get_width())
+            converted_time = karaoke.song_pos_to_scroll(
+                current_time, worlds[0].get_width())
             scrollbar.set_current_value(converted_time)
         elif play_button.text != "▶":
             play_button.set_text('▶')
@@ -1269,10 +1286,11 @@ def main():
         if scrollbar_moved:
             if loaded and not pygame.mixer.music.get_busy():
                 # change the time when scrolling
-                converted_scroll = scroll_to_song_pos(
-                    scrollbar.get_current_value(), karaoke, worlds[0].get_width())
+                converted_scroll = karaoke.scroll_to_song_pos(
+                    scrollbar.get_current_value(), worlds[0].get_width())
                 if converted_scroll > length:
                     converted_scroll = length
+
                 music_box.set_text(str(converted_scroll))
             scrollbar_moved = False
 

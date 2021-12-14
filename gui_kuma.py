@@ -280,20 +280,20 @@ def normal_round(n):  # https://stackoverflow.com/questions/33019698/how-to-prop
     return ceil(n)
 
 
-def song_pos_to_scroll(position, karaoke):
-    if position > 198250 or position < 50:
-        diff = 0
+def song_pos_to_scroll(position, karaoke, world_width):
+    new_pos = ((position) / 100) * (karaoke.box_size + karaoke.border)
+    if new_pos > world_width:
+        return ((position - 150) / 100) * (karaoke.box_size + karaoke.border)
     else:
-        diff = -50
-    return ((position + diff) / 100) * (karaoke.box_size + karaoke.border)
+        return new_pos
 
 
-def scroll_to_song_pos(position, karaoke):
+def scroll_to_song_pos(position, karaoke, world_width):
     new_pos = int((position * 100) / (karaoke.box_size + karaoke.border))
-    if new_pos > 198250:
+    if new_pos < world_width:
         return new_pos
     else:
-        return new_pos + 50
+        return new_pos + 150
 
 # KPM code
 
@@ -889,7 +889,7 @@ def main():
             if event.type == pygame.QUIT:
                 with open(settings_file, 'w', encoding='UTF-8') as configfile:  # save config
                     config.write(configfile)
-                print('Closing KUMA. (^ _ ^)/')
+                print('(^ _ ^)/')
                 exit()
 
             # delete held button when entering menu bar to prevent accidentally adding notes
@@ -997,7 +997,7 @@ def main():
                                         box.show()
                                 # set values
                                     update_text_boxes(
-                                        currently_edited, boxes, dropdowns)  # TODO - cleanup all the generic stuff
+                                        currently_edited, boxes, dropdowns)
 
                     else:
                         if karaoke.In_grid(pos[0], pos[1]):
@@ -1051,7 +1051,7 @@ def main():
                                 pygame.mixer.music.stop()
                             else:
                                 audio_start_pos = int(music_box.get_text())
-                                # TODO - get a nicer button
+                                # TODO - get a nicer pause button
                                 play_button.set_text('▌▌')
                                 try:
                                     pygame.mixer.music.play(
@@ -1138,7 +1138,7 @@ def main():
                         new_value = music_box.get_text()
                         if len(new_value) > 0:
                             new_pos = int(song_pos_to_scroll(
-                                int(music_box.get_text()), karaoke))
+                                int(music_box.get_text()), karaoke, worlds[0].get_width()))
                             scrollbar.set_current_value(new_pos)
 
                 if event.user_type == UI_HORIZONTAL_SLIDER_MOVED and event.ui_object_id == '#volume_slider':
@@ -1259,17 +1259,18 @@ def main():
             current_time = pygame.mixer.music.get_pos() + audio_start_pos
             music_box.set_text(str(current_time))
             # make the scrollbar move when song is playing
-            converted_time = song_pos_to_scroll(current_time, karaoke)
+            converted_time = song_pos_to_scroll(
+                current_time, karaoke, worlds[0].get_width())
             scrollbar.set_current_value(converted_time)
         elif play_button.text != "▶":
             play_button.set_text('▶')
-        pygame.draw.line(screen, (222, 175, 74), (karaoke.x + karaoke.box_size // 2, karaoke.y + 10), (karaoke.x +
-                                                                                                       karaoke.box_size // 2, ((karaoke.box_size + karaoke.border) * karaoke.rows) + 70), width=5)  # helpful line for music
+        pygame.draw.line(screen, (222, 175, 74), (karaoke.x, karaoke.y + 10), (karaoke.x, ((
+            karaoke.box_size + karaoke.border) * karaoke.rows) + 70), width=5)  # helpful line for music
         if scrollbar_moved:
             if loaded and not pygame.mixer.music.get_busy():
                 # change the time when scrolling
                 converted_scroll = scroll_to_song_pos(
-                    scrollbar.get_current_value(), karaoke)
+                    scrollbar.get_current_value(), karaoke, worlds[0].get_width())
                 if converted_scroll > length:
                     converted_scroll = length
                 music_box.set_text(str(converted_scroll))

@@ -110,7 +110,7 @@ class Item:
 class Karaoke:
     def __init__(self):
         self.rows = 8
-        self.col = 3966
+        self.col = 5000  # increasing this increases memory usage. only use values that can be divided by 2, please
         self.items = [[None for _ in range(self.rows)]
                       for _ in range(self.col)]
         self.box_size = 30
@@ -120,23 +120,23 @@ class Karaoke:
         self.border = 3
 
     # draw everything
-    def draw(self, world, surface_nr, scroll, screen_width, sheet_bg, line_bg):
+    def draw(self, world, surface_nr, scroll, screen_width, sheet_bg, line_bg, world_count):
         # draw background
         surface2_offset = 0
         one_box = self.box_size + self.border
-        if surface_nr == 2:
+        if surface_nr > 0:
             x_coord = 0
-            scroll -= world.get_width() - 50
-            surface2_offset = int(self.col / 2)
+            scroll -= (world.get_width() * surface_nr) - 50
+            surface2_offset = int(self.col / world_count) * surface_nr
         else:
             x_coord = self.x
 
         col_start = (scroll // one_box - 2)
         col_end = col_start + (screen_width // one_box) + 2
-        if surface_nr == 2:
+        if surface_nr > 0:
             col_end += 2
-        if col_end > (self.col // 2):
-            col_end = (self.col // 2)
+        if col_end > (self.col // world_count):
+            col_end = (self.col // world_count)
 
         for i in range(col_start, col_end):
             world.blit(sheet_bg, (x_coord + (33 * (i)),
@@ -145,8 +145,9 @@ class Karaoke:
                 current_time = self.format_time(i + surface2_offset)
                 time_text = font.render(current_time, 1, pygame.Color("grey"))
                 world.blit(time_text, (x_coord + (33 * (i)), 30))
-                world.blit(
-                    line_bg, (x_coord + (one_box // 2) + (33 * (i)), self.y + self.box_size / 2))
+                world.blit(line_bg, (x_coord + (one_box // 2) +
+                                     (33 * (i)), self.y + self.box_size / 2))
+
         for x in range(col_start, col_end):
             for y in range(self.rows):
                 rect = (x_coord + (self.box_size + self.border)*x + self.border, self.x +
@@ -156,13 +157,13 @@ class Karaoke:
                                [y].resize(self.box_size), rect)
 
     # get the square that the mouse is over
-    def Get_pos(self, scroll):
+    def Get_pos(self, scroll, world, world_count):
         mouse = pygame.mouse.get_pos()
-        x = scroll + mouse[0] - self.x  # adjust for scrollbar
+        x = scroll + mouse[0]  # adjust for scrollbar
         y = mouse[1] - self.y
-        # 1000 comes from testing
-        if x > int(((self.col * self.box_size) + (self.col + self.border)) / 2) + 1000:
-            x -= 15
+        surface_nr = int(x / world.get_width())  # 0
+        if surface_nr == 0:
+            x -= self.x
         x = x//(self.box_size + self.border)
         y = y//(self.box_size + self.border)
         return (x, y)
@@ -622,11 +623,19 @@ def main():
     screen = pygame.display.set_mode((scr_size))
     karaoke = Karaoke()
     # FIXME - some notes overflow to the start, minor visual issue.
-    accurate_size = (4 + karaoke.col) * (karaoke.box_size + karaoke.border)
-    world = pygame.Surface(
-        (int(accurate_size / 2), int(scr_size[1])), pygame.SRCALPHA, 32)
-    world2 = pygame.Surface(
-        (accurate_size - world.get_width(), int(scr_size[1])), pygame.SRCALPHA, 32)
+    accurate_size = (karaoke.col) * (karaoke.box_size + karaoke.border)
+    world_count = 10  # must be able to divide column count, otherwise it will break
+    # test
+    if karaoke.col % world_count != 0:
+        raise ValueError(
+            'Karaoke column amount not dividable by surface count! Please change the values.')
+
+    worlds = [pygame.Surface(
+        (int(accurate_size / world_count), int(scr_size[1])), pygame.SRCALPHA, 32) for x in range(world_count)]
+
+    if worlds[0].get_width() > 65535:
+        raise ValueError(
+            'Surface size is too big! Increase surface or decrease column count!')
 
     # ui manager
     manager = UIManager(scr_size, theme_path='assets/ui_theme.json')
@@ -805,27 +814,27 @@ def main():
         scrollbar_value = scrollbar.get_current_value()
 
         # draw the screen
-        if scrollbar_value + 1600 > world.get_width():
-            world1_end = world.get_width() - scrollbar_value
-            if world1_end > 0:
-                world.fill((fill_colour), rect=pygame.Rect(
-                    scrollbar_value, 0, world1_end, 480))  # clean the screen
-                world2.fill((fill_colour), rect=pygame.Rect(
-                    scrollbar_value - world.get_width(), 0, 1600, 480))  # clean the screen
-                karaoke.draw(world, 1, scrollbar_value,
-                             scr_size[0], sheet_bg, line_bg)
-                karaoke.draw(world2, 2, scrollbar_value,
-                             scr_size[0], sheet_bg, line_bg)
-            else:
-                world2.fill((fill_colour), rect=pygame.Rect(
-                    scrollbar_value - world.get_width(), 0, 1600, 480))  # clean the screen
-                karaoke.draw(world2, 2, scrollbar_value,
-                             scr_size[0], sheet_bg, line_bg)
+        surface_nr = int(scrollbar_value / worlds[0].get_width())  # 0
+        next_surface = int(
+            (scrollbar_value + screen.get_width() + 50) / worlds[0].get_width())  # 1
+        # draw surfaces
+        if surface_nr != next_surface and world_count > next_surface:
+            world_end = worlds[0].get_width(
+            ) - (scrollbar_value - (worlds[0].get_width() * surface_nr))
+            if world_end > 0:
+                worlds[surface_nr].fill((fill_colour), rect=pygame.Rect(
+                    scrollbar_value - worlds[0].get_width() * surface_nr, 0, world_end, 480))  # clean the screen
+                worlds[next_surface].fill((fill_colour), rect=pygame.Rect(
+                    scrollbar_value - worlds[0].get_width() * next_surface, 0, 1600, 480))  # clean the screen
+                karaoke.draw(worlds[surface_nr], surface_nr, scrollbar_value,
+                             scr_size[0], sheet_bg, line_bg, world_count)
+                karaoke.draw(worlds[next_surface], next_surface, scrollbar_value,
+                             scr_size[0], sheet_bg, line_bg, world_count)
         else:
-            world.fill((fill_colour), rect=pygame.Rect(
-                scrollbar_value, 0, 1600, 480))  # clean the screen
-            karaoke.draw(world, 1, scrollbar_value,
-                         scr_size[0], sheet_bg, line_bg)
+            worlds[surface_nr].fill((fill_colour), rect=pygame.Rect(
+                scrollbar_value - worlds[0].get_width() * surface_nr, 0, 1600, 480))  # clean the screen
+            karaoke.draw(worlds[surface_nr], surface_nr, scrollbar_value,
+                         scr_size[0], sheet_bg, line_bg, world_count)
 
         mousex, mousey = pygame.mouse.get_pos()
         mousex += scrollbar_value  # adjust for scrollbar
@@ -849,24 +858,30 @@ def main():
 
         # if holding something, draw it next to mouse
         if selected:
-            if mousex > world.get_width():
-                world2.blit(selected.resize(20),
-                            (mousex - world.get_width(), mousey))
+            if mousex > worlds[0].get_width() * (surface_nr + 1) and world_count > next_surface:
+                worlds[next_surface].blit(selected.resize(20),
+                                          (mousex - worlds[0].get_width() * next_surface, mousey))
             else:
-                world.blit(selected.resize(20), (mousex, mousey))
+                worlds[surface_nr].blit(selected.resize(
+                    20), (mousex - worlds[0].get_width() * surface_nr, mousey))
 
         # if editing note params
         if currently_edited:
-            x = 2 + karaoke.x + \
-                (currently_edited.x * (karaoke.box_size + karaoke.border))
+            x = 2 + \
+                (currently_edited.x * (karaoke.box_size +
+                                       karaoke.border))
             y = 2 + karaoke.y + \
                 (currently_edited.y * (karaoke.box_size + karaoke.border))
-            if x > world.get_width():
-                pygame.draw.rect(world2, (0, 100, 255), (x - world.get_width() + karaoke.box_size / 2, y, karaoke.box_size + karaoke.border,
-                                                         karaoke.box_size + karaoke.border), 3)
+
+            if surface_nr == 0:
+                x += karaoke.x
+
+            if x > worlds[0].get_width() * (surface_nr + 1) and world_count > next_surface:
+                pygame.draw.rect(worlds[next_surface], (0, 100, 255), (x - worlds[0].get_width() * next_surface + karaoke.box_size / 2, y, karaoke.box_size + karaoke.border,
+                                                                       karaoke.box_size + karaoke.border), 3)
             else:
-                pygame.draw.rect(world, (0, 100, 255), (x, y, karaoke.box_size + karaoke.border,
-                                                        karaoke.box_size + karaoke.border), 3)
+                pygame.draw.rect(worlds[surface_nr], (0, 100, 255), (x - worlds[0].get_width() * surface_nr, y, karaoke.box_size + karaoke.border,
+                                                                     karaoke.box_size + karaoke.border), 3)
 
         # Application events
         events = pygame.event.get()
@@ -874,6 +889,7 @@ def main():
             if event.type == pygame.QUIT:
                 with open(settings_file, 'w', encoding='UTF-8') as configfile:  # save config
                     config.write(configfile)
+                print('Closing KUMA. (^ _ ^)/')
                 exit()
 
             # delete held button when entering menu bar to prevent accidentally adding notes
@@ -894,7 +910,8 @@ def main():
                             note_id = 0
                     selected = Item(0, 0, note_id, 0, 0)  # add item
                 elif event.button == 1:  # left click
-                    pos = karaoke.Get_pos(scrollbar_value)
+                    pos = karaoke.Get_pos(
+                        scrollbar_value, worlds[0], world_count)
                     if karaoke.In_grid(pos[0], pos[1]):
                         if selected:
                             selected.start_pos = karaoke.pos_to_game(pos[0])
@@ -964,7 +981,8 @@ def main():
                     note_id = 5
                     selected = Item(0, 0, note_id, 'Rapid', 0)  # add item
                 if event.key == pygame.K_e:  # property editing mode
-                    pos = karaoke.Get_pos(scrollbar_value)
+                    pos = karaoke.Get_pos(
+                        scrollbar_value, worlds[0], world_count)
                     if not currently_edited:
                         if karaoke.In_grid(pos[0], pos[1]):
                             if karaoke.items[pos[0]][pos[1]] != None:
@@ -1223,22 +1241,19 @@ def main():
 
             manager.process_events(event)
 
-        trunc_world_orig = (scrollbar_value, 0)
+        trunc_world_orig = (
+            scrollbar_value - worlds[0].get_width() * surface_nr, 0)
         trunc_world = (scr_size[0], scr_size[1] - thick_h + 5)
-
-        if scrollbar_value + 1600 > world.get_width():
-            trunc_world2_orig = (
-                scrollbar.get_current_value() - world.get_width(), 0)
-            world1_end = world.get_width() - trunc_world_orig[0]
+        if surface_nr != next_surface and world_count > next_surface:
+            world1_end = worlds[0].get_width() - trunc_world_orig[0]
             if world1_end > 0:
-                screen.blit(world, (0, 0), (trunc_world_orig,
-                                            (world1_end, trunc_world[1])))
-                screen.blit(world2, (world1_end, 0), ((0, 0),
-                                                      (trunc_world[0] - world1_end, trunc_world[1])))
-            else:
-                screen.blit(world2, (0, 0), (trunc_world2_orig, trunc_world))
+                screen.blit(worlds[surface_nr], (0, 0),
+                            (trunc_world_orig, (world1_end, trunc_world[1])))
+                screen.blit(worlds[next_surface], (world1_end, 0), ((
+                    0, 0), (trunc_world[0] - world1_end, trunc_world[1])))
         else:
-            screen.blit(world, (0, 0), (trunc_world_orig, trunc_world))
+            screen.blit(worlds[surface_nr], (0, 0),
+                        (trunc_world_orig, trunc_world))
 
         if pygame.mixer.music.get_busy():
             current_time = pygame.mixer.music.get_pos() + audio_start_pos

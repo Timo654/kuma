@@ -47,6 +47,24 @@
         "X",
         "Y"
       ]
+    ],
+    "Keyboard": [
+      "buttons_pc.png",
+      [
+        "Right",
+        "Down",
+        "Left",
+        "Up"
+      ]
+    ],
+    "Keyboard (Classic)": [
+      "buttons_pc_alt.png",
+      [
+        "L",
+        "K",
+        "J",
+        "I"
+      ]
     ]
   },
   "Languages": {

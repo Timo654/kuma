@@ -1,4 +1,3 @@
-
 import pygame
 from pygame_gui import UIManager, UI_BUTTON_START_PRESS, UI_BUTTON_PRESSED, UI_DROP_DOWN_MENU_CHANGED, UI_CONFIRMATION_DIALOG_CONFIRMED, UI_HORIZONTAL_SLIDER_MOVED, UI_TEXT_ENTRY_CHANGED
 from pygame_gui.windows import UIFileDialog, UIConfirmationDialog, UIMessageWindow
@@ -15,9 +14,9 @@ import locale
 import mutagen
 
 # general info
-VERSION = "v0.9.0"
+VERSION = "v0.9.1"
 CREATORS = 'Timo654'
-TRANSLATORS = 'Timo654, ketrub, Mink, jason098, Capitán Retraso, Kent, Edness, JustAnyone'
+TRANSLATORS = 'Timo654, ketrub, Mink, jason098, Capitán Retraso, Kent, Edness, JustAnyone, Tervel'
 TESTERS = "ketrub, KaarelJ98"
 print("""
    _     _      _     _      _     _      _     _   
@@ -634,7 +633,6 @@ def main():
     scr_size = (1600, 490)
     screen = pygame.display.set_mode((scr_size))
     karaoke = Karaoke()
-    # FIXME - some notes overflow to the start, minor visual issue.
     accurate_size = (karaoke.col) * (karaoke.box_size + karaoke.border)
     # number of surfaces, must be able to divide column count, otherwise it will break
     world_count = int(config['ADV. SETTINGS']['SURFACES'])
@@ -658,7 +656,7 @@ def main():
                          menu_item_data=menu_data,
                          manager=manager)
     # buttons
-    undo_button = UIButton(relative_rect=pygame.Rect((385, 400), (220, 30)),
+    undo_button = UIButton(relative_rect=pygame.Rect((385, 400), (230, 30)),
                            text=_('Undo note changes'),
                            manager=manager)
     undo_button.hide()
@@ -1068,7 +1066,7 @@ def main():
                                 else:
                                     audio_start_pos = 0
 
-                                # TODO - get a nicer pause button
+                                # TODO - get a nicer pause button, might not be possible before pygame-gui 6
                                 play_button.set_text('▌▌')
                                 try:
                                     pygame.mixer.music.play(

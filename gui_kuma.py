@@ -564,7 +564,7 @@ def load_song(filename, music_elements):
 def switch_language(language, params=None, boot=False):
     lang_code = assets['Languages'][language]
     lang = gettext.translation(
-        lang_code, localedir='locales', languages=[lang_code])
+        lang_code, localedir='assets/locales', languages=[lang_code])
     lang.install()
     _ = lang.gettext
     if not boot:

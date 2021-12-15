@@ -65,14 +65,14 @@ if not config.has_section("CONFIG"):
     config.set("CONFIG", "VOLUME", str(1))
 if not config.has_section("PATHS"):
     config.add_section("PATHS")
-    config.set("PATHS", "Input", f'{str(Path().resolve())}\\input_file.kbd')
-    config.set("PATHS", "Output", f'{str(Path().resolve())}\\output_file.kbd')
+    config.set("PATHS", "Input", f'{str(Path().resolve())}/input_file.kbd')
+    config.set("PATHS", "Output", f'{str(Path().resolve())}/output_file.kbd')
     config.set("PATHS", "KPM_Input",
-               f'{str(Path().resolve())}\\input_file.kpm')
+               f'{str(Path().resolve())}/input_file.kpm')
     config.set("PATHS", "KPM_Output",
-               f'{str(Path().resolve())}\\output_file.kpm')
+               f'{str(Path().resolve())}/output_file.kpm')
     config.set("PATHS", "Music",
-               f'{str(Path().resolve())}\\audio.ogg')
+               f'{str(Path().resolve())}/audio.ogg')
 if not config.has_section("ADV. SETTINGS"):
     config.add_section("ADV. SETTINGS")
     config.set("ADV. SETTINGS", "NOTE",
@@ -88,7 +88,7 @@ pygame.init()
 font = pygame.font.SysFont("FiraCode", 22)
 clock = pygame.time.Clock()
 pygame.display.set_caption('KUMA')
-pygame_icon = pygame.image.load(f"{assets['Texture folder']}\\icon_small.png")
+pygame_icon = pygame.image.load(f"{assets['Texture folder']}/icon_small.png")
 pygame.display.set_icon(pygame_icon)
 pygame.mixer.music.set_volume(float(config["CONFIG"]["VOLUME"]))
 
@@ -262,7 +262,7 @@ class Karaoke:
 def load_item_tex(button_type, karaoke, selected, dropdown):
     global items
     # load note textures
-    tex_name = f"{texture_path}\\{assets['Button prompts'][button_type][0]}"
+    tex_name = f"{texture_path}/{assets['Button prompts'][button_type][0]}"
     image = pygame.image.load(tex_name).convert_alpha()
     buttons = strip_from_sheet(image, (0, 0), (122, 122), 2, 2)
     items = [pygame.Surface((122, 122), pygame.SRCALPHA) for _ in range(6)]
@@ -375,7 +375,7 @@ def load_kbd(file, karaoke, cutscene_box):
                                          note['Note type'], note['Start position'] + progress_value))
                     karaoke.Add(Item(
                         end_pos, note['Vertical position'], note['Button type'], 3, note['End position']))
-        kpm_file = f"{str(file.parent)}\\{file.stem.split('_')[0]}_param.kpm"
+        kpm_file = f"{str(file.parent)}/{file.stem.split('_')[0]}_param.kpm"
         if Path(kpm_file).exists():
             kpm_data = load_kpm(kpm_file, cutscene_box)
             return karaoke, True, kpm_data
@@ -791,8 +791,8 @@ def main():
                   None, note_picker)  # load button textures
 
     # load sheet textures and scale them
-    sheet_tex = f"{texture_path}\\{assets['Sheet texture']}"
-    line_tex = f"{texture_path}\\{assets['Line texture']}"
+    sheet_tex = f"{texture_path}/{assets['Sheet texture']}"
+    line_tex = f"{texture_path}/{assets['Line texture']}"
     sheet_bg = pygame.image.load(sheet_tex).convert()
     line_bg = pygame.image.load(line_tex).convert()
     line_bg = pygame.transform.scale(

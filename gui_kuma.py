@@ -642,12 +642,14 @@ def main():
     current_language = config['CONFIG']['LANGUAGE']
     if current_language not in languages:
         current_language = languages[0]
+        config.set("CONFIG", "LANGUAGE", current_language)
     switch_language(current_language, boot=True)
 
     # get current controller
     current_controller = config['CONFIG']['BUTTONS']
     if current_controller not in controllers:
         current_controller = controllers[0]
+        config.set("CONFIG", "BUTTONS", current_controller)
 
     scr_size = (1600, 490)
     screen = pygame.display.set_mode((scr_size))

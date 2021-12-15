@@ -2,7 +2,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: KUMA 1.0\n"
 "POT-Creation-Date: 2021-12-13 15:56+0200\n"
-"PO-Revision-Date: 2021-12-13 21:15+0200\n"
+"PO-Revision-Date: 2021-12-15 16:09+0200\n"
 "Last-Translator: \n"
 "Language-Team: \n"
 "Language: et\n"
@@ -115,11 +115,11 @@ msgstr "Vertikaalne asend"
 
 #: gui_kuma.py:564 gui_kuma.py:709
 msgid "Cue ID"
-msgstr ""
+msgstr "Heli ID"
 
 #: gui_kuma.py:565 gui_kuma.py:712
 msgid "Cuesheet ID"
-msgstr ""
+msgstr "Helifaili ID"
 
 #: gui_kuma.py:566 gui_kuma.py:715
 msgid "Note button"

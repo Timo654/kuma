@@ -17,7 +17,7 @@ import sys
 # general info
 VERSION = "v0.9.1"
 CREATORS = 'Timo654'
-TRANSLATORS = 'Timo654, ketrub, Mink, jason098, Capitán Retraso, Kent, Edness, JustAnyone, Tervel, RyuHachii, Foas'
+TRANSLATORS = 'Timo654, ketrub, Mink, jason098, Capitán Retraso, Kent, Edness, JustAnyone, Tervel, RyuHachii, Foas, Biggelskog'
 TESTERS = "ketrub, KaarelJ98"
 print("""
    _     _      _     _      _     _      _     _   

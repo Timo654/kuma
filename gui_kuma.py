@@ -345,10 +345,10 @@ def load_kbd(file, karaoke, cutscene_box):
         data = kbd.read_file(file)
     except(ValueError):
         print(_('Unable to read file.'))
-        return karaoke, None
+        return karaoke, False, None
     except(PermissionError):
         print(_('Unable to open file.'))
-        return karaoke, None
+        return karaoke, False, None
     else:
         karaoke = Karaoke()  # reset data
         for note in data['Notes']:

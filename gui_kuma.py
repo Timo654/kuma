@@ -15,7 +15,7 @@ import mutagen
 import sys
 
 # general info
-VERSION = "v0.9.1"
+VERSION = "v0.9.2"
 CREATORS = 'Timo654'
 TRANSLATORS = 'Timo654, ketrub, Mink, jason098, Capitán Retraso, Kent, Edness, JustAnyone, Tervel, RyuHachii, Foas, Biggelskog'
 TESTERS = "ketrub, KaarelJ98"
@@ -30,13 +30,13 @@ print("""
 (.-./`-'\.-.)(.-./`-'\.-.)(.-./`-'\.-.)(.-./`-'\.-.)
  `-'     `-'  `-'     `-'  `-'     `-'  `-'     `-'   """ + VERSION + '\n\n')
 
+# loading asset data from file
 asset_file = 'assets.json'
 if Path(asset_file).is_file():
     with open(asset_file, 'r', encoding='UTF-8') as json_file:
         assets = json.load(json_file)
 else:
     raise Exception(_('Asset data missing'))
-
 texture_path = assets['Texture folder']
 controllers = [key for key in assets['Button prompts']]
 languages = [key for key in assets['Languages']]
@@ -149,6 +149,7 @@ class Karaoke:
         if col_end > (self.col // world_count):
             col_end = (self.col // world_count)
 
+        # draw the karaoke sheet and lines every 2 seconds
         for i in range(col_start, col_end):
             world.blit(sheet_bg, (x_coord + (33 * (i)),
                                   self.y + self.box_size / 2))
@@ -158,7 +159,7 @@ class Karaoke:
                 world.blit(time_text, (x_coord + (33 * (i)), 30))
                 world.blit(line_bg, (x_coord + (one_box // 2) +
                                      (33 * (i)), self.y + self.box_size / 2))
-
+        # draw the notes
         for x in range(col_start, col_end):
             for y in range(self.rows):
                 rect = (x_coord + (self.box_size + self.border)*x + self.border, self.x +
@@ -166,18 +167,6 @@ class Karaoke:
                 if self.items[x + surface2_offset][y]:
                     world.blit(self.items[x + surface2_offset]
                                [y].resize(self.box_size), rect)
-
-    # get the square that the mouse is over
-    def Get_pos(self, scroll, world, world_count):
-        mouse = pygame.mouse.get_pos()
-        x = scroll + mouse[0]  # adjust for scrollbar
-        y = mouse[1] - self.y
-        surface_nr = int(x / world.get_width())  # 0
-        if surface_nr == 0:
-            x -= self.x
-        x = x//(self.box_size + self.border)
-        y = y//(self.box_size + self.border)
-        return (x, y)
 
     # add an item
     def Add(self, Item):
@@ -187,6 +176,7 @@ class Karaoke:
     def Remove(self, x, y):
         self.items[x][y] = None
 
+    # remove a hold/rapid
     def Remove_long(self, x, y, y_pos=None, old_start_pos=None, new_end_pos=0):
         note = self.items[x][y]
         if y_pos == None:
@@ -198,13 +188,26 @@ class Karaoke:
                 break
             self.Remove(i, y_pos)
 
-        # if stuff is before start position
+        # if there's rapid/hold parts before start position
         old_start_pos = self.pos_convert(old_start_pos)
         if old_start_pos != None and old_start_pos != start_pos:
             for i in range(start_pos + 1, old_start_pos, -1):
                 if i != start_pos:
                     self.Remove(i, y_pos)
         note = None
+
+    # get the square that the mouse is over
+
+    def Get_pos(self, scroll, world):
+        mouse = pygame.mouse.get_pos()
+        x = scroll + mouse[0]  # adjust for scrollbar
+        y = mouse[1] - self.y
+        surface_nr = int(x / world.get_width())  # 0
+        if surface_nr == 0:
+            x -= self.x
+        x = x//(self.box_size + self.border)
+        y = y//(self.box_size + self.border)
+        return (x, y)
 
     # check whether the mouse in in the grid
     def In_grid(self, x, y):
@@ -213,7 +216,7 @@ class Karaoke:
         return True
 
     def format_time(self, i):
-        # display current time, 100 ms each square
+        # display current time
         seconds = i // self.scale
         minutes = seconds // 60
         if minutes:
@@ -234,6 +237,7 @@ class Karaoke:
     def pos_to_game(self, pos):
         return normal_round((pos / self.scale) * 3000)
 
+    # convert song (audio) position to scroll
     def song_pos_to_scroll(self, position, world_width):
         scale = 1000 // self.scale
         new_pos = (position / scale) * (self.box_size + self.border)
@@ -243,6 +247,7 @@ class Karaoke:
         else:
             return int(new_pos)
 
+    # convert scroll position to song (audio) position
     def scroll_to_song_pos(self, position, world_width):
         scale = 1000 // self.scale
         new_pos = int((position * (scale)) / (self.box_size + self.border))
@@ -250,6 +255,7 @@ class Karaoke:
             return new_pos
         else:
             return int(new_pos + (scale * 1.5))
+
 # Loading textures
 
 
@@ -352,11 +358,11 @@ def load_kbd(file, karaoke, cutscene_box):
     else:
         karaoke = Karaoke()  # reset data
         for note in data['Notes']:
-            if note['Note type'] < 3:
+            if note['Note type'] < 3:  # ignore any notes above 3, because those shouldn't exist
                 start_pos = karaoke.pos_convert(note['Start position'])
                 karaoke.Add(Item(start_pos, note['Vertical position'], note['Button type'], note['Note type'],
                                  note['Start position'], end_pos=note['End position'], cue_id=note['Cue ID'], cuesheet_id=note['Cuesheet ID']))
-                if note['Note type'] != 0:
+                if note['Note type'] != 0:  # if note is hold or rapid
                     end_pos = karaoke.pos_convert(note['End position'])
                     if note['Note type'] == 1:
                         note_id = 4
@@ -449,10 +455,10 @@ def update_fps():  # fps counter from https://pythonprogramming.altervista.org/p
     fps = str(int(clock.get_fps()))
     return fps
 
-# save parameter when stopping editing
+# save note changes when stopping editing
 
 
-def save_before_closing(note, boxes, dropdowns, karaoke):
+def save_note(note, boxes, dropdowns, karaoke):
     vert_changed = False
     old_start_pos = note.start_pos
     # start position
@@ -522,9 +528,10 @@ def save_before_closing(note, boxes, dropdowns, karaoke):
             note.end_pos = 0
 
 
+# hide ui after stopping editing
 def stop_editing(boxes, box_labels, dropdowns, undo_button):
     for box in boxes:
-        box.hide()  # disable text boxes
+        box.hide()
         for label in box_labels:
             label.hide()
         for dropdown in dropdowns:
@@ -532,6 +539,7 @@ def stop_editing(boxes, box_labels, dropdowns, undo_button):
         undo_button.hide()
 
 
+# loading a song
 def load_song(filename, music_elements):
     pygame.mixer.music.unload()
     if pygame.mixer.music.get_busy():
@@ -548,6 +556,8 @@ def load_song(filename, music_elements):
         print(_('Unable to read file.'))
         return False, -1
     return True, length
+
+
 # language related functions
 
 
@@ -560,6 +570,8 @@ def switch_language(language, params=None, boot=False):
     if not boot:
         print(_('Language changed.'))
         update_text(params)
+
+# menu bar data
 
 
 def get_menu_data():
@@ -626,18 +638,22 @@ def save_file(open_file, manager):
 
 
 def main():
-    switch_language(config['CONFIG']['LANGUAGE'], boot=True)
-    current_controller = config['CONFIG']['BUTTONS']
-    if current_controller not in controllers:
-        current_controller = controllers[0]
+    # load language
     current_language = config['CONFIG']['LANGUAGE']
     if current_language not in languages:
         current_language = languages[0]
+    switch_language(current_language, boot=True)
+
+    # get current controller
+    current_controller = config['CONFIG']['BUTTONS']
+    if current_controller not in controllers:
+        current_controller = controllers[0]
 
     scr_size = (1600, 490)
     screen = pygame.display.set_mode((scr_size))
     karaoke = Karaoke()
     accurate_size = (karaoke.col) * (karaoke.box_size + karaoke.border)
+
     # number of surfaces, must be able to divide column count, otherwise it will break
     world_count = int(config['ADV. SETTINGS']['SURFACES'])
 
@@ -664,14 +680,12 @@ def main():
                            text=_('Undo note changes'),
                            manager=manager)
     undo_button.hide()
-
     load_kpm_button = UIButton(relative_rect=pygame.Rect((225, 340), (150, 30)),
                                text=_('Load time'),
                                manager=manager)
     save_kpm_button = UIButton(relative_rect=pygame.Rect((225, 365), (150, 30)),
                                text=_('Save time'),
                                manager=manager)
-
     play_button = UIButton(relative_rect=pygame.Rect((355, 400), (30, 30)),
                            text='▶',
                            manager=manager)
@@ -719,7 +733,6 @@ def main():
         (870, 365), (150, 50)), manager=manager)
     cuesheet_box = UITextEntryLine(relative_rect=pygame.Rect(
         (1025, 365), (150, 50)), manager=manager)
-
     music_box = UITextEntryLine(relative_rect=pygame.Rect(
         (10, 425), (200, 50)), manager=manager, object_id="#song_position")
     music_box.set_text(str(0))
@@ -731,7 +744,7 @@ def main():
             valid_chars.pop()
         boxes[i].set_allowed_characters(valid_chars)
         boxes[i].hide()
-    # music_box.set_allowed_characters(valid_chars)
+    music_box.set_allowed_characters(valid_chars)
 
     # labels
     cutscene_label = UILabel(pygame.Rect((10, 340), (200, 22)),
@@ -858,6 +871,7 @@ def main():
         mousex, mousey = pygame.mouse.get_pos()
         mousex += scrollbar_value  # adjust for scrollbar
 
+        # scrollbar moving with arrow/page keys
         if key_pressed:
             scrollbar_moved = True
             scrollbar_add += 1
@@ -891,12 +905,10 @@ def main():
                                        karaoke.border))
             y = 2 + karaoke.y + \
                 (currently_edited.y * (karaoke.box_size + karaoke.border))
-
             if surface_nr == 0:
                 x += karaoke.x
-
             if x > worlds[0].get_width() * (surface_nr + 1) and world_count > next_surface:
-                pygame.draw.rect(worlds[next_surface], (0, 100, 255), (x - worlds[0].get_width() * next_surface + karaoke.box_size / 2, y, karaoke.box_size + karaoke.border,
+                pygame.draw.rect(worlds[next_surface], (0, 100, 255), (x - worlds[0].get_width() * next_surface, y, karaoke.box_size + karaoke.border,
                                                                        karaoke.box_size + karaoke.border), 3)
             else:
                 pygame.draw.rect(worlds[surface_nr], (0, 100, 255), (x - worlds[0].get_width() * surface_nr, y, karaoke.box_size + karaoke.border,
@@ -930,7 +942,7 @@ def main():
                     selected = Item(0, 0, note_id, 0, 0)  # add item
                 elif event.button == 1:  # left click
                     pos = karaoke.Get_pos(
-                        scrollbar_value, worlds[0], world_count)
+                        scrollbar_value, worlds[0])
                     if karaoke.In_grid(pos[0], pos[1]):
                         if selected:
                             selected.start_pos = karaoke.pos_to_game(pos[0])
@@ -962,9 +974,11 @@ def main():
                     else:
                         scrollbar.set_current_value(0)
 
+                # go back to the start
                 if event.key == pygame.K_HOME:
                     scrollbar.set_current_value(1)
 
+                # move scrollbar to last note
                 if event.key == pygame.K_END:
                     exit_loop = False
                     if len(karaoke.items) > 0:
@@ -1001,7 +1015,7 @@ def main():
                     selected = Item(0, 0, note_id, 'Rapid', 0)  # add item
                 if event.key == pygame.K_e:  # property editing mode
                     pos = karaoke.Get_pos(
-                        scrollbar_value, worlds[0], world_count)
+                        scrollbar_value, worlds[0])
                     if not currently_edited:
                         if karaoke.In_grid(pos[0], pos[1]):
                             if karaoke.items[pos[0]][pos[1]] != None:
@@ -1022,7 +1036,7 @@ def main():
                         if karaoke.In_grid(pos[0], pos[1]):
                             if karaoke.items[pos[0]][pos[1]] != currently_edited and karaoke.items[pos[0]][pos[1]] != None:
                                 if karaoke.items[pos[0]][pos[1]].id < 4 and karaoke.items[pos[0]][pos[1]].note_type < 3:
-                                    save_before_closing(
+                                    save_note(
                                         currently_edited, boxes, dropdowns, karaoke)
                                     currently_edited = karaoke.items[pos[0]][pos[1]]
                                     update_text_boxes(
@@ -1034,7 +1048,7 @@ def main():
                         else:
                             stopped_editing = True
                         if stopped_editing:
-                            save_before_closing(
+                            save_note(
                                 currently_edited, boxes, dropdowns, karaoke)
                             stopped_editing = False  # reset value
                             currently_edited = None  # deselect
@@ -1281,11 +1295,11 @@ def main():
         if pygame.mixer.music.get_busy():
             current_time = pygame.mixer.music.get_pos() + audio_start_pos
             music_box.set_text(str(current_time))
-            # make the scrollbar move when song is playing
+            # makes the scrollbar move when song is playing
             converted_time = karaoke.song_pos_to_scroll(
                 current_time, worlds[0].get_width())
             scrollbar.set_current_value(converted_time)
-        elif play_button.text != "▶":
+        elif play_button.text != "▶":  # when song ends, change button to play button
             play_button.set_text('▶')
         pygame.draw.line(screen, (222, 175, 74), (karaoke.x, karaoke.y + 10), (karaoke.x, ((
             karaoke.box_size + karaoke.border) * karaoke.rows) + 70), width=5)  # helpful line for music

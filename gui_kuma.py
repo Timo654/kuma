@@ -12,6 +12,7 @@ import configparser
 import gettext
 import locale
 import mutagen
+import sys
 
 # general info
 VERSION = "v0.9.1"
@@ -328,16 +329,18 @@ def load_kpm(file, cutscene_box, refresh=1):
 def save_kpm(file, cutscene_box, data):
     if Path.exists(file):
         data = load_kpm(file, cutscene_box, refresh=0)
-    elif data != None:
+    if data != None:
         data['Parameters'][0]['Cutscene start time'] = float(
             cutscene_box.get_text())
         kpm.write_file(data, file)
         print(_("KPM written to {}").format(file))
+        return data
 
 # KBD code
 
 
 def load_kbd(file, karaoke, cutscene_box):
+    file = Path(file)  # ensure it is actually path
     try:
         data = kbd.read_file(file)
     except(ValueError):
@@ -368,8 +371,9 @@ def load_kbd(file, karaoke, cutscene_box):
                         end_pos, note['Vertical position'], note['Button type'], 3, note['End position']))
         kpm_file = f"{str(file.parent)}\\{file.stem.split('_')[0]}_param.kpm"
         if Path(kpm_file).exists():
-            load_kpm(kpm_file, cutscene_box)
-    return karaoke, True
+            kpm_data = load_kpm(kpm_file, cutscene_box)
+            return karaoke, True, kpm_data
+    return karaoke, True, None
 
 
 def write_kbd(file, karaoke, cutscene_box):
@@ -802,6 +806,10 @@ def main():
     for item in music_elements:
         item.hide()
 
+    if len(sys.argv) > 1:
+        karaoke, can_save, kpm_data = load_kbd(
+            sys.argv[1], karaoke, cutscene_box)
+
     # what the player is holding
     selected = None
     # what the player is currently editing
@@ -1174,7 +1182,7 @@ def main():
                                 stop_editing(boxes, box_labels,
                                              dropdowns, undo_button)
                                 currently_edited = None
-                            karaoke, can_save = load_kbd(
+                            karaoke, can_save, kpm_data = load_kbd(
                                 input_selection.current_file_path, karaoke, cutscene_box)
                             if can_save:
                                 config.set("PATHS", "Input", str(
@@ -1201,7 +1209,7 @@ def main():
                         if event.ui_element == kpm_output_selection.ok_button:
                             config.set("PATHS", "KPM_Output", str(
                                 kpm_output_selection.current_file_path))
-                            save_kpm(
+                            kpm_data = save_kpm(
                                 kpm_output_selection.current_file_path, cutscene_box, kpm_data)
 
                     if gui_button_mode == 'Music':

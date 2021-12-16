@@ -15,7 +15,7 @@ import mutagen
 import sys
 
 # general info
-VERSION = "v0.9.2"
+VERSION = "v0.9.3"
 CREATORS = 'Timo654'
 TRANSLATORS = 'Timo654, ketrub, Mink, jason098, Capitán Retraso, Kent, Edness, JustAnyone, Tervel, RyuHachii, Foas, Biggelskog'
 TESTERS = "ketrub, KaarelJ98"
@@ -37,7 +37,7 @@ if Path(asset_file).is_file():
         assets = json.load(json_file)
 else:
     raise Exception(_('Asset data missing'))
-texture_path = assets['Texture folder']
+asset_path = assets['Assets folder']
 controllers = [key for key in assets['Button prompts']]
 languages = [key for key in assets['Languages']]
 
@@ -88,7 +88,7 @@ pygame.init()
 font = pygame.font.SysFont("FiraCode", 22)
 clock = pygame.time.Clock()
 pygame.display.set_caption('KUMA')
-pygame_icon = pygame.image.load(f"{assets['Texture folder']}/icon_small.png")
+pygame_icon = pygame.image.load(f"{asset_path}/textures/icon_small.png")
 pygame.display.set_icon(pygame_icon)
 pygame.mixer.music.set_volume(float(config["CONFIG"]["VOLUME"]))
 
@@ -126,8 +126,10 @@ class Karaoke:
         self.box_size = 30
         self.x = 50
         self.y = 50
-        # 1/10 second, so 100 ms per square
-        self.scale = int(config['ADV. SETTINGS']['SCALE'])
+        # number to scale by
+        self.scaler = int(config['ADV. SETTINGS']['SCALE'])
+        # length of one box (ms)
+        self.scale = 1000 // self.scaler
         self.border = 3
 
     # draw everything
@@ -153,7 +155,7 @@ class Karaoke:
         for i in range(col_start, col_end):
             world.blit(sheet_bg, (x_coord + (33 * (i)),
                                   self.y + self.box_size / 2))
-            if (i + surface2_offset) % (self.scale * 2) == 0:  # each 2 seconds
+            if (i + surface2_offset) % (self.scaler * 2) == 0:  # each 2 seconds
                 current_time = self.format_time(i + surface2_offset)
                 time_text = font.render(current_time, 1, pygame.Color("grey"))
                 world.blit(time_text, (x_coord + (33 * (i)), 30))
@@ -174,7 +176,8 @@ class Karaoke:
 
     # remove an item
     def Remove(self, x, y):
-        self.items[x][y] = None
+        if x < len(self.items):
+            self.items[x][y] = None
 
     # remove a hold/rapid
     def Remove_long(self, x, y, y_pos=None, old_start_pos=None, new_end_pos=0):
@@ -202,7 +205,7 @@ class Karaoke:
         mouse = pygame.mouse.get_pos()
         x = scroll + mouse[0]  # adjust for scrollbar
         y = mouse[1] - self.y
-        surface_nr = int(x / world.get_width())  # 0
+        surface_nr = int(x / world.get_width())
         if surface_nr == 0:
             x -= self.x
         x = x//(self.box_size + self.border)
@@ -217,7 +220,7 @@ class Karaoke:
 
     def format_time(self, i):
         # display current time
-        seconds = i // self.scale
+        seconds = i // self.scaler
         minutes = seconds // 60
         if minutes:
             if seconds % 60 == 0:
@@ -230,16 +233,16 @@ class Karaoke:
 
     # convert positions
     def pos_convert(self, pos):
-        return normal_round(((pos / 3000) * self.scale))
+        return normal_round(((pos / 3000) * self.scaler))
 
     # converts pos back to yakuza time
 
     def pos_to_game(self, pos):
-        return normal_round((pos / self.scale) * 3000)
+        return normal_round((pos / self.scaler) * 3000)
 
     # convert song (audio) position to scroll
     def song_pos_to_scroll(self, position, world_width):
-        scale = 1000 // self.scale
+        scale = self.scale
         new_pos = (position / scale) * (self.box_size + self.border)
         if new_pos > world_width:
             # 1.5x note is difference for other surfaces
@@ -249,7 +252,7 @@ class Karaoke:
 
     # convert scroll position to song (audio) position
     def scroll_to_song_pos(self, position, world_width):
-        scale = 1000 // self.scale
+        scale = self.scale
         new_pos = int((position * (scale)) / (self.box_size + self.border))
         if new_pos < world_width:
             return new_pos
@@ -262,7 +265,7 @@ class Karaoke:
 def load_item_tex(button_type, karaoke, selected, dropdown):
     global items
     # load note textures
-    tex_name = f"{texture_path}/{assets['Button prompts'][button_type][0]}"
+    tex_name = f"{asset_path}/textures/{assets['Button prompts'][button_type][0]}"
     image = pygame.image.load(tex_name).convert_alpha()
     buttons = strip_from_sheet(image, (0, 0), (122, 122), 2, 2)
     items = [pygame.Surface((122, 122), pygame.SRCALPHA) for _ in range(6)]
@@ -370,7 +373,7 @@ def load_kbd(file, karaoke, cutscene_box):
                         note_id = 5
                     progress_value = 0
                     for i in range(start_pos + 1, end_pos):
-                        progress_value += (1000 // karaoke.scale)
+                        progress_value += karaoke.scale
                         karaoke.Add(Item(i, note['Vertical position'], note_id,
                                          note['Note type'], note['Start position'] + progress_value))
                     karaoke.Add(Item(
@@ -459,16 +462,18 @@ def update_fps():  # fps counter from https://pythonprogramming.altervista.org/p
 
 
 def save_note(note, boxes, dropdowns, karaoke):
+    max_pos = (karaoke.col - 1) * karaoke.scale
     vert_changed = False
     old_start_pos = note.start_pos
     # start position
     if len(boxes[0].get_text()) > 0:
-        new_pos = ms_to_game(float(boxes[0].get_text()))
-        if karaoke.pos_convert(new_pos) <= len(karaoke.items):
-            note.start_pos = new_pos
-            karaoke.items[note.x][note.y] = None
-            note.x = karaoke.pos_convert(note.start_pos)
-            karaoke.items[note.x][note.y] = note
+        if float(boxes[0].get_text()) <= max_pos:
+            new_pos = ms_to_game(float(boxes[0].get_text()))
+            if karaoke.pos_convert(new_pos) <= len(karaoke.items):
+                note.start_pos = new_pos
+                karaoke.items[note.x][note.y] = None
+                note.x = karaoke.pos_convert(note.start_pos)
+                karaoke.items[note.x][note.y] = note
     # vertical position
     if len(boxes[2].get_text()) > 0:
         if int(boxes[2].get_text()) < karaoke.rows:
@@ -480,10 +485,12 @@ def save_note(note, boxes, dropdowns, karaoke):
             karaoke.items[note.x][note.y] = note
     # cue id
     if len(boxes[3].get_text()) > 0:
-        note.cue_id = int(boxes[3].get_text())
+        if int(boxes[3].get_text()) <= 65535:  # uint16 max
+            note.cue_id = int(boxes[3].get_text())
     # cuesheet id
     if len(boxes[4].get_text()) > 0:
-        note.cuesheet_id = int(boxes[4].get_text())
+        if int(boxes[4].get_text()) <= 65535:  # uint16 max
+            note.cuesheet_id = int(boxes[4].get_text())
     # note id
     note.id = dropdowns[0].options_list.index(dropdowns[0].selected_option)
     # note type
@@ -493,39 +500,40 @@ def save_note(note, boxes, dropdowns, karaoke):
 
     # end position
     if len(boxes[1].get_text()) > 0:
-        if note.note_type != 0:
-            end_pos = ms_to_game(float(boxes[1].get_text()))
-        else:
-            end_pos = 0
-        if end_pos < note.end_pos or vert_changed or old_start_pos < note.start_pos:
-            if vert_changed:
-                y_pos = old_pos
-                new_end_pos = 0
-            else:
-                y_pos = note.y
-                new_end_pos = karaoke.pos_convert(end_pos)
-            karaoke.Remove_long(note.x, note.y, y_pos=y_pos, old_start_pos=old_start_pos,
-                                new_end_pos=new_end_pos)
-            if vert_changed:
-                y_pos = note.y
+        if float(boxes[1].get_text()) <= max_pos:
+            if note.note_type != 0:
                 end_pos = ms_to_game(float(boxes[1].get_text()))
-        if end_pos > note.start_pos:
-            note.end_pos = end_pos
-            start_pos = karaoke.pos_convert(note.start_pos)
-            end_pos = karaoke.pos_convert(note.end_pos)
-            if note.note_type == 1:
-                note_id = 4
             else:
-                note_id = 5
-            progress_value = 0
-            for i in range(start_pos + 1, end_pos):
-                progress_value += (1000 // karaoke.scale)
-                karaoke.Add(Item(i, note.y, note_id,
-                                 note.note_type, note.start_pos + progress_value))
-            karaoke.Add(
-                Item(end_pos, note.y, note.id, 3, note.end_pos))  # note type 3 is hold/rapid end, not an actual thing in the game
-        else:
-            note.end_pos = 0
+                end_pos = 0
+            if end_pos < note.end_pos or vert_changed or old_start_pos < note.start_pos:
+                if vert_changed:
+                    y_pos = old_pos
+                    new_end_pos = 0
+                else:
+                    y_pos = note.y
+                    new_end_pos = karaoke.pos_convert(end_pos)
+                karaoke.Remove_long(note.x, note.y, y_pos=y_pos, old_start_pos=old_start_pos,
+                                    new_end_pos=new_end_pos)
+                if vert_changed:
+                    y_pos = note.y
+                    end_pos = ms_to_game(float(boxes[1].get_text()))
+            if end_pos > note.start_pos:
+                note.end_pos = end_pos
+                start_pos = karaoke.pos_convert(note.start_pos)
+                end_pos = karaoke.pos_convert(note.end_pos)
+                if note.note_type == 1:
+                    note_id = 4
+                else:
+                    note_id = 5
+                progress_value = 0
+                for i in range(start_pos + 1, end_pos):
+                    progress_value += karaoke.scale
+                    karaoke.Add(Item(i, note.y, note_id,
+                                     note.note_type, note.start_pos + progress_value))
+                karaoke.Add(
+                    Item(end_pos, note.y, note.id, 3, note.end_pos))  # note type 3 is hold/rapid end, not an actual thing in the game
+            else:
+                note.end_pos = 0
 
 
 # hide ui after stopping editing
@@ -564,7 +572,7 @@ def load_song(filename, music_elements):
 def switch_language(language, params=None, boot=False):
     lang_code = assets['Languages'][language]
     lang = gettext.translation(
-        lang_code, localedir='assets/locales', languages=[lang_code])
+        lang_code, localedir=f'{asset_path}/locales', languages=[lang_code])
     lang.install()
     _ = lang.gettext
     if not boot:
@@ -671,7 +679,7 @@ def main():
             'Surface size is too big! Increase surface or decrease column count!')
 
     # ui manager
-    manager = UIManager(scr_size, theme_path='assets/ui_theme.json')
+    manager = UIManager(scr_size, theme_path=f'{asset_path}/ui_theme.json')
     # menu bar related things, menu bar from https://github.com/MyreMylar/pygame_paint
     menu_data = get_menu_data()
     menu_bar = UIMenuBar(relative_rect=pygame.Rect(0, 0, scr_size[0], 25),
@@ -793,8 +801,8 @@ def main():
                   None, note_picker)  # load button textures
 
     # load sheet textures and scale them
-    sheet_tex = f"{texture_path}/{assets['Sheet texture']}"
-    line_tex = f"{texture_path}/{assets['Line texture']}"
+    sheet_tex = f"{asset_path}/textures/{assets['Sheet texture']}"
+    line_tex = f"{asset_path}/textures/{assets['Line texture']}"
     sheet_bg = pygame.image.load(sheet_tex).convert()
     line_bg = pygame.image.load(line_tex).convert()
     line_bg = pygame.transform.scale(
@@ -824,6 +832,8 @@ def main():
     if len(sys.argv) > 1:
         karaoke, can_save, kpm_data = load_kbd(
             sys.argv[1], karaoke, cutscene_box)
+    else:
+        kpm_data = None
 
     # what the player is holding
     selected = None

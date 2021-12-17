@@ -231,7 +231,7 @@ class Karaoke:
         else:
             return _("{sec} s").format(sec=seconds)
 
-    # convert positions
+    # convert ms to grid pos
     def pos_convert(self, pos):
         return normal_round(((pos / 3000) * self.scaler))
 

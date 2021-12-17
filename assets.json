@@ -1,10 +1,19 @@
 {
-  "Texture folder": "./assets/textures",
+  "Assets folder": "./assets",
   "Sheet texture": "sheet.png",
   "Line texture": "line.png",
   "Button prompts": {
     "Dualshock 4": [
       "buttons_ds.png",
+      [
+        "Circle",
+        "Cross",
+        "Square",
+        "Triangle"
+      ]
+    ],
+	"Dualshock (RGG test)": [
+      "buttons_dev_ds.png",
       [
         "Circle",
         "Cross",
@@ -21,6 +30,24 @@
         "Y"
       ]
     ],
+	"XBOX (Console style)": [
+      "buttons_xbox_alt.png",
+      [
+        "B",
+        "A",
+        "X",
+        "Y"
+      ]
+    ],
+	"XBOX (RGG inspired)": [
+      "buttons_dev_insp_xbox.png",
+      [
+        "B",
+        "A",
+        "X",
+        "Y"
+      ]
+    ],
     "Nintendo Switch": [
       "buttons_nx.png",
       [
@@ -28,24 +55,6 @@
         "B",
         "Y",
         "X"
-      ]
-    ],
-    "Dualshock (RGG test)": [
-      "buttons_dev_ds.png",
-      [
-        "Circle",
-        "Cross",
-        "Square",
-        "Triangle"
-      ]
-    ],
-    "XBOX (RGG inspired)": [
-      "buttons_dev_insp_xbox.png",
-      [
-        "B",
-        "A",
-        "X",
-        "Y"
       ]
     ],
     "Keyboard": [

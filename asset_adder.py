@@ -7,7 +7,7 @@ if Path(asset_file).is_file():
         assets = json.load(json_file)
 else:
     assets = dict()
-    assets['Texture folder'] = "./assets/textures"
+    assets['Assets folder'] = "./assets"
     assets['Sheet texture'] = 'sheet.png'
     assets['Line texture'] = 'line.png'
     assets['Button prompts'] = dict()

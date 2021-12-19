@@ -15,7 +15,7 @@ import mutagen
 import sys
 
 # general info
-VERSION = "v0.9.3"
+VERSION = "v0.9.4"
 CREATORS = 'Timo654'
 TRANSLATORS = 'Timo654, ketrub, Mink, jason098, Capitán Retraso, Kent, Edness, JustAnyone, Tervel, RyuHachii, Foas, Biggelskog'
 TESTERS = "ketrub, KaarelJ98"
@@ -64,6 +64,7 @@ if not config.has_section("CONFIG"):
     config.set("CONFIG", "BUTTONS", controllers[0])
     config.set("CONFIG", "LANGUAGE", get_default_language())
     config.set("CONFIG", "VOLUME", str(1))
+    config.set("CONFIG", "UNDO KBD LOAD", str(0))
 if not config.has_section("PATHS"):
     config.add_section("PATHS")
     config.set("PATHS", "Input", f'{str(Path().resolve())}/input_file.kbd')
@@ -98,6 +99,10 @@ if config["CONFIG"]["FPS COUNTER"] == '1':
 else:
     fps_counter = False
 
+if config["CONFIG"]["UNDO KBD LOAD"] == '1':
+    undo_kbd = True
+else:
+    undo_kbd = False
 
 # class for a item, just holds the surface and can resize it
 
@@ -137,6 +142,25 @@ class Karaoke:
         # length of one box (ms)
         self.scale = 1000 // self.scaler
         self.border = 3
+        self.undo_list = list()
+
+    def undo(self):
+        if len(self.undo_list) > 0:
+            self.items = self.undo_list[-1]  # set last list as items
+            self.undo_list.pop()
+
+    def add_to_undo_list(self, prev_items):
+        if prev_items != self.items:
+            self.undo_list.append(prev_items)
+
+    def reset_undo_list(self):
+        self.undo_list.clear()
+
+    def copy_list(self): # workaround for copying the list
+        prev_list = list()
+        for row in self.items:
+            prev_list.append(row.copy())
+        return prev_list
 
     # draw everything
     def draw(self, world, surface_nr, scroll, screen_width, sheet_bg, line_bg, world_count):
@@ -178,6 +202,7 @@ class Karaoke:
 
     # add an item
     def Add(self, Item):
+        prev_list = self.copy_list()  # copies the list
         self.items[Item.x][Item.y] = Item
 
     def Add_long(self, start_pos, end_pos, vert_pos, note_type, note_id):
@@ -297,6 +322,11 @@ class Karaoke:
             print(_('Unable to open file.'))
             return self, False, None
         else:
+            if undo_kbd:
+                prev_list = self.copy_list()
+            else:
+                self.reset_undo_list()
+
             self.reset()  # reset data
             for note in data['Notes']:
                 if note['Note type'] < 3:  # ignore any notes above 3, because those shouldn't exist
@@ -310,6 +340,8 @@ class Karaoke:
             if Path(kpm_file).exists():
                 kpm_data = load_kpm(kpm_file, cutscene_box)
                 return True, kpm_data
+            if undo_kbd:
+                self.add_to_undo_list(prev_list)
         return True, None
 
     def write_kbd(self, file, cutscene_box):
@@ -368,6 +400,7 @@ class Karaoke:
     # save note changes when stopping editing
 
     def save_note(self, note, boxes, dropdowns):
+        prev_list = self.copy_list()
         max_pos = (self.col - 1) * self.scale
         vert_changed = False
         old_start_pos = note.start_pos
@@ -429,7 +462,7 @@ class Karaoke:
                                   note.y, note.note_type, note.id)
                 else:
                     note.end_pos = 0
-
+        self.add_to_undo_list(prev_list)
     # Loading textures
 
     def load_item_tex(self, button_type, held_note, dropdown):
@@ -861,7 +894,6 @@ def main():
     currently_copied = list()
     stopped_editing = False
     gui_button_mode = None
-    undo_list = list()  # TODO - implement undo
     open_file = None
     scrollbar_moved = False  # has scrollbar been moved yet
     loaded = False  # is audio file loaded
@@ -970,10 +1002,12 @@ def main():
                         scrollbar_value, worlds[0])
                     if karaoke.In_grid(pos[0], pos[1]):
                         if held_note:
+                            prev_list = karaoke.copy_list()
                             held_note.start_pos = karaoke.pos_to_game(pos[0])
                             held_note.x = pos[0]
                             held_note.y = pos[1]
                             held_note = karaoke.Add(held_note)
+                            karaoke.add_to_undo_list(prev_list)
                         elif karaoke.items[pos[0]][pos[1]]:
                             if karaoke.items[pos[0]][pos[1]] != currently_edited:
                                 held_note = karaoke.items[pos[0]][pos[1]]
@@ -1056,6 +1090,7 @@ def main():
 
                 if keys[pygame.K_LCTRL] and keys[pygame.K_v]:  # paste notes
                     if len(currently_copied) > 0:
+                        prev_list = karaoke.copy_list()
                         new_notes = list()
                         for note in currently_copied:
                             new_notes.append(
@@ -1080,6 +1115,10 @@ def main():
                                 if note[4] != 0:
                                     karaoke.Add_long(
                                         start_pos, end_pos, note[2], note[4], note[3])
+                        karaoke.add_to_undo_list(prev_list)
+
+                if keys[pygame.K_LCTRL] and keys[pygame.K_z]:  # undo
+                    karaoke.undo()
 
                 if event.key == pygame.K_ESCAPE:
                     currently_selected.clear()  # empty list

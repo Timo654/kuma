@@ -202,7 +202,6 @@ class Karaoke:
 
     # add an item
     def Add(self, Item):
-        prev_list = self.copy_list()  # copies the list
         self.items[Item.x][Item.y] = Item
 
     def Add_long(self, start_pos, end_pos, vert_pos, note_type, note_id):
@@ -317,10 +316,10 @@ class Karaoke:
             data = kbd.read_file(file)
         except(ValueError):
             print(_('Unable to read file.'))
-            return self, False, None
+            return False, None
         except(PermissionError):
             print(_('Unable to open file.'))
-            return self, False, None
+            return False, None
         else:
             if undo_kbd:
                 prev_list = self.copy_list()
@@ -881,8 +880,9 @@ def main():
         item.hide()
 
     if len(sys.argv) > 1:
-        can_save, kpm_data = karaoke.load_kbd(
-            sys.argv[1], cutscene_box)
+        if Path(sys.argv[1]).is_file():
+            can_save, kpm_data = karaoke.load_kbd(
+                sys.argv[1], cutscene_box)
     else:
         kpm_data = None
 

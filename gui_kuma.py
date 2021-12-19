@@ -60,6 +60,7 @@ if Path(settings_file).is_file():
 if not config.has_section("CONFIG"):
     config.add_section("CONFIG")
     config.set("CONFIG", "FPS", str(100))
+    config.set("CONFIG", "FPS COUNTER", str(0))
     config.set("CONFIG", "BUTTONS", controllers[0])
     config.set("CONFIG", "LANGUAGE", get_default_language())
     config.set("CONFIG", "VOLUME", str(1))
@@ -92,6 +93,11 @@ pygame_icon = pygame.image.load(f"{asset_path}/textures/icon_small.png")
 pygame.display.set_icon(pygame_icon)
 pygame.mixer.music.set_volume(float(config["CONFIG"]["VOLUME"]))
 
+if config["CONFIG"]["FPS COUNTER"] == '1':
+    fps_counter = True
+else:
+    fps_counter = False
+    
 
 # class for a item, just holds the surface and can resize it
 
@@ -793,9 +799,10 @@ def main():
     note_type_label = UILabel(pygame.Rect((1335, 340), (200, 22)),
                               _("Note type"),
                               manager=manager)
-    fps_label = UILabel(pygame.Rect((0, 30), (30, 30)),
-                        "0",
-                        manager=manager)
+    if fps_counter:
+        fps_label = UILabel(pygame.Rect((0, 30), (30, 30)),
+                            "0",
+                            manager=manager)
     song_label = UILabel(pygame.Rect((10, 400), (200, 22)),
                          _("Song position"),
                          manager=manager)
@@ -855,6 +862,7 @@ def main():
     currently_copied = list()
     stopped_editing = False
     gui_button_mode = None
+    undo_list = list() # TODO - implement undo
     open_file = None
     scrollbar_moved = False  # has scrollbar been moved yet
     loaded = False  # is audio file loaded
@@ -870,7 +878,6 @@ def main():
         # Clock tick
         time_delta = clock.tick(FPS) / 1000
         scrollbar_value = scrollbar.get_current_value()
-
         # draw the screen
         surface_nr = int(scrollbar_value / worlds[0].get_width())
         next_surface = int(
@@ -1076,7 +1083,7 @@ def main():
                                         start_pos, end_pos, note[2], note[4], note[3])
 
                 if event.key == pygame.K_ESCAPE:
-                    currently_selected = list()  # empty list
+                    currently_selected.clear()  # empty list
 
                 if event.key == pygame.K_LALT:
                     note_id = 4
@@ -1270,7 +1277,7 @@ def main():
                                 currently_edited = None
                             karaoke, can_save, kpm_data = load_kbd(
                                 input_selection.current_file_path, karaoke, cutscene_box)
-                            currently_selected = list()  # empty the list
+                            currently_selected.clear()  # empty the list
                             if can_save:
                                 config.set("PATHS", "Input", str(
                                     input_selection.current_file_path))
@@ -1327,7 +1334,7 @@ def main():
                     if gui_button_mode == 'Reset':
                         gui_button_mode = None
                         karaoke.reset()
-                        currently_selected = list()  # empty the list
+                        currently_selected.clear()  # empty the list
                         if currently_edited:
                             currently_edited = None
                             stop_editing(boxes, box_labels,
@@ -1349,7 +1356,7 @@ def main():
                                 karaoke.Remove_long(
                                     note.x, note.y)
                             karaoke.Remove(note.x, note.y)
-                        currently_selected = list()  # empty the list
+                        currently_selected.clear()  # empty the list
 
                     if gui_button_mode == 'Save':
                         if open_file != None:
@@ -1396,7 +1403,8 @@ def main():
                 music_box.set_text(str(converted_scroll))
             scrollbar_moved = False
 
-        fps_label.set_text(update_fps())
+        if fps_counter:
+            fps_label.set_text(update_fps())
         manager.draw_ui(screen)
         manager.update(time_delta)
         pygame.display.update()

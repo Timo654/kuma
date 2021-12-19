@@ -156,7 +156,7 @@ class Karaoke:
     def reset_undo_list(self):
         self.undo_list.clear()
 
-    def copy_list(self): # workaround for copying the list
+    def copy_list(self):  # workaround for copying the list
         prev_list = list()
         for row in self.items:
             prev_list.append(row.copy())
@@ -492,6 +492,49 @@ class Karaoke:
         update_dropdown(dropdown, mode='update all', new_list=assets['Button prompts']
                         [button_type][1], index=dropdown.options_list.index(dropdown.selected_option))
 
+    def paste(self, currently_copied, worlds, scrollbar_value, mode='boring'):
+        if mode == 'cooler':
+            cool = True
+        else:
+            cool = False
+
+        if len(currently_copied) > 0:
+            prev_list = self.copy_list()
+            new_notes = list()
+            if cool:
+                smallest_y = self.rows
+            for note in currently_copied:
+                if cool:
+                    if note.y < smallest_y:
+                        smallest_y = note.y
+                new_notes.append(
+                    (note.start_pos, note.end_pos, note.y, note.id, note.note_type, note.cue_id, note.cuesheet_id))
+            new_notes.sort()
+            note_offset = new_notes[0][0]
+            mouse_pos = self.Get_pos(scrollbar_value, worlds[0])
+            current_loc = self.pos_to_game(mouse_pos[0])  # where the cursor is
+            for note in new_notes:
+                if note[4] != 0:
+                    end_pos = note[1] - \
+                        note_offset + current_loc
+                else:
+                    end_pos = 0
+                start_pos = note[0] - \
+                    note_offset + current_loc
+                grid_start_pos = self.game_to_pos(
+                    start_pos)
+                y_pos = note[2]
+                if cool:
+                    y_pos -= smallest_y
+                    y_pos += mouse_pos[1]
+
+                if self.In_grid(grid_start_pos, y_pos):
+                    self.Add(Item(grid_start_pos, y=y_pos, id=note[3], note_type=note[4],
+                                  start_pos=start_pos, end_pos=end_pos, cue_id=note[5], cuesheet_id=note[6]))
+                    if note[4] != 0:
+                        self.Add_long(
+                            start_pos, end_pos, y_pos, note[4], note[3])
+            self.add_to_undo_list(prev_list)
 # strip from sheet https://python-forum.io/thread-403.html
 
 
@@ -1088,34 +1131,12 @@ def main():
                 if keys[pygame.K_LCTRL] and keys[pygame.K_c]:  # copy notes
                     currently_copied = currently_selected.copy()
 
-                if keys[pygame.K_LCTRL] and keys[pygame.K_v]:  # paste notes
-                    if len(currently_copied) > 0:
-                        prev_list = karaoke.copy_list()
-                        new_notes = list()
-                        for note in currently_copied:
-                            new_notes.append(
-                                (note.start_pos, note.end_pos, note.y, note.id, note.note_type, note.cue_id, note.cuesheet_id))
-                        new_notes.sort()
-                        note_offset = new_notes[0][0]
-                        current_loc = karaoke.pos_to_game(karaoke.Get_pos(scrollbar_value, worlds[0])[
-                            0])  # where the cursor is
-                        for note in new_notes:
-                            if note[4] != 0:
-                                end_pos = note[1] - \
-                                    note_offset + current_loc
-                            else:
-                                end_pos = 0
-                            start_pos = note[0] - \
-                                note_offset + current_loc
-                            grid_start_pos = karaoke.game_to_pos(
-                                start_pos)
-                            if karaoke.In_grid(grid_start_pos, note[2]):
-                                karaoke.Add(Item(grid_start_pos, y=note[2], id=note[3], note_type=note[4],
-                                                 start_pos=start_pos, end_pos=end_pos, cue_id=note[5], cuesheet_id=note[6]))
-                                if note[4] != 0:
-                                    karaoke.Add_long(
-                                        start_pos, end_pos, note[2], note[4], note[3])
-                        karaoke.add_to_undo_list(prev_list)
+                if keys[pygame.K_LCTRL] and keys[pygame.K_v] and keys[pygame.K_LSHIFT]:  # paste notes
+                    karaoke.paste(currently_copied, worlds,
+                                  scrollbar_value, mode='cooler')
+
+                elif keys[pygame.K_LCTRL] and keys[pygame.K_v]:  # paste notes
+                    karaoke.paste(currently_copied, worlds, scrollbar_value)
 
                 if keys[pygame.K_LCTRL] and keys[pygame.K_z]:  # undo
                     karaoke.undo()
@@ -1132,9 +1153,9 @@ def main():
                 if event.key == pygame.K_e:  # property editing mode
                     pos = karaoke.Get_pos(
                         scrollbar_value, worlds[0])
-                    if karaoke.items[pos[0]][pos[1]] not in currently_selected:
-                        if not currently_edited:
-                            if karaoke.In_grid(pos[0], pos[1]):
+                    if not currently_edited:
+                        if karaoke.In_grid(pos[0], pos[1]):
+                            if karaoke.items[pos[0]][pos[1]] not in currently_selected:
                                 if karaoke.items[pos[0]][pos[1]] != None:
                                     if karaoke.items[pos[0]][pos[1]].id < 4 and karaoke.items[pos[0]][pos[1]].note_type < 3:
                                         currently_edited = karaoke.items[pos[0]][pos[1]]
@@ -1149,28 +1170,28 @@ def main():
                                         update_text_boxes(
                                             currently_edited, boxes, dropdowns)
 
-                        else:
-                            if karaoke.In_grid(pos[0], pos[1]):
-                                if karaoke.items[pos[0]][pos[1]] != currently_edited and karaoke.items[pos[0]][pos[1]] != None:
-                                    if karaoke.items[pos[0]][pos[1]].id < 4 and karaoke.items[pos[0]][pos[1]].note_type < 3:
-                                        karaoke.save_note(
-                                            currently_edited, boxes, dropdowns)
-                                        currently_edited = karaoke.items[pos[0]][pos[1]]
-                                        update_text_boxes(
-                                            currently_edited, boxes, dropdowns)
-                                    else:
-                                        stopped_editing = True
+                    else:
+                        if karaoke.In_grid(pos[0], pos[1]):
+                            if karaoke.items[pos[0]][pos[1]] != currently_edited and karaoke.items[pos[0]][pos[1]] != None:
+                                if karaoke.items[pos[0]][pos[1]].id < 4 and karaoke.items[pos[0]][pos[1]].note_type < 3:
+                                    karaoke.save_note(
+                                        currently_edited, boxes, dropdowns)
+                                    currently_edited = karaoke.items[pos[0]][pos[1]]
+                                    update_text_boxes(
+                                        currently_edited, boxes, dropdowns)
                                 else:
                                     stopped_editing = True
                             else:
                                 stopped_editing = True
-                            if stopped_editing:
-                                karaoke.save_note(
-                                    currently_edited, boxes, dropdowns)
-                                stopped_editing = False  # reset value
-                                currently_edited = None  # deselect
-                                stop_editing(boxes, box_labels,
-                                             dropdowns, undo_button)
+                        else:
+                            stopped_editing = True
+                        if stopped_editing:
+                            karaoke.save_note(
+                                currently_edited, boxes, dropdowns)
+                            stopped_editing = False  # reset value
+                            currently_edited = None  # deselect
+                            stop_editing(boxes, box_labels,
+                                         dropdowns, undo_button)
 
             if event.type == pygame.KEYUP:
                 if event.key in [pygame.K_RIGHT, pygame.K_LEFT, pygame.K_PAGEDOWN, pygame.K_PAGEUP]:

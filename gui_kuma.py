@@ -20,13 +20,13 @@ CREATORS = 'Timo654'
 TRANSLATORS = 'Timo654, ketrub, Mink, jason098, Capitán Retraso, Kent, Edness, JustAnyone, Tervel, RyuHachii, Foas, Biggelskog'
 TESTERS = "ketrub, KaarelJ98"
 print("""
-   _     _      _     _      _     _      _     _   
-  (c).-.(c)    (c).-.(c)    (c).-.(c)    (c).-.(c)  
-   / ._. \      / ._. \      / ._. \      / ._. \   
- __\( Y )/__  __\( Y )/__  __\( Y )/__  __\( Y )/__ 
+   _     _      _     _      _     _      _     _
+  (c).-.(c)    (c).-.(c)    (c).-.(c)    (c).-.(c)
+   / ._. \      / ._. \      / ._. \      / ._. \\
+ __\( Y )/__  __\( Y )/__  __\( Y )/__  __\( Y )/__
 (_.-/'-'\-._)(_.-/'-'\-._)(_.-/'-'\-._)(_.-/'-'\-._)
-   || K ||      || U ||      || M ||      || A ||   
- _.' `-' '._  _.' `-' '._  _.' `-' '._  _.' `-' '._ 
+   || K ||      || U ||      || M ||      || A ||
+ _.' `-' '._  _.' `-' '._  _.' `-' '._  _.' `-' '._
 (.-./`-'\.-.)(.-./`-'\.-.)(.-./`-'\.-.)(.-./`-'\.-.)
  `-'     `-'  `-'     `-'  `-'     `-'  `-'     `-'   """ + VERSION + '\n\n')
 
@@ -174,6 +174,25 @@ class Karaoke:
     def Add(self, Item):
         self.items[Item.x][Item.y] = Item
 
+    def Add_long(self, start_pos, end_pos, vert_pos, note_type, note_id):
+        grid_start_pos = self.game_to_pos(start_pos)
+        grid_end_pos = self.game_to_pos(end_pos)
+        if note_type == 1:
+            long_note_id = 4
+        else:
+            long_note_id = 5
+        progress_value = 0
+        for i in range(grid_start_pos + 1, grid_end_pos):
+            progress_value += self.scale
+            self.Add(Item(i, vert_pos, long_note_id,
+                          note_type, start_pos + progress_value))
+        # note type 3 is hold/rapid end, not an actual thing in the game
+        self.Add(Item(grid_end_pos, vert_pos, note_id, 3, end_pos))
+
+    def reset(self):
+        self.items = [[None for _ in range(self.rows)]
+                      for _ in range(self.col)]
+
     # remove an item
     def Remove(self, x, y):
         if x < len(self.items):
@@ -184,15 +203,15 @@ class Karaoke:
         note = self.items[x][y]
         if y_pos == None:
             y_pos = note.y
-        old_end_pos = self.pos_convert(note.end_pos)
-        start_pos = self.pos_convert(note.start_pos)
+        old_end_pos = self.game_to_pos(note.end_pos)
+        start_pos = self.game_to_pos(note.start_pos)
         for i in range(old_end_pos + 1, new_end_pos, -1):
             if i == start_pos:
                 break
             self.Remove(i, y_pos)
 
         # if there's rapid/hold parts before start position
-        old_start_pos = self.pos_convert(old_start_pos)
+        old_start_pos = self.game_to_pos(old_start_pos)
         if old_start_pos != None and old_start_pos != start_pos:
             for i in range(start_pos + 1, old_start_pos, -1):
                 if i != start_pos:
@@ -231,8 +250,8 @@ class Karaoke:
         else:
             return _("{sec} s").format(sec=seconds)
 
-    # convert ms to grid pos
-    def pos_convert(self, pos):
+    # convert game to grid pos
+    def game_to_pos(self, pos):
         return normal_round(((pos / 3000) * self.scaler))
 
     # converts pos back to yakuza time
@@ -262,7 +281,7 @@ class Karaoke:
 # Loading textures
 
 
-def load_item_tex(button_type, karaoke, selected, dropdown):
+def load_item_tex(button_type, karaoke, held_note, dropdown):
     global items
     # load note textures
     tex_name = f"{asset_path}/textures/{assets['Button prompts'][button_type][0]}"
@@ -282,8 +301,8 @@ def load_item_tex(button_type, karaoke, selected, dropdown):
                 button_id = karaoke.items[x][y].id
                 karaoke.items[x][y].surface = items[button_id]
 
-    if selected:
-        selected.surface = items[selected.id]
+    if held_note:
+        held_note.surface = items[held_note.id]
 
     update_dropdown(dropdown, mode='update all', new_list=assets['Button prompts']
                     [button_type][1], index=dropdown.options_list.index(dropdown.selected_option))
@@ -359,25 +378,15 @@ def load_kbd(file, karaoke, cutscene_box):
         print(_('Unable to open file.'))
         return karaoke, False, None
     else:
-        karaoke = Karaoke()  # reset data
+        karaoke.reset()  # reset data
         for note in data['Notes']:
             if note['Note type'] < 3:  # ignore any notes above 3, because those shouldn't exist
-                start_pos = karaoke.pos_convert(note['Start position'])
+                start_pos = karaoke.game_to_pos(note['Start position'])
                 karaoke.Add(Item(start_pos, note['Vertical position'], note['Button type'], note['Note type'],
                                  note['Start position'], end_pos=note['End position'], cue_id=note['Cue ID'], cuesheet_id=note['Cuesheet ID']))
                 if note['Note type'] != 0:  # if note is hold or rapid
-                    end_pos = karaoke.pos_convert(note['End position'])
-                    if note['Note type'] == 1:
-                        note_id = 4
-                    else:
-                        note_id = 5
-                    progress_value = 0
-                    for i in range(start_pos + 1, end_pos):
-                        progress_value += karaoke.scale
-                        karaoke.Add(Item(i, note['Vertical position'], note_id,
-                                         note['Note type'], note['Start position'] + progress_value))
-                    karaoke.Add(Item(
-                        end_pos, note['Vertical position'], note['Button type'], 3, note['End position']))
+                    karaoke.Add_long(note['Start position'], note['End position'],
+                                     note['Vertical position'], note['Note type'], note['Button type'])
         kpm_file = f"{str(file.parent)}/{file.stem.split('_')[0]}_param.kpm"
         if Path(kpm_file).exists():
             kpm_data = load_kpm(kpm_file, cutscene_box)
@@ -469,10 +478,10 @@ def save_note(note, boxes, dropdowns, karaoke):
     if len(boxes[0].get_text()) > 0:
         if float(boxes[0].get_text()) <= max_pos:
             new_pos = ms_to_game(float(boxes[0].get_text()))
-            if karaoke.pos_convert(new_pos) <= len(karaoke.items):
+            if karaoke.game_to_pos(new_pos) <= len(karaoke.items):
                 note.start_pos = new_pos
                 karaoke.items[note.x][note.y] = None
-                note.x = karaoke.pos_convert(note.start_pos)
+                note.x = karaoke.game_to_pos(note.start_pos)
                 karaoke.items[note.x][note.y] = note
     # vertical position
     if len(boxes[2].get_text()) > 0:
@@ -511,7 +520,7 @@ def save_note(note, boxes, dropdowns, karaoke):
                     new_end_pos = 0
                 else:
                     y_pos = note.y
-                    new_end_pos = karaoke.pos_convert(end_pos)
+                    new_end_pos = karaoke.game_to_pos(end_pos)
                 karaoke.Remove_long(note.x, note.y, y_pos=y_pos, old_start_pos=old_start_pos,
                                     new_end_pos=new_end_pos)
                 if vert_changed:
@@ -519,19 +528,8 @@ def save_note(note, boxes, dropdowns, karaoke):
                     end_pos = ms_to_game(float(boxes[1].get_text()))
             if end_pos > note.start_pos:
                 note.end_pos = end_pos
-                start_pos = karaoke.pos_convert(note.start_pos)
-                end_pos = karaoke.pos_convert(note.end_pos)
-                if note.note_type == 1:
-                    note_id = 4
-                else:
-                    note_id = 5
-                progress_value = 0
-                for i in range(start_pos + 1, end_pos):
-                    progress_value += karaoke.scale
-                    karaoke.Add(Item(i, note.y, note_id,
-                                     note.note_type, note.start_pos + progress_value))
-                karaoke.Add(
-                    Item(end_pos, note.y, note.id, 3, note.end_pos))  # note type 3 is hold/rapid end, not an actual thing in the game
+                karaoke.Add_long(note.start_pos, note.end_pos,
+                                 note.y, note.note_type, note.id)
             else:
                 note.end_pos = 0
 
@@ -643,6 +641,20 @@ def save_file(open_file, manager):
         output_selection.ok_button.set_text(_('OK'))
         output_selection.cancel_button.set_text(_('Cancel'))
         return gui_button_mode, output_selection
+
+
+def highlight_note(karaoke, note, color, worlds, surface_nr, next_surface):
+    x = 2 + (note.x * (karaoke.box_size + karaoke.border))
+    y = 2 + karaoke.y + \
+        (note.y * (karaoke.box_size + karaoke.border))
+    if surface_nr == 0:
+        x += karaoke.x
+    if x > worlds[0].get_width() * (surface_nr + 1) and len(worlds) > next_surface:
+        pygame.draw.rect(worlds[next_surface], color, (x - worlds[0].get_width() * next_surface, y, karaoke.box_size + karaoke.border,
+                                                       karaoke.box_size + karaoke.border), 3)
+    else:
+        pygame.draw.rect(worlds[surface_nr], color, (x - worlds[0].get_width() * surface_nr, y, karaoke.box_size + karaoke.border,
+                                                     karaoke.box_size + karaoke.border), 3)
 
 
 def main():
@@ -836,9 +848,11 @@ def main():
         kpm_data = None
 
     # what the player is holding
-    selected = None
+    held_note = None
     # what the player is currently editing
     currently_edited = None
+    currently_selected = list()  # make lists
+    currently_copied = list()
     stopped_editing = False
     gui_button_mode = None
     open_file = None
@@ -902,29 +916,22 @@ def main():
                     scrollbar.set_current_value(0)
 
         # if holding something, draw it next to mouse
-        if selected:
+        if held_note:
             if mousex > worlds[0].get_width() * (surface_nr + 1) and world_count > next_surface:
-                worlds[next_surface].blit(selected.resize(20),
+                worlds[next_surface].blit(held_note.resize(20),
                                           (mousex - worlds[0].get_width() * next_surface, mousey))
             else:
-                worlds[surface_nr].blit(selected.resize(
+                worlds[surface_nr].blit(held_note.resize(
                     20), (mousex - worlds[0].get_width() * surface_nr, mousey))
 
         # if editing note params
         if currently_edited:
-            x = 2 + \
-                (currently_edited.x * (karaoke.box_size +
-                                       karaoke.border))
-            y = 2 + karaoke.y + \
-                (currently_edited.y * (karaoke.box_size + karaoke.border))
-            if surface_nr == 0:
-                x += karaoke.x
-            if x > worlds[0].get_width() * (surface_nr + 1) and world_count > next_surface:
-                pygame.draw.rect(worlds[next_surface], (0, 100, 255), (x - worlds[0].get_width() * next_surface, y, karaoke.box_size + karaoke.border,
-                                                                       karaoke.box_size + karaoke.border), 3)
-            else:
-                pygame.draw.rect(worlds[surface_nr], (0, 100, 255), (x - worlds[0].get_width() * surface_nr, y, karaoke.box_size + karaoke.border,
-                                                                     karaoke.box_size + karaoke.border), 3)
+            highlight_note(karaoke, currently_edited,
+                           (0, 100, 255), worlds, surface_nr, next_surface)
+
+        for note in currently_selected:
+            highlight_note(karaoke, note, (255, 0, 0),
+                           worlds, surface_nr, next_surface)
 
         # Application events
         events = pygame.event.get()
@@ -939,31 +946,31 @@ def main():
             if (event.type == pygame.USEREVENT and
                 event.user_type == UI_BUTTON_START_PRESS and
                     event.ui_element in menu_bar.menu_bar_container.elements):
-                selected = None
+                held_note = None
 
             if event.type == pygame.MOUSEBUTTONDOWN:
                 # if right clicked, get a note
                 if event.button == 3:  # right click
-                    if selected == None:
+                    if held_note == None:
                         pass
                     else:
                         if note_id < 3:
                             note_id += 1
                         else:
                             note_id = 0
-                    selected = Item(0, 0, note_id, 0, 0)  # add item
+                    held_note = Item(0, 0, note_id, 0, 0)  # add item
                 elif event.button == 1:  # left click
                     pos = karaoke.Get_pos(
                         scrollbar_value, worlds[0])
                     if karaoke.In_grid(pos[0], pos[1]):
-                        if selected:
-                            selected.start_pos = karaoke.pos_to_game(pos[0])
-                            selected.x = pos[0]
-                            selected.y = pos[1]
-                            selected = karaoke.Add(selected)
+                        if held_note:
+                            held_note.start_pos = karaoke.pos_to_game(pos[0])
+                            held_note.x = pos[0]
+                            held_note.y = pos[1]
+                            held_note = karaoke.Add(held_note)
                         elif karaoke.items[pos[0]][pos[1]]:
                             if karaoke.items[pos[0]][pos[1]] != currently_edited:
-                                selected = karaoke.items[pos[0]][pos[1]]
+                                held_note = karaoke.items[pos[0]][pos[1]]
                                 karaoke.items[pos[0]][pos[1]] = None
 
             if event.type == pygame.KEYDOWN:
@@ -1013,59 +1020,112 @@ def main():
                         delete_note = UIConfirmationDialog(
                             rect=pygame.Rect(0, 0, 300, 300), manager=manager, action_long_desc=_('Are you sure you want to remove this note? This change cannot be undone.'), window_title=_('Delete note'), action_short_name=_('OK'))
                         delete_note.cancel_button.set_text(_('Cancel'))
+                    elif currently_selected:
+                        gui_button_mode = 'Delete_Multiple'
+                        delete_note = UIConfirmationDialog(
+                            rect=pygame.Rect(0, 0, 300, 300), manager=manager, action_long_desc=_('Are you sure you want to remove these notes? This change cannot be undone.'), window_title=_('Delete note'), action_short_name=_('OK'))
+                        delete_note.cancel_button.set_text(_('Cancel'))
 
-                    selected = None  # deletes selected note
+                    held_note = None  # deletes selected note
                 keys = pygame.key.get_pressed()
                 if keys[pygame.K_LCTRL] and keys[pygame.K_s]:
                     gui_button_mode, output_selection = save_file(
                         open_file, manager)
+
+                if keys[pygame.K_LCTRL] and keys[pygame.K_f]:  # select notes
+                    pos = karaoke.Get_pos(scrollbar_value, worlds[0])
+                    if karaoke.items[pos[0]][pos[1]] not in currently_selected:
+                        if karaoke.In_grid(pos[0], pos[1]):
+                            if karaoke.items[pos[0]][pos[1]] not in currently_selected:
+                                if not currently_edited:
+                                    if karaoke.items[pos[0]][pos[1]] != None:
+                                        currently_selected.append(
+                                            karaoke.items[pos[0]][pos[1]])
+                    else:
+                        currently_selected.remove(
+                            karaoke.items[pos[0]][pos[1]])
+
+                if keys[pygame.K_LCTRL] and keys[pygame.K_c]:  # copy notes
+                    currently_copied = currently_selected.copy()
+
+                if keys[pygame.K_LCTRL] and keys[pygame.K_v]:  # paste notes
+                    if len(currently_copied) > 0:
+                        new_notes = list()
+                        for note in currently_copied:
+                            new_notes.append(
+                                (note.start_pos, note.end_pos, note.y, note.id, note.note_type, note.cue_id, note.cuesheet_id))
+                        new_notes.sort()
+                        note_offset = new_notes[0][0]
+                        current_loc = karaoke.pos_to_game(karaoke.Get_pos(scrollbar_value, worlds[0])[
+                            0])  # where the cursor is
+                        for note in new_notes:
+                            if note[4] != 0:
+                                end_pos = note[1] - \
+                                    note_offset + current_loc
+                            else:
+                                end_pos = 0
+                            start_pos = note[0] - \
+                                note_offset + current_loc
+                            grid_start_pos = karaoke.game_to_pos(
+                                start_pos)
+                            if karaoke.In_grid(grid_start_pos, note[2]):
+                                karaoke.Add(Item(grid_start_pos, y=note[2], id=note[3], note_type=note[4],
+                                                 start_pos=start_pos, end_pos=end_pos, cue_id=note[5], cuesheet_id=note[6]))
+                                if note[4] != 0:
+                                    karaoke.Add_long(
+                                        start_pos, end_pos, note[2], note[4], note[3])
+
+                if event.key == pygame.K_ESCAPE:
+                    currently_selected = list()  # empty list
+
                 if event.key == pygame.K_LALT:
                     note_id = 4
-                    selected = Item(0, 0, note_id, 'Hold', 0)  # add item
+                    held_note = Item(0, 0, note_id, 'Hold', 0)  # add item
                 if event.key == pygame.K_LSHIFT:
                     note_id = 5
-                    selected = Item(0, 0, note_id, 'Rapid', 0)  # add item
+                    held_note = Item(0, 0, note_id, 'Rapid', 0)  # add item
                 if event.key == pygame.K_e:  # property editing mode
                     pos = karaoke.Get_pos(
                         scrollbar_value, worlds[0])
-                    if not currently_edited:
-                        if karaoke.In_grid(pos[0], pos[1]):
-                            if karaoke.items[pos[0]][pos[1]] != None:
-                                if karaoke.items[pos[0]][pos[1]].id < 4 and karaoke.items[pos[0]][pos[1]].note_type < 3:
-                                    currently_edited = karaoke.items[pos[0]][pos[1]]
-                                    for dropdown in dropdowns:
-                                        dropdown.show()
-                                    undo_button.show()
-                                    for label in box_labels:
-                                        label.show()
-                                    for box in boxes:
-                                        box.show()
-                                # set values
-                                    update_text_boxes(
-                                        currently_edited, boxes, dropdowns)
+                    if karaoke.items[pos[0]][pos[1]] not in currently_selected:
+                        if not currently_edited:
+                            if karaoke.In_grid(pos[0], pos[1]):
+                                if karaoke.items[pos[0]][pos[1]] != None:
+                                    if karaoke.items[pos[0]][pos[1]].id < 4 and karaoke.items[pos[0]][pos[1]].note_type < 3:
+                                        currently_edited = karaoke.items[pos[0]][pos[1]]
+                                        for dropdown in dropdowns:
+                                            dropdown.show()
+                                        undo_button.show()
+                                        for label in box_labels:
+                                            label.show()
+                                        for box in boxes:
+                                            box.show()
+                                    # set values
+                                        update_text_boxes(
+                                            currently_edited, boxes, dropdowns)
 
-                    else:
-                        if karaoke.In_grid(pos[0], pos[1]):
-                            if karaoke.items[pos[0]][pos[1]] != currently_edited and karaoke.items[pos[0]][pos[1]] != None:
-                                if karaoke.items[pos[0]][pos[1]].id < 4 and karaoke.items[pos[0]][pos[1]].note_type < 3:
-                                    save_note(
-                                        currently_edited, boxes, dropdowns, karaoke)
-                                    currently_edited = karaoke.items[pos[0]][pos[1]]
-                                    update_text_boxes(
-                                        currently_edited, boxes, dropdowns)
+                        else:
+                            if karaoke.In_grid(pos[0], pos[1]):
+                                if karaoke.items[pos[0]][pos[1]] != currently_edited and karaoke.items[pos[0]][pos[1]] != None:
+                                    if karaoke.items[pos[0]][pos[1]].id < 4 and karaoke.items[pos[0]][pos[1]].note_type < 3:
+                                        save_note(
+                                            currently_edited, boxes, dropdowns, karaoke)
+                                        currently_edited = karaoke.items[pos[0]][pos[1]]
+                                        update_text_boxes(
+                                            currently_edited, boxes, dropdowns)
+                                    else:
+                                        stopped_editing = True
                                 else:
                                     stopped_editing = True
                             else:
                                 stopped_editing = True
-                        else:
-                            stopped_editing = True
-                        if stopped_editing:
-                            save_note(
-                                currently_edited, boxes, dropdowns, karaoke)
-                            stopped_editing = False  # reset value
-                            currently_edited = None  # deselect
-                            stop_editing(boxes, box_labels,
-                                         dropdowns, undo_button)
+                            if stopped_editing:
+                                save_note(
+                                    currently_edited, boxes, dropdowns, karaoke)
+                                stopped_editing = False  # reset value
+                                currently_edited = None  # deselect
+                                stop_editing(boxes, box_labels,
+                                             dropdowns, undo_button)
 
             if event.type == pygame.KEYUP:
                 if event.key in [pygame.K_RIGHT, pygame.K_LEFT, pygame.K_PAGEDOWN, pygame.K_PAGEUP]:
@@ -1210,6 +1270,7 @@ def main():
                                 currently_edited = None
                             karaoke, can_save, kpm_data = load_kbd(
                                 input_selection.current_file_path, karaoke, cutscene_box)
+                            currently_selected = list()  # empty the list
                             if can_save:
                                 config.set("PATHS", "Input", str(
                                     input_selection.current_file_path))
@@ -1256,7 +1317,7 @@ def main():
                     config.set("CONFIG", "BUTTONS", str(
                         button_picker.selected_option))
                     load_item_tex(button_picker.selected_option,
-                                  karaoke, selected, note_picker)
+                                  karaoke, held_note, note_picker)
                 if (event.user_type == UI_DROP_DOWN_MENU_CHANGED and event.ui_object_id == '#language_picker'):
                     config.set("CONFIG", "LANGUAGE", str(
                         language_picker.selected_option))
@@ -1265,7 +1326,8 @@ def main():
                 if event.user_type == UI_CONFIRMATION_DIALOG_CONFIRMED:  # reset event
                     if gui_button_mode == 'Reset':
                         gui_button_mode = None
-                        karaoke = Karaoke()
+                        karaoke.reset()
+                        currently_selected = list()  # empty the list
                         if currently_edited:
                             currently_edited = None
                             stop_editing(boxes, box_labels,
@@ -1281,6 +1343,14 @@ def main():
                         karaoke.Remove(currently_edited.x, currently_edited.y)
                         stop_editing(boxes, box_labels, dropdowns, undo_button)
                         currently_edited = None
+                    if gui_button_mode == 'Delete_Multiple':
+                        for note in currently_selected:
+                            if note.note_type != 0:
+                                karaoke.Remove_long(
+                                    note.x, note.y)
+                            karaoke.Remove(note.x, note.y)
+                        currently_selected = list()  # empty the list
+
                     if gui_button_mode == 'Save':
                         if open_file != None:
                             write_kbd(

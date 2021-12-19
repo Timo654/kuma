@@ -97,7 +97,7 @@ if config["CONFIG"]["FPS COUNTER"] == '1':
     fps_counter = True
 else:
     fps_counter = False
-    
+
 
 # class for a item, just holds the surface and can resize it
 
@@ -284,36 +284,183 @@ class Karaoke:
         else:
             return int(new_pos + (scale * 1.5))
 
-# Loading textures
+    # KBD code
 
+    def load_kbd(self, file, cutscene_box):
+        file = Path(file)  # ensure it is actually path
+        try:
+            data = kbd.read_file(file)
+        except(ValueError):
+            print(_('Unable to read file.'))
+            return self, False, None
+        except(PermissionError):
+            print(_('Unable to open file.'))
+            return self, False, None
+        else:
+            self.reset()  # reset data
+            for note in data['Notes']:
+                if note['Note type'] < 3:  # ignore any notes above 3, because those shouldn't exist
+                    start_pos = self.game_to_pos(note['Start position'])
+                    self.Add(Item(start_pos, note['Vertical position'], note['Button type'], note['Note type'],
+                                  note['Start position'], end_pos=note['End position'], cue_id=note['Cue ID'], cuesheet_id=note['Cuesheet ID']))
+                    if note['Note type'] != 0:  # if note is hold or rapid
+                        self.Add_long(note['Start position'], note['End position'],
+                                      note['Vertical position'], note['Note type'], note['Button type'])
+            kpm_file = f"{str(file.parent)}/{file.stem.split('_')[0]}_param.kpm"
+            if Path(kpm_file).exists():
+                kpm_data = load_kpm(kpm_file, cutscene_box)
+                return True, kpm_data
+        return True, None
 
-def load_item_tex(button_type, karaoke, held_note, dropdown):
-    global items
-    # load note textures
-    tex_name = f"{asset_path}/textures/{assets['Button prompts'][button_type][0]}"
-    image = pygame.image.load(tex_name).convert_alpha()
-    buttons = strip_from_sheet(image, (0, 0), (122, 122), 2, 2)
-    items = [pygame.Surface((122, 122), pygame.SRCALPHA) for _ in range(6)]
-    items[0].blit(buttons[1], (0, 0))  # circle
-    items[1].blit(buttons[3], (0, 0))  # cross
-    items[2].blit(buttons[2], (0, 0))  # square
-    items[3].blit(buttons[0], (0, 0))  # triangle
-    pygame.draw.line(items[4], (0, 109, 198), (0, 61), (144, 61), 61)  # hold
-    pygame.draw.line(items[5], (198, 0, 99), (0, 61), (144, 61), 61)  # rapid
+    def write_kbd(self, file, cutscene_box):
+        data = dict()
+        note_list = list()
+        x = 0
+        while x < len(self.items):
+            y = 0
+            while y < len(self.items[x]):
+                if self.items[x][y] != None:
+                    if self.items[x][y].id <= 3 and self.items[x][y].note_type < 3:  # if not End
+                        current_note = self.items[x][y]
+                        note = dict()
+                        note['Start position'] = current_note.start_pos
+                        note['End position'] = 0
+                        note['Vertical position'] = y
+                        note['Button type'] = current_note.id
+                        note['Note type'] = current_note.note_type
+                        note['Cue ID'] = current_note.cue_id
+                        note['Cuesheet ID'] = current_note.cuesheet_id
+                        if current_note.end_pos > 0:
+                            note['End position'] = current_note.end_pos
+                        else:
+                            if self.items[x+1][y] != None:
+                                if self.items[x+1][y].id > 3:
+                                    o = x + 1
+                                    note['Note type'] = self.items[o][y].note_type
+                                    while self.items[o][y].id > 3:
+                                        o += 1
+                                    self.items[o][y].note_type = 3  # End
+                                    note['End position'] = self.pos_to_game(o)
+                                    current_note.end_pos = note['End position']
+                        note_list.append(note)
+                y += 1
+            x += 1
+        data['Notes'] = note_list
+        data['Header'] = dict()
+        data['Header']['Version'] = 2
+        kbd.write_file(data, file, cutscene_start=float(
+            cutscene_box.get_text()))
+        print(_("File written to {}").format(file))
 
-    for x in range(0, karaoke.col):  # change existing button's texture
-        for y in range(karaoke.rows):
-            if karaoke.items[x][y]:
-                button_id = karaoke.items[x][y].id
-                karaoke.items[x][y].surface = items[button_id]
+    def highlight_note(self, note, color, worlds, surface_nr, next_surface):
+        x = 2 + (note.x * (self.box_size + self.border))
+        y = 2 + self.y + \
+            (note.y * (self.box_size + self.border))
+        if surface_nr == 0:
+            x += self.x
+        if x > worlds[0].get_width() * (surface_nr + 1) and len(worlds) > next_surface:
+            pygame.draw.rect(worlds[next_surface], color, (x - worlds[0].get_width() * next_surface, y, self.box_size + self.border,
+                                                           self.box_size + self.border), 3)
+        else:
+            pygame.draw.rect(worlds[surface_nr], color, (x - worlds[0].get_width() * surface_nr, y, self.box_size + self.border,
+                                                         self.box_size + self.border), 3)
 
-    if held_note:
-        held_note.surface = items[held_note.id]
+    # save note changes when stopping editing
 
-    update_dropdown(dropdown, mode='update all', new_list=assets['Button prompts']
-                    [button_type][1], index=dropdown.options_list.index(dropdown.selected_option))
+    def save_note(self, note, boxes, dropdowns):
+        max_pos = (self.col - 1) * self.scale
+        vert_changed = False
+        old_start_pos = note.start_pos
+        # start position
+        if len(boxes[0].get_text()) > 0:
+            if float(boxes[0].get_text()) <= max_pos:
+                new_pos = ms_to_game(float(boxes[0].get_text()))
+                if self.game_to_pos(new_pos) <= len(self.items):
+                    note.start_pos = new_pos
+                    self.items[note.x][note.y] = None
+                    note.x = self.game_to_pos(note.start_pos)
+                    self.items[note.x][note.y] = note
+        # vertical position
+        if len(boxes[2].get_text()) > 0:
+            if int(boxes[2].get_text()) < self.rows:
+                if note.y != int(boxes[2].get_text()):
+                    vert_changed = True
+                    old_pos = note.y
+                self.items[note.x][note.y] = None
+                note.y = int(boxes[2].get_text())
+                self.items[note.x][note.y] = note
+        # cue id
+        if len(boxes[3].get_text()) > 0:
+            if int(boxes[3].get_text()) <= 65535:  # uint16 max
+                note.cue_id = int(boxes[3].get_text())
+        # cuesheet id
+        if len(boxes[4].get_text()) > 0:
+            if int(boxes[4].get_text()) <= 65535:  # uint16 max
+                note.cuesheet_id = int(boxes[4].get_text())
+        # note id
+        note.id = dropdowns[0].options_list.index(dropdowns[0].selected_option)
+        # note type
+        note.note_type = dropdowns[1].options_list.index(
+            dropdowns[1].selected_option)
+        note.surface = items[note.id]
 
-# https://python-forum.io/thread-403.html
+        # end position
+        if len(boxes[1].get_text()) > 0:
+            if float(boxes[1].get_text()) <= max_pos:
+                if note.note_type != 0:
+                    end_pos = ms_to_game(float(boxes[1].get_text()))
+                else:
+                    end_pos = 0
+                if end_pos < note.end_pos or vert_changed or old_start_pos < note.start_pos:
+                    if vert_changed:
+                        y_pos = old_pos
+                        new_end_pos = 0
+                    else:
+                        y_pos = note.y
+                        new_end_pos = self.game_to_pos(end_pos)
+                    self.Remove_long(note.x, note.y, y_pos=y_pos, old_start_pos=old_start_pos,
+                                     new_end_pos=new_end_pos)
+                    if vert_changed:
+                        y_pos = note.y
+                        end_pos = ms_to_game(float(boxes[1].get_text()))
+                if end_pos > note.start_pos:
+                    note.end_pos = end_pos
+                    self.Add_long(note.start_pos, note.end_pos,
+                                  note.y, note.note_type, note.id)
+                else:
+                    note.end_pos = 0
+
+    # Loading textures
+
+    def load_item_tex(self, button_type, held_note, dropdown):
+        global items
+        # load note textures
+        tex_name = f"{asset_path}/textures/{assets['Button prompts'][button_type][0]}"
+        image = pygame.image.load(tex_name).convert_alpha()
+        buttons = strip_from_sheet(image, (0, 0), (122, 122), 2, 2)
+        items = [pygame.Surface((122, 122), pygame.SRCALPHA) for _ in range(6)]
+        items[0].blit(buttons[1], (0, 0))  # circle
+        items[1].blit(buttons[3], (0, 0))  # cross
+        items[2].blit(buttons[2], (0, 0))  # square
+        items[3].blit(buttons[0], (0, 0))  # triangle
+        pygame.draw.line(items[4], (0, 109, 198),
+                         (0, 61), (144, 61), 61)  # hold
+        pygame.draw.line(items[5], (198, 0, 99),
+                         (0, 61), (144, 61), 61)  # rapid
+
+        for x in range(0, self.col):  # change existing button's texture
+            for y in range(self.rows):
+                if self.items[x][y]:
+                    button_id = self.items[x][y].id
+                    self.items[x][y].surface = items[button_id]
+
+        if held_note:
+            held_note.surface = items[held_note.id]
+
+        update_dropdown(dropdown, mode='update all', new_list=assets['Button prompts']
+                        [button_type][1], index=dropdown.options_list.index(dropdown.selected_option))
+
+# strip from sheet https://python-forum.io/thread-403.html
 
 
 def strip_from_sheet(sheet, start, size, columns, rows):
@@ -370,74 +517,6 @@ def save_kpm(file, cutscene_box, data):
         print(_("KPM written to {}").format(file))
         return data
 
-# KBD code
-
-
-def load_kbd(file, karaoke, cutscene_box):
-    file = Path(file)  # ensure it is actually path
-    try:
-        data = kbd.read_file(file)
-    except(ValueError):
-        print(_('Unable to read file.'))
-        return karaoke, False, None
-    except(PermissionError):
-        print(_('Unable to open file.'))
-        return karaoke, False, None
-    else:
-        karaoke.reset()  # reset data
-        for note in data['Notes']:
-            if note['Note type'] < 3:  # ignore any notes above 3, because those shouldn't exist
-                start_pos = karaoke.game_to_pos(note['Start position'])
-                karaoke.Add(Item(start_pos, note['Vertical position'], note['Button type'], note['Note type'],
-                                 note['Start position'], end_pos=note['End position'], cue_id=note['Cue ID'], cuesheet_id=note['Cuesheet ID']))
-                if note['Note type'] != 0:  # if note is hold or rapid
-                    karaoke.Add_long(note['Start position'], note['End position'],
-                                     note['Vertical position'], note['Note type'], note['Button type'])
-        kpm_file = f"{str(file.parent)}/{file.stem.split('_')[0]}_param.kpm"
-        if Path(kpm_file).exists():
-            kpm_data = load_kpm(kpm_file, cutscene_box)
-            return karaoke, True, kpm_data
-    return karaoke, True, None
-
-
-def write_kbd(file, karaoke, cutscene_box):
-    data = dict()
-    note_list = list()
-    x = 0
-    while x < len(karaoke.items):
-        y = 0
-        while y < len(karaoke.items[x]):
-            if karaoke.items[x][y] != None:
-                if karaoke.items[x][y].id <= 3 and karaoke.items[x][y].note_type < 3:  # if not End
-                    current_note = karaoke.items[x][y]
-                    note = dict()
-                    note['Start position'] = current_note.start_pos
-                    note['End position'] = 0
-                    note['Vertical position'] = y
-                    note['Button type'] = current_note.id
-                    note['Note type'] = current_note.note_type
-                    note['Cue ID'] = current_note.cue_id
-                    note['Cuesheet ID'] = current_note.cuesheet_id
-                    if current_note.end_pos > 0:
-                        note['End position'] = current_note.end_pos
-                    else:
-                        if karaoke.items[x+1][y] != None:
-                            if karaoke.items[x+1][y].id > 3:
-                                o = x + 1
-                                note['Note type'] = karaoke.items[o][y].note_type
-                                while karaoke.items[o][y].id > 3:
-                                    o += 1
-                                karaoke.items[o][y].note_type = 3  # End
-                                note['End position'] = karaoke.pos_to_game(o)
-                                current_note.end_pos = note['End position']
-                    note_list.append(note)
-            y += 1
-        x += 1
-    data['Notes'] = note_list
-    data['Header'] = dict()
-    data['Header']['Version'] = 2
-    kbd.write_file(data, file, cutscene_start=float(cutscene_box.get_text()))
-    print(_("File written to {}").format(file))
 
 # update values
 
@@ -472,72 +551,6 @@ def update_dropdown(dropdown, mode, new_list=list(), index=0):
 def update_fps():  # fps counter from https://pythonprogramming.altervista.org/pygame-how-to-display-the-frame-rate-fps-on-the-screen/
     fps = str(int(clock.get_fps()))
     return fps
-
-# save note changes when stopping editing
-
-
-def save_note(note, boxes, dropdowns, karaoke):
-    max_pos = (karaoke.col - 1) * karaoke.scale
-    vert_changed = False
-    old_start_pos = note.start_pos
-    # start position
-    if len(boxes[0].get_text()) > 0:
-        if float(boxes[0].get_text()) <= max_pos:
-            new_pos = ms_to_game(float(boxes[0].get_text()))
-            if karaoke.game_to_pos(new_pos) <= len(karaoke.items):
-                note.start_pos = new_pos
-                karaoke.items[note.x][note.y] = None
-                note.x = karaoke.game_to_pos(note.start_pos)
-                karaoke.items[note.x][note.y] = note
-    # vertical position
-    if len(boxes[2].get_text()) > 0:
-        if int(boxes[2].get_text()) < karaoke.rows:
-            if note.y != int(boxes[2].get_text()):
-                vert_changed = True
-                old_pos = note.y
-            karaoke.items[note.x][note.y] = None
-            note.y = int(boxes[2].get_text())
-            karaoke.items[note.x][note.y] = note
-    # cue id
-    if len(boxes[3].get_text()) > 0:
-        if int(boxes[3].get_text()) <= 65535:  # uint16 max
-            note.cue_id = int(boxes[3].get_text())
-    # cuesheet id
-    if len(boxes[4].get_text()) > 0:
-        if int(boxes[4].get_text()) <= 65535:  # uint16 max
-            note.cuesheet_id = int(boxes[4].get_text())
-    # note id
-    note.id = dropdowns[0].options_list.index(dropdowns[0].selected_option)
-    # note type
-    note.note_type = dropdowns[1].options_list.index(
-        dropdowns[1].selected_option)
-    note.surface = items[note.id]
-
-    # end position
-    if len(boxes[1].get_text()) > 0:
-        if float(boxes[1].get_text()) <= max_pos:
-            if note.note_type != 0:
-                end_pos = ms_to_game(float(boxes[1].get_text()))
-            else:
-                end_pos = 0
-            if end_pos < note.end_pos or vert_changed or old_start_pos < note.start_pos:
-                if vert_changed:
-                    y_pos = old_pos
-                    new_end_pos = 0
-                else:
-                    y_pos = note.y
-                    new_end_pos = karaoke.game_to_pos(end_pos)
-                karaoke.Remove_long(note.x, note.y, y_pos=y_pos, old_start_pos=old_start_pos,
-                                    new_end_pos=new_end_pos)
-                if vert_changed:
-                    y_pos = note.y
-                    end_pos = ms_to_game(float(boxes[1].get_text()))
-            if end_pos > note.start_pos:
-                note.end_pos = end_pos
-                karaoke.Add_long(note.start_pos, note.end_pos,
-                                 note.y, note.note_type, note.id)
-            else:
-                note.end_pos = 0
 
 
 # hide ui after stopping editing
@@ -647,20 +660,6 @@ def save_file(open_file, manager):
         output_selection.ok_button.set_text(_('OK'))
         output_selection.cancel_button.set_text(_('Cancel'))
         return gui_button_mode, output_selection
-
-
-def highlight_note(karaoke, note, color, worlds, surface_nr, next_surface):
-    x = 2 + (note.x * (karaoke.box_size + karaoke.border))
-    y = 2 + karaoke.y + \
-        (note.y * (karaoke.box_size + karaoke.border))
-    if surface_nr == 0:
-        x += karaoke.x
-    if x > worlds[0].get_width() * (surface_nr + 1) and len(worlds) > next_surface:
-        pygame.draw.rect(worlds[next_surface], color, (x - worlds[0].get_width() * next_surface, y, karaoke.box_size + karaoke.border,
-                                                       karaoke.box_size + karaoke.border), 3)
-    else:
-        pygame.draw.rect(worlds[surface_nr], color, (x - worlds[0].get_width() * surface_nr, y, karaoke.box_size + karaoke.border,
-                                                     karaoke.box_size + karaoke.border), 3)
 
 
 def main():
@@ -816,8 +815,8 @@ def main():
     for label in box_labels:
         label.hide()
 
-    load_item_tex(current_controller, karaoke,
-                  None, note_picker)  # load button textures
+    karaoke.load_item_tex(current_controller,
+                          None, note_picker)  # load button textures
 
     # load sheet textures and scale them
     sheet_tex = f"{asset_path}/textures/{assets['Sheet texture']}"
@@ -849,8 +848,8 @@ def main():
         item.hide()
 
     if len(sys.argv) > 1:
-        karaoke, can_save, kpm_data = load_kbd(
-            sys.argv[1], karaoke, cutscene_box)
+        can_save, kpm_data = karaoke.load_kbd(
+            sys.argv[1], cutscene_box)
     else:
         kpm_data = None
 
@@ -862,7 +861,7 @@ def main():
     currently_copied = list()
     stopped_editing = False
     gui_button_mode = None
-    undo_list = list() # TODO - implement undo
+    undo_list = list()  # TODO - implement undo
     open_file = None
     scrollbar_moved = False  # has scrollbar been moved yet
     loaded = False  # is audio file loaded
@@ -933,12 +932,12 @@ def main():
 
         # if editing note params
         if currently_edited:
-            highlight_note(karaoke, currently_edited,
-                           (0, 100, 255), worlds, surface_nr, next_surface)
+            karaoke.highlight_note(currently_edited,
+                                   (0, 100, 255), worlds, surface_nr, next_surface)
 
         for note in currently_selected:
-            highlight_note(karaoke, note, (255, 0, 0),
-                           worlds, surface_nr, next_surface)
+            karaoke.highlight_note(note, (255, 0, 0),
+                                   worlds, surface_nr, next_surface)
 
         # Application events
         events = pygame.event.get()
@@ -1115,8 +1114,8 @@ def main():
                             if karaoke.In_grid(pos[0], pos[1]):
                                 if karaoke.items[pos[0]][pos[1]] != currently_edited and karaoke.items[pos[0]][pos[1]] != None:
                                     if karaoke.items[pos[0]][pos[1]].id < 4 and karaoke.items[pos[0]][pos[1]].note_type < 3:
-                                        save_note(
-                                            currently_edited, boxes, dropdowns, karaoke)
+                                        karaoke.save_note(
+                                            currently_edited, boxes, dropdowns)
                                         currently_edited = karaoke.items[pos[0]][pos[1]]
                                         update_text_boxes(
                                             currently_edited, boxes, dropdowns)
@@ -1127,8 +1126,8 @@ def main():
                             else:
                                 stopped_editing = True
                             if stopped_editing:
-                                save_note(
-                                    currently_edited, boxes, dropdowns, karaoke)
+                                karaoke.save_note(
+                                    currently_edited, boxes, dropdowns)
                                 stopped_editing = False  # reset value
                                 currently_edited = None  # deselect
                                 stop_editing(boxes, box_labels,
@@ -1275,8 +1274,8 @@ def main():
                                 stop_editing(boxes, box_labels,
                                              dropdowns, undo_button)
                                 currently_edited = None
-                            karaoke, can_save, kpm_data = load_kbd(
-                                input_selection.current_file_path, karaoke, cutscene_box)
+                            can_save, kpm_data = karaoke.load_kbd(
+                                input_selection.current_file_path, cutscene_box)
                             currently_selected.clear()  # empty the list
                             if can_save:
                                 config.set("PATHS", "Input", str(
@@ -1289,8 +1288,8 @@ def main():
                             open_file = output_selection.current_file_path
                             config.set("PATHS", "Output", str(
                                 output_selection.current_file_path))
-                            write_kbd(
-                                output_selection.current_file_path, karaoke, cutscene_box)
+                            karaoke.write_kbd(
+                                output_selection.current_file_path, cutscene_box)
 
                     if gui_button_mode == 'KPM_Input':
                         if event.ui_element == kpm_input_selection.ok_button:
@@ -1323,8 +1322,8 @@ def main():
                 if (event.user_type == UI_DROP_DOWN_MENU_CHANGED and event.ui_object_id == '#button_picker'):
                     config.set("CONFIG", "BUTTONS", str(
                         button_picker.selected_option))
-                    load_item_tex(button_picker.selected_option,
-                                  karaoke, held_note, note_picker)
+                    karaoke.load_item_tex(
+                        button_picker.selected_option, held_note, note_picker)
                 if (event.user_type == UI_DROP_DOWN_MENU_CHANGED and event.ui_object_id == '#language_picker'):
                     config.set("CONFIG", "LANGUAGE", str(
                         language_picker.selected_option))
@@ -1360,8 +1359,8 @@ def main():
 
                     if gui_button_mode == 'Save':
                         if open_file != None:
-                            write_kbd(
-                                open_file, karaoke, cutscene_box)
+                            karaoke.write_kbd(
+                                open_file, cutscene_box)
                         else:
                             raise Exception(_('No open file, unable to save!'))
 

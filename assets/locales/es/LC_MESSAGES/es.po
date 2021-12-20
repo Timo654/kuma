@@ -6,7 +6,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "POT-Creation-Date: 2021-12-20 14:54+0200\n"
-"PO-Revision-Date: 2021-12-20 16:46+0200\n"
+"PO-Revision-Date: 2021-12-20 23:02+0200\n"
 "Last-Translator: \n"
 "Language-Team: \n"
 "Language: es\n"
@@ -51,7 +51,7 @@ msgstr "KPM guardado en {}"
 
 #: gui_kuma.py:657
 msgid "Song loaded."
-msgstr ""
+msgstr "Canción cargada."
 
 #: gui_kuma.py:674
 msgid "Language changed."
@@ -187,7 +187,7 @@ msgstr "Selecciona un archivo de salida (kbd)"
 
 #: gui_kuma.py:1120
 msgid "Are you sure you want to remove this note?"
-msgstr ""
+msgstr "¿Estás seguro/a de que quieres eliminar esta nota?"
 
 #: gui_kuma.py:1120 gui_kuma.py:1125
 msgid "Delete note"
@@ -195,7 +195,7 @@ msgstr "Eliminar nota"
 
 #: gui_kuma.py:1125
 msgid "Are you sure you want to remove these notes?"
-msgstr ""
+msgstr "¿Estás seguro/a de que quieres eliminar estas notas?"
 
 #: gui_kuma.py:1216
 msgid "Select a parameter file (kpm)"
@@ -316,31 +316,34 @@ msgstr "<b>Fin</b> - Ir a la última nota."
 
 #: gui_kuma.py:1296
 msgid "<b>Left Ctrl + S</b> - Save."
-msgstr ""
+msgstr "<b>Ctrl Izq + S</b> - Guardar."
 
 #: gui_kuma.py:1297
 msgid "<b>Left Ctrl + Z</b> - Undo."
-msgstr ""
+msgstr "<b>Ctrl Izq + Z</b> - Deshacer."
 
 #: gui_kuma.py:1298
 msgid "<b>Left Ctrl + F</b> - Select a note."
-msgstr ""
+msgstr "<b>Ctrl Izq + F</b> - Seleccionar nota."
 
 #: gui_kuma.py:1299
 msgid "<b>Left Ctrl + C</b> - Copy selected notes."
-msgstr ""
+msgstr "<b>Ctrl Izq + C</b> - Copiar notas seleccionadas."
 
 #: gui_kuma.py:1300
 msgid ""
 "<b>Left Ctrl + V</b> - Paste copied notes (Vertical position does not "
 "change)."
 msgstr ""
+"<b>Ctrl Izq + V</b> - Pegar notas copiadas (La posición vertical no cambia)."
 
 #: gui_kuma.py:1301
 msgid ""
 "<b>Left Ctrl + Left Shift + V</b> - Paste copied notes (Vertical position "
 "changes)."
 msgstr ""
+"<b>Ctrl Izq + Shift (Mayús) Izq + V</b> - Pegar notas copiadas (La posición "
+"vertical cambia)."
 
 #: gui_kuma.py:1308 gui_kuma.py:1324
 msgid "Close"

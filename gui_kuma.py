@@ -237,7 +237,9 @@ class Karaoke:
         self.Add(Item(grid_end_pos, vert_pos, note_id, 3, end_pos))
 
     # reset items
-    def reset(self):
+    def reset(self, file_undo=False):
+        if not file_undo:  # if you can undo file loads
+            self.reset_undo_list()
         self.items.clear()
         self.items = [[None for _ in range(self.rows)]
                       for _ in range(self.col)]
@@ -337,12 +339,7 @@ class Karaoke:
             print(_('Unable to open file.'))
             return False, None
         else:
-            if undo_kbd:
-                prev_list = self.get_list()
-            else:
-                self.reset_undo_list()
-
-            self.reset()  # reset data
+            self.reset(undo_kbd)  # reset data
             for note in data['Notes']:
                 if note['Note type'] < 3:  # ignore any notes above 3, because those shouldn't exist
                     start_pos = self.game_to_pos(note['Start position'])
@@ -1428,7 +1425,7 @@ def main():
                 if event.user_type == UI_CONFIRMATION_DIALOG_CONFIRMED:  # reset event
                     if gui_button_mode == 'Reset':
                         gui_button_mode = None
-                        karaoke.reset()
+                        karaoke.reset(undo_kbd)
                         currently_selected.clear()  # empty the list
                         if currently_edited:
                             currently_edited = None

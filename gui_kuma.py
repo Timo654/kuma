@@ -112,7 +112,7 @@ if config["CONFIG"]["UNDO KBD LOAD"] == '1':
 else:
     undo_kbd = False
 
-# class for a item, just holds the surface and can resize it
+# class for a item, holds the surface and data related to it
 
 
 class Item:
@@ -164,7 +164,7 @@ class Karaoke:
     def reset_undo_list(self):
         self.undo_list.clear()
 
-    def copy_list(self):  # workaround for copying the list
+    def get_list(self):  # workaround for copying the list
         prev_list = list()
         for row in self.items:
             prev_list.append(row.copy())
@@ -208,10 +208,11 @@ class Karaoke:
                     world.blit(self.items[x + surface2_offset]
                                [y].resize(self.box_size), rect)
 
-    # add an item
+    # add a note
     def Add(self, Item):
         self.items[Item.x][Item.y] = Item
 
+    # add a long note
     def Add_long(self, start_pos, end_pos, vert_pos, note_type, note_id):
         grid_start_pos = self.game_to_pos(start_pos)
         grid_end_pos = self.game_to_pos(end_pos)
@@ -227,16 +228,18 @@ class Karaoke:
         # note type 3 is hold/rapid end, not an actual thing in the game
         self.Add(Item(grid_end_pos, vert_pos, note_id, 3, end_pos))
 
+    # reset items
     def reset(self):
+        self.items.clear()
         self.items = [[None for _ in range(self.rows)]
                       for _ in range(self.col)]
 
-    # remove an item
+    # remove a note
     def Remove(self, x, y):
         if x < len(self.items):
             self.items[x][y] = None
 
-    # remove a hold/rapid
+    # remove a long note
     def Remove_long(self, x, y, y_pos=None, old_start_pos=None, new_end_pos=0):
         note = self.items[x][y]
         if y_pos == None:
@@ -257,7 +260,6 @@ class Karaoke:
         note = None
 
     # get the square that the mouse is over
-
     def Get_pos(self, scroll, world):
         mouse = pygame.mouse.get_pos()
         x = scroll + mouse[0]  # adjust for scrollbar
@@ -293,7 +295,6 @@ class Karaoke:
         return normal_round(((pos / 3000) * self.scaler))
 
     # converts pos back to yakuza time
-
     def pos_to_game(self, pos):
         return normal_round((pos / self.scaler) * 3000)
 
@@ -316,8 +317,7 @@ class Karaoke:
         else:
             return int(new_pos + (scale * 1.5))
 
-    # KBD code
-
+    # KBD loading code
     def load_kbd(self, file, cutscene_box):
         file = Path(file)  # ensure it is actually path
         try:
@@ -330,7 +330,7 @@ class Karaoke:
             return False, None
         else:
             if undo_kbd:
-                prev_list = self.copy_list()
+                prev_list = self.get_list()
             else:
                 self.reset_undo_list()
 
@@ -351,6 +351,7 @@ class Karaoke:
                 self.add_to_undo_list(prev_list)
         return True, None
 
+    # KBD writing code
     def write_kbd(self, file, cutscene_box):
         data = dict()
         note_list = list()
@@ -391,6 +392,7 @@ class Karaoke:
             cutscene_box.get_text()))
         print(_("File written to {}").format(file))
 
+    # draw a square around a note
     def highlight_note(self, note, color, worlds, surface_nr, next_surface):
         x = 2 + (note.x * (self.box_size + self.border))
         y = 2 + self.y + \
@@ -405,9 +407,8 @@ class Karaoke:
                                                          self.box_size + self.border), 3)
 
     # save note changes when stopping editing
-
     def save_note(self, note, boxes, dropdowns):
-        prev_list = self.copy_list()
+        prev_list = self.get_list()
         max_pos = (self.col - 1) * self.scale
         vert_changed = False
         old_start_pos = note.start_pos
@@ -470,8 +471,8 @@ class Karaoke:
                 else:
                     note.end_pos = 0
         self.add_to_undo_list(prev_list)
-    # Loading textures
 
+    # Loading textures
     def load_item_tex(self, button_type, held_note, dropdown):
         global items
         # load note textures
@@ -500,41 +501,38 @@ class Karaoke:
         update_dropdown(dropdown, mode='update all', new_list=assets['Button prompts']
                         [button_type][1], index=dropdown.options_list.index(dropdown.selected_option))
 
+    # paste copied notes
     def paste(self, currently_copied, worlds, scrollbar_value, mode='boring'):
-        if mode == 'cooler':
+        if mode == 'cooler':  # advanced copy paste
             cool = True
         else:
             cool = False
 
         if len(currently_copied) > 0:
-            prev_list = self.copy_list()
+            prev_list = self.get_list()
             new_notes = list()
-            if cool:
-                smallest_y = self.rows
             for note in currently_copied:
-                if cool:
-                    if note.y < smallest_y:
-                        smallest_y = note.y
                 new_notes.append(
                     (note.start_pos, note.end_pos, note.y, note.id, note.note_type, note.cue_id, note.cuesheet_id))
             new_notes.sort()
-            note_offset = new_notes[0][0]
+            x_offset = new_notes[0][0]
+            if cool:
+                y_offset = new_notes[0][2]
             mouse_pos = self.Get_pos(scrollbar_value, worlds[0])
             current_loc = self.pos_to_game(mouse_pos[0])  # where the cursor is
             for note in new_notes:
                 if note[4] != 0:
                     end_pos = note[1] - \
-                        note_offset + current_loc
+                        x_offset + current_loc
                 else:
                     end_pos = 0
                 start_pos = note[0] - \
-                    note_offset + current_loc
+                    x_offset + current_loc
                 grid_start_pos = self.game_to_pos(
                     start_pos)
                 y_pos = note[2]
-                if cool:
-                    y_pos -= smallest_y
-                    y_pos += mouse_pos[1]
+                if cool:  # adjust y position
+                    y_pos += mouse_pos[1] - y_offset
 
                 if self.In_grid(grid_start_pos, y_pos):
                     self.Add(Item(grid_start_pos, y=y_pos, id=note[3], note_type=note[4],
@@ -543,6 +541,7 @@ class Karaoke:
                         self.Add_long(
                             start_pos, end_pos, y_pos, note[4], note[3])
             self.add_to_undo_list(prev_list)
+
 # strip from sheet https://python-forum.io/thread-403.html
 
 
@@ -554,9 +553,8 @@ def strip_from_sheet(sheet, start, size, columns, rows):
             frames.append(sheet.subsurface(pygame.Rect(location, size)))
     return frames
 
+
 # various time conversions
-
-
 def game_to_ms(pos):
     return float(pos / 3)
 
@@ -571,9 +569,7 @@ def normal_round(n):  # https://stackoverflow.com/questions/33019698/how-to-prop
     return ceil(n)
 
 
-# KPM code
-
-
+# load karaoke param
 def load_kpm(file, cutscene_box, refresh=1):
     try:
         data = kpm.read_file(file)
@@ -589,6 +585,8 @@ def load_kpm(file, cutscene_box, refresh=1):
                 str(data['Parameters'][0]['Cutscene start time']))
         return data
 
+# save karaoke param
+
 
 def save_kpm(file, cutscene_box, data):
     if Path.exists(file):
@@ -602,8 +600,6 @@ def save_kpm(file, cutscene_box, data):
 
 
 # update values
-
-
 def update_text_boxes(note, boxes, dropdowns):
     # set values
     boxes[0].set_text(str(game_to_ms(note.start_pos)))
@@ -658,6 +654,7 @@ def load_song(filename, music_elements):
         pygame.mixer.music.load(filename)
         song = mutagen.File(filename)
         length = round(song.info.length * 1000)
+        print(_('Song loaded.'))
     except(pygame.error):
         for element in music_elements:
             element.hide()
@@ -666,9 +663,7 @@ def load_song(filename, music_elements):
     return True, length
 
 
-# language related functions
-
-
+# language switching
 def switch_language(language, params=None, boot=False):
     lang_code = assets['Languages'][language]
     lang = gettext.translation(
@@ -707,6 +702,8 @@ def get_menu_data():
     }
     }
 
+# update button text
+
 
 def update_text(params):
     params[0].set_text(_('Undo note changes'))
@@ -728,6 +725,8 @@ def update_text(params):
     params[14].set_text(_("Volume {}").format(
         round(float(config['CONFIG']['VOLUME']) * 100)))
 
+# save box
+
 
 def save_file(open_file, manager):
     if open_file != None:
@@ -743,6 +742,8 @@ def save_file(open_file, manager):
         output_selection.ok_button.set_text(_('OK'))
         output_selection.cancel_button.set_text(_('Cancel'))
         return gui_button_mode, output_selection
+
+# the main loop where all the cool stuff happens
 
 
 def main():
@@ -1060,7 +1061,7 @@ def main():
                         scrollbar_value, worlds[0])
                     if karaoke.In_grid(pos[0], pos[1]):
                         if held_note:
-                            prev_list = karaoke.copy_list()
+                            prev_list = karaoke.get_list()
                             held_note.start_pos = karaoke.pos_to_game(pos[0])
                             held_note.x = pos[0]
                             held_note.y = pos[1]
@@ -1159,12 +1160,6 @@ def main():
                 if event.key == pygame.K_ESCAPE:
                     currently_selected.clear()  # empty list
 
-                if event.key == pygame.K_LALT:
-                    note_id = 4
-                    held_note = Item(0, 0, note_id, 'Hold', 0)  # add item
-                if event.key == pygame.K_LSHIFT:
-                    note_id = 5
-                    held_note = Item(0, 0, note_id, 'Rapid', 0)  # add item
                 if event.key == pygame.K_e:  # property editing mode
                     pos = karaoke.Get_pos(
                         scrollbar_value, worlds[0])
@@ -1297,12 +1292,15 @@ def main():
                                                                      '---------------<br><br>'
                                                                      '<b>Left click</b> - Place and pick up notes.<br>'
                                                                      '<b>Right click</b> - Change held note type.<br>'
-                                                                     '<b>Left Alt</b> - Change held note type to "Hold" note.<br>'
-                                                                     '<b>Left Shift</b> - Change held note type to "Rapid" note.<br>'
                                                                      '<b>E</b> - Note edit mode. You can accurately change note timings, position, type and more. Pressing E again saves the note.<br>'
                                                                      '<b>Arrow keys, Page Up, Page Down</b> - Move the scrollbar.<br>'
                                                                      '<b>Delete</b> - Removes currently selected/edited note.<br>'
-                                                                     '<b>End</b> - Jump to the last note.'),
+                                                                     '<b>End</b> - Jump to the last note.<br>'
+                                                                     '<b>Left Ctrl + Z</b> - Undo.<br>'
+                                                                     '<b>Left Ctrl + F</b> - Select a note.<br>'
+                                                                     '<b>Left Ctrl + F</b> - Copy selected notes.<br>'
+                                                                     '<b>Left Ctrl + V</b> - Paste selected notes (Vertical position does not change).<br>'
+                                                                     '<b>Left Ctrl + Left Shift + V</b> - Paste selected notes (Vertical position changes).'),
                                                       manager=manager,
                                                       window_title=_('Help'))
                         help_window.dismiss_button.set_text(_('Close'))

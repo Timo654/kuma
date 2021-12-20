@@ -7,7 +7,7 @@ import modules.kpm_reader as kpm
 from modules.ui_menu_bar import UIMenuBar
 from pathlib import Path
 from math import ceil, floor
-from ctypes import windll
+import ctypes
 from os import name
 import json
 import configparser
@@ -18,7 +18,7 @@ import sys
 
 
 # general info
-VERSION = "v0.9.4"
+VERSION = "v0.9.5"
 CREATORS = 'Timo654'
 TRANSLATORS = 'Timo654, ketrub, Mink, jason098, Capitán Retraso, Kent, Edness, JustAnyone, Tervel, RyuHachii, Foas, Biggelskog'
 TESTERS = "ketrub, KaarelJ98"
@@ -43,9 +43,6 @@ else:
 asset_path = assets['Assets folder']
 controllers = [key for key in assets['Button prompts']]
 languages = [key for key in assets['Languages']]
-# fix UI getting too big when using a different scale from 100%
-if name == 'nt':
-    windll.user32.SetProcessDPIAware()
 
 # get default language
 
@@ -92,7 +89,24 @@ if not config.has_section("ADV. SETTINGS"):
     config.set("ADV. SETTINGS", "COLUMNS", str(10000))
     config.set("ADV. SETTINGS", "SURFACES", str(8))
     config.set("ADV. SETTINGS", "SCALE", str(20))
+    config.set("ADV. SETTINGS", "UNDO COUNT", str(50))
 
+if config["CONFIG"]["FPS COUNTER"] == '1':
+    fps_counter = True
+else:
+    fps_counter = False
+
+# whether you should be able to undo a file load or not
+if config["CONFIG"]["UNDO KBD LOAD"] == '1':
+    undo_kbd = True
+else:
+    undo_kbd = False
+
+undo_count = int(config["ADV. SETTINGS"]["UNDO COUNT"])
+
+# fix UI getting too big when using a different scale from 100%
+if name == 'nt':
+    ctypes.windll.user32.SetProcessDPIAware()
 # initialize pygame stuff
 pygame.init()
 font = pygame.font.SysFont("FiraCode", 22)
@@ -102,15 +116,6 @@ pygame_icon = pygame.image.load(f"{asset_path}/textures/icon_small.png")
 pygame.display.set_icon(pygame_icon)
 pygame.mixer.music.set_volume(float(config["CONFIG"]["VOLUME"]))
 
-if config["CONFIG"]["FPS COUNTER"] == '1':
-    fps_counter = True
-else:
-    fps_counter = False
-
-if config["CONFIG"]["UNDO KBD LOAD"] == '1':
-    undo_kbd = True
-else:
-    undo_kbd = False
 
 # class for a item, holds the surface and data related to it
 
@@ -160,6 +165,9 @@ class Karaoke:
     def add_to_undo_list(self, prev_items):
         if prev_items != self.items:
             self.undo_list.append(prev_items)
+            # the higher the max undo count, the more RAM it will use
+            if len(self.undo_list) > undo_count:
+                self.undo_list.pop(0)
 
     def reset_undo_list(self):
         self.undo_list.clear()
@@ -1117,12 +1125,12 @@ def main():
                     if currently_edited:
                         gui_button_mode = 'Delete'
                         delete_note = UIConfirmationDialog(
-                            rect=pygame.Rect(0, 0, 300, 300), manager=manager, action_long_desc=_('Are you sure you want to remove this note? This change cannot be undone.'), window_title=_('Delete note'), action_short_name=_('OK'))
+                            rect=pygame.Rect(0, 0, 300, 300), manager=manager, action_long_desc=_('Are you sure you want to remove this note?'), window_title=_('Delete note'), action_short_name=_('OK'))
                         delete_note.cancel_button.set_text(_('Cancel'))
                     elif currently_selected:
                         gui_button_mode = 'Delete_Multiple'
                         delete_note = UIConfirmationDialog(
-                            rect=pygame.Rect(0, 0, 300, 300), manager=manager, action_long_desc=_('Are you sure you want to remove these notes? This change cannot be undone.'), window_title=_('Delete note'), action_short_name=_('OK'))
+                            rect=pygame.Rect(0, 0, 300, 300), manager=manager, action_long_desc=_('Are you sure you want to remove these notes?'), window_title=_('Delete note'), action_short_name=_('OK'))
                         delete_note.cancel_button.set_text(_('Cancel'))
 
                     held_note = None  # deletes selected note
@@ -1277,30 +1285,45 @@ def main():
                     if event.ui_object_id == 'menu_bar.#help_menu_items.#how_to_use':
                         info_window_rect = pygame.Rect(0, 0, 500, 400)
                         info_window_rect.center = screen.get_rect().center
+                        # separated text so it would be easier for translators
+                        how_1 = _('How to use')
+                        how_2 = _(
+                            'KUMA - A karaoke editor for Dragon Engine games.')
+                        how_3 = _(
+                            'To begin using the tool, you can add start by loading an existing file from <b>File</b> -> <b>Open</b> or just by adding notes to a new file.')
+                        how_4 = _(
+                            'You can choose your preferred <b>controller type</b> and <b>language</b> using the dropdown menus at the top of the screen.')
+                        how_5 = _('When placing a note, the accuracy is <b>{ms} milliseconds</b>. You can change the position more accurately in <b>note edit mode.').format(
+                            ms=karaoke.scaler)
+                        how_6 = _(
+                            'You can play songs by loading them from the <b>Music</b> tab and then pressing the <b>Play</b> button in the left corner.')
+                        how_7 = _(
+                            'If you want to save, you can save by going to <b>File</b> -> <b>Save</b> or <b>Save as...</b> to either create a new file or overwrite an existing one.')
+                        how_8 = _('Key binds')
+                        how_9 = _(
+                            '<b>Left click</b> - Place and pick up notes.')
+                        how_10 = _(
+                            '<b>Right click</b> - Change held note type.')
+                        how_11 = _(
+                            '<b>E</b> - Note edit mode. You can accurately change note timings, position, type and more. Pressing E again saves the note.')
+                        how_12 = _(
+                            '<b>Arrow keys, Page Up, Page Down</b> - Move the scrollbar.')
+                        how_13 = _(
+                            '<b>Delete</b> - Removes currently selected/edited note.')
+                        how_14 = _('<b>End</b> - Jump to the last note.')
+                        how_15 = _('<b>Left Ctrl + S</b> - Save.')
+                        how_16 = _('<b>Left Ctrl + Z</b> - Undo.')
+                        how_17 = _('<b>Left Ctrl + F</b> - Select a note.')
+                        how_18 = _(
+                            '<b>Left Ctrl + C</b> - Copy selected notes.')
+                        how_19 = _(
+                            '<b>Left Ctrl + V</b> - Paste copied notes (Vertical position does not change).')
+                        how_20 = _(
+                            '<b>Left Ctrl + Left Shift + V</b> - Paste copied notes (Vertical position changes).')
 
                         help_window = UIMessageWindow(rect=info_window_rect,
-                                                      html_message=_('<b>How to use</b><br>'
-                                                                     '---------------<br>'
-                                                                     '<b>KUMA - A karaoke editor for Dragon Engine games.</b><br>'
-                                                                     'To begin using the tool, you can add start by loading an existing file from <b>File</b> -> <b>Open</b> or just by adding notes to a new file.<br>'
-                                                                     'You can choose your preferred <b>controller type</b> and <b>language</b> using the dropdown menus at the top of the screen.<br>'
-                                                                     'When placing a note, the accuracy is <b>100 milliseconds</b>. You can change the position more accurately in <b>note edit mode.</b><br>'
-                                                                     'You can play songs by loading them from the <b>Music</b> tab and then pressing the <b>Play</b> button in the left corner.<br>'
-                                                                     'If you want to save, you can save by going to <b>File</b> -> <b>Save</b> or <b>Save as...</b> to either create a new file or overwrite an existing one.<br>'
-                                                                     '---------------<br><br>'
-                                                                     '<b>Key binds</b><br>'
-                                                                     '---------------<br><br>'
-                                                                     '<b>Left click</b> - Place and pick up notes.<br>'
-                                                                     '<b>Right click</b> - Change held note type.<br>'
-                                                                     '<b>E</b> - Note edit mode. You can accurately change note timings, position, type and more. Pressing E again saves the note.<br>'
-                                                                     '<b>Arrow keys, Page Up, Page Down</b> - Move the scrollbar.<br>'
-                                                                     '<b>Delete</b> - Removes currently selected/edited note.<br>'
-                                                                     '<b>End</b> - Jump to the last note.<br>'
-                                                                     '<b>Left Ctrl + Z</b> - Undo.<br>'
-                                                                     '<b>Left Ctrl + F</b> - Select a note.<br>'
-                                                                     '<b>Left Ctrl + F</b> - Copy selected notes.<br>'
-                                                                     '<b>Left Ctrl + V</b> - Paste selected notes (Vertical position does not change).<br>'
-                                                                     '<b>Left Ctrl + Left Shift + V</b> - Paste selected notes (Vertical position changes).'),
+                                                      html_message=(
+                                                          f'<b>{how_1}</b><br>---------------<br><b>{how_2}</b><br>{how_3}.<br>{how_4}<br>{how_5}</b><br>{how_6}<br>{how_7}<br>---------------<br><br><b>{how_8}</b><br>---------------<br><br>{how_9}<br>{how_10}<br>{how_11}<br>{how_12}<br>{how_13}<br>{how_14}<br>{how_15}<br>{how_16}<br>{how_17}<br>{how_18}<br>{how_19}<br>{how_20}'),
                                                       manager=manager,
                                                       window_title=_('Help'))
                         help_window.dismiss_button.set_text(_('Close'))

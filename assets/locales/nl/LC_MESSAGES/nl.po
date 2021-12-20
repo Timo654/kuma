@@ -5,8 +5,8 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: \n"
-"POT-Creation-Date: 2021-12-13 15:56+0200\n"
-"PO-Revision-Date: 2021-12-13 21:10+0200\n"
+"POT-Creation-Date: 2021-12-20 14:54+0200\n"
+"PO-Revision-Date: 2021-12-20 21:31+0200\n"
 "Last-Translator: \n"
 "Language-Team: \n"
 "Language: nl\n"
@@ -17,282 +17,372 @@ msgstr ""
 "Generated-By: pygettext.py 1.5\n"
 "X-Generator: Poedit 3.0.1\n"
 
-#: gui_kuma.py:36
+#: gui_kuma.py:42
 msgid "Asset data missing"
 msgstr "Asset data niet aanwezig"
 
-#: gui_kuma.py:200
+#: gui_kuma.py:286
 msgid "{min} min"
 msgstr ""
 
-#: gui_kuma.py:203
+#: gui_kuma.py:289
 msgid "{min} min {sec} s"
 msgstr ""
 
-#: gui_kuma.py:205
+#: gui_kuma.py:291
 msgid "{sec} s"
 msgstr ""
 
-#: gui_kuma.py:295 gui_kuma.py:323 gui_kuma.py:514
+#: gui_kuma.py:326 gui_kuma.py:577 gui_kuma.py:661
 msgid "Unable to read file."
 msgstr "Kan bestand niet lezen."
 
-#: gui_kuma.py:298 gui_kuma.py:326
+#: gui_kuma.py:329 gui_kuma.py:580
 msgid "Unable to open file."
 msgstr "Kan bestand niet openen."
 
-#: gui_kuma.py:314
-msgid "KPM written to {}"
-msgstr "KPM geschreven naar {}"
-
-#: gui_kuma.py:391
+#: gui_kuma.py:393
 msgid "File written to {}"
 msgstr "Bestand geschreven naar {}"
 
-#: gui_kuma.py:527
+#: gui_kuma.py:598
+msgid "KPM written to {}"
+msgstr "KPM geschreven naar {}"
+
+#: gui_kuma.py:657
+msgid "Song loaded."
+msgstr "Track geladen."
+
+#: gui_kuma.py:674
 msgid "Language changed."
 msgstr "Taal veranderd."
 
-#: gui_kuma.py:532
+#: gui_kuma.py:681
 msgid "File"
 msgstr "Bestand"
 
-#: gui_kuma.py:535
+#: gui_kuma.py:684
 msgid "New..."
 msgstr "Nieuw..."
 
-#: gui_kuma.py:536
+#: gui_kuma.py:685
 msgid "Open..."
 msgstr "Openen..."
 
-#: gui_kuma.py:537
+#: gui_kuma.py:686
 msgid "Save"
 msgstr "Opslaan"
 
-#: gui_kuma.py:538
+#: gui_kuma.py:687
 msgid "Save As..."
 msgstr "Opslaan als..."
 
-#: gui_kuma.py:541
+#: gui_kuma.py:690
 msgid "Music"
 msgstr "Muziek"
 
-#: gui_kuma.py:544
+#: gui_kuma.py:693
 msgid "Load song..."
 msgstr "Laad track..."
 
-#: gui_kuma.py:547 gui_kuma.py:1075
+#: gui_kuma.py:696 gui_kuma.py:1307
 msgid "Help"
 msgstr ""
 
-#: gui_kuma.py:550
+#: gui_kuma.py:699 gui_kuma.py:1281
 msgid "How to use"
 msgstr "Gebruikershandleiding"
 
-#: gui_kuma.py:551 gui_kuma.py:1091
+#: gui_kuma.py:700 gui_kuma.py:1323
 msgid "About"
 msgstr "Over"
 
-#: gui_kuma.py:558 gui_kuma.py:623
+#: gui_kuma.py:709 gui_kuma.py:798
 msgid "Undo note changes"
 msgstr "Ongedaan maken"
 
-#: gui_kuma.py:559 gui_kuma.py:628
+#: gui_kuma.py:710 gui_kuma.py:802
 msgid "Load time"
 msgstr "Laad tijd"
 
-#: gui_kuma.py:560 gui_kuma.py:631
+#: gui_kuma.py:711 gui_kuma.py:805
 msgid "Save time"
 msgstr "Opslaan tijd"
 
-#: gui_kuma.py:561 gui_kuma.py:697
+#: gui_kuma.py:712 gui_kuma.py:869
 msgid "Cutscene start"
 msgstr ""
 
-#: gui_kuma.py:562 gui_kuma.py:700
+#: gui_kuma.py:713 gui_kuma.py:872
 msgid "Start position"
 msgstr "Start positie"
 
-#: gui_kuma.py:563 gui_kuma.py:706
+#: gui_kuma.py:714 gui_kuma.py:878
 msgid "Vertical position"
 msgstr "Verticale positie"
 
-#: gui_kuma.py:564 gui_kuma.py:709
+#: gui_kuma.py:715 gui_kuma.py:881
 msgid "Cue ID"
 msgstr ""
 
-#: gui_kuma.py:565 gui_kuma.py:712
+#: gui_kuma.py:716 gui_kuma.py:884
 msgid "Cuesheet ID"
 msgstr ""
 
-#: gui_kuma.py:566 gui_kuma.py:715
+#: gui_kuma.py:717 gui_kuma.py:887
 msgid "Note button"
 msgstr "Note knop"
 
-#: gui_kuma.py:567 gui_kuma.py:718
+#: gui_kuma.py:718 gui_kuma.py:890
 msgid "Note type"
 msgstr ""
 
-#: gui_kuma.py:568 gui_kuma.py:703
+#: gui_kuma.py:719 gui_kuma.py:875
 msgid "End position"
 msgstr "Eindpositie"
 
-#: gui_kuma.py:569 gui_kuma.py:655
+#: gui_kuma.py:720 gui_kuma.py:828
 msgid "Hold"
 msgstr ""
 
-#: gui_kuma.py:569 gui_kuma.py:655
+#: gui_kuma.py:720 gui_kuma.py:828
 msgid "Rapid"
 msgstr ""
 
-#: gui_kuma.py:569 gui_kuma.py:655
+#: gui_kuma.py:720 gui_kuma.py:828
 msgid "Regular"
 msgstr ""
 
-#: gui_kuma.py:573 gui_kuma.py:724
+#: gui_kuma.py:724 gui_kuma.py:897
 msgid "Song position"
 msgstr "Track positie"
 
-#: gui_kuma.py:574 gui_kuma.py:727 gui_kuma.py:1106
+#: gui_kuma.py:725 gui_kuma.py:900 gui_kuma.py:1338
 msgid "Volume {}"
 msgstr ""
 
-#: gui_kuma.py:582
+#: gui_kuma.py:735
 msgid "Are you sure you want to overwrite {}?"
 msgstr "Weet u zeker dat u {} wilt overschrijven?"
 
-#: gui_kuma.py:582
+#: gui_kuma.py:735
 msgid "Save file"
 msgstr "Bestand opslaan"
 
-#: gui_kuma.py:582 gui_kuma.py:589 gui_kuma.py:928 gui_kuma.py:994
-#: gui_kuma.py:1001 gui_kuma.py:1026 gui_kuma.py:1031 gui_kuma.py:1040
-#: gui_kuma.py:1047 gui_kuma.py:1161
+#: gui_kuma.py:735 gui_kuma.py:742 gui_kuma.py:1120 gui_kuma.py:1125 gui_kuma.py:1217 gui_kuma.py:1224
+#: gui_kuma.py:1253 gui_kuma.py:1258 gui_kuma.py:1267 gui_kuma.py:1274 gui_kuma.py:1394
 msgid "OK"
 msgstr ""
 
-#: gui_kuma.py:583 gui_kuma.py:590 gui_kuma.py:929 gui_kuma.py:995
-#: gui_kuma.py:1003 gui_kuma.py:1027 gui_kuma.py:1032 gui_kuma.py:1041
-#: gui_kuma.py:1048 gui_kuma.py:1162
+#: gui_kuma.py:736 gui_kuma.py:743 gui_kuma.py:1121 gui_kuma.py:1126 gui_kuma.py:1218 gui_kuma.py:1226
+#: gui_kuma.py:1254 gui_kuma.py:1259 gui_kuma.py:1268 gui_kuma.py:1275 gui_kuma.py:1395
 msgid "Cancel"
 msgstr "Annuleren"
 
-#: gui_kuma.py:588 gui_kuma.py:1046
+#: gui_kuma.py:741 gui_kuma.py:1273
 msgid "Select an output file (kbd)"
 msgstr "Selecteer een output bestand (kbd)"
 
-#: gui_kuma.py:928
-msgid ""
-"Are you sure you want to remove this note? This change cannot be undone."
-msgstr ""
-"Weet je zeker dat je deze note wil verwijderen? Deze actie kan niet worden "
-"teruggedraaid."
+#: gui_kuma.py:1120
+msgid "Are you sure you want to remove this note?"
+msgstr "Weet je zeker dat je deze note wil verwijderen?"
 
-#: gui_kuma.py:928
+#: gui_kuma.py:1120 gui_kuma.py:1125
 msgid "Delete note"
 msgstr "Note verwijderen"
 
-#: gui_kuma.py:993
+#: gui_kuma.py:1125
+msgid "Are you sure you want to remove these notes?"
+msgstr "Weet je zeker dat je deze noten wil verwijderen?"
+
+#: gui_kuma.py:1216
 msgid "Select a parameter file (kpm)"
 msgstr "Selecteer een parameter bestand (kpm)"
 
-#: gui_kuma.py:1000
+#: gui_kuma.py:1223
 msgid "Select an output file (kpm)"
 msgstr "Selecteer een output bestand (kpm)"
 
-#: gui_kuma.py:1019
-msgid ""
-"Unable to play the song from the given position, restarting from the "
-"beginning."
-msgstr ""
-"Kan track niet starten op aangegeven positie, zal starten vanaf het begin."
+#: gui_kuma.py:1246
+msgid "Unable to play the song from the given position, restarting from the beginning."
+msgstr "Kan track niet starten op aangegeven positie, zal starten vanaf het begin."
 
-#: gui_kuma.py:1025
+#: gui_kuma.py:1252
 msgid "Select an input file (kbd)"
 msgstr "Selecteer een invoerbestand (kbd)"
 
-#: gui_kuma.py:1031
-msgid ""
-"Are you sure you want to create a new file? Any unsaved changes will be lost."
+#: gui_kuma.py:1258
+msgid "Are you sure you want to create a new file? Any unsaved changes will be lost."
 msgstr ""
-"Weet je zeker dat je een nieuw bestand wil aanmaken? Niet-opgeslagen "
-"wijzigingen gaan verloren."
+"Weet je zeker dat je een nieuw bestand wil aanmaken? Niet-opgeslagen wijzigingen gaan verloren."
 
-#: gui_kuma.py:1031
+#: gui_kuma.py:1258
 msgid "Create a new file"
 msgstr "Maak een nieuw bestand"
 
-#: gui_kuma.py:1039
+#: gui_kuma.py:1266
 msgid "Select an audio file (mp3/ogg)"
 msgstr "Selecteer een audiobestand (mp3/ogg)"
 
-#: gui_kuma.py:1055
-msgid ""
-"<b>How to use</b><br>---------------<br><b>KUMA - A karaoke editor for "
-"Dragon Engine games.</b><br>To begin using the tool, you can add start by "
-"loading an existing file from <b>File</b> -> <b>Open</b> or just by adding "
-"notes to a new file.<br>You can choose your preferred <b>controller type</b> "
-"and <b>language</b> using the dropdown menus at the top of the screen."
-"<br>When placing a note, the accuracy is <b>100 milliseconds</b>. You can "
-"change the position more accurately in <b>note edit mode.</b><br>You can "
-"play songs by loading them from the <b>Music</b> tab and then pressing the "
-"<b>Play</b> button in the left corner.<br>If you want to save, you can save "
-"by going to <b>File</b> -> <b>Save</b> or <b>Save as...</b> to either create "
-"a new file or overwrite an existing one.<br>---------------<br><br><b>Key "
-"binds</b><br>---------------<br><br><b>Left click</b> - Place and pick up "
-"notes.<br><b>Right click</b> - Change held note type.<br><b>Left Alt</b> - "
-"Change held note type to \"Hold\" note.<br><b>Left Shift</b> - Change held "
-"note type to \"Rapid\" note.<br><b>E</b> - Note edit mode. You can "
-"accurately change note timings, position, type and more. Pressing E again "
-"saves the note.<br><b>Arrow keys, Page Up, Page Down</b> - Move the "
-"scrollbar.<br><b>Delete</b> - Removes currently selected/edited note."
-"<br><b>End</b> - Jump to the last note."
-msgstr ""
-"<b>Gebruikershandleiding</b><br>---------------<br><b>KUMA - Een karaoke "
-"editor voor Dragon Engine games.</b><br>Om te beginnen moet u een "
-"bestaandbestand laden van <b>Bestand</b> -> <b>Openen</b> of door notes toe "
-"te voegen in een nieuw bestand.<br>Je kan je <b>controller type</b> en "
-"<b>language</b> door de dropdown menu's te gebruiken boven aan het programma."
-"<br>Wanneer je een note plaatst, is de nauwkeurigheid <b>100 milliseconden</"
-"b>. Je kan de positie nauwkeuriger aanpassen in <b>note edit mode.</b><br> "
-"Je kan tracks afspelen vanuit de <b>Music</b> tab of als je drukt op de "
-"<b>Play</b> knop in de linker hoek.<br>Als je wilt opslaan kan door naar "
-"<b>Bestand</b> -> <b>Opslaan</b> of <b>Opslaan als...</b> te selecteren je "
-"kan een bestaand bestand overscrijven of een nieuw bestand aanmaken."
-"<br>---------------<br><br><b>Key binds</b><br>---------------"
-"<br><br><b>Linker muisknop</b> - Plaats en beweeg notes.<br><b>Rechter "
-"muisknop</b> - Verander held note type.<br><b>Linker Alt</b> - Verander held "
-"note type naar \"Hold\" note.<br><b>Linker Shift</b> - Verander "
-"geselecteerde note type naar \"Rapid\" note.<br><b>E</b> - Note edit mode. "
-"Je kan de note timings, positie, type en meer nauwkeurig veranderen. Op E "
-"drukken slaat de note op.<br><b>Pijltoetsen, Page Up, Page Down</b> - Beweeg "
-"de scrollbar.<br><b>Verwijderen</b> - Verwijder huidig geselecteerde note(s)."
-"<br><b>End</b> - Spring naar de laatste note."
+#: gui_kuma.py:1282
+msgid "KUMA - A karaoke editor for Dragon Engine games."
+msgstr "KUMA - Een karaoke editor voor Dragon Engine games."
 
-#: gui_kuma.py:1076 gui_kuma.py:1092
+#: gui_kuma.py:1283
+msgid ""
+"To begin using the tool, you can add start by loading an existing file from <b>File</b> -> <b>Open</"
+"b> or just by adding notes to a new file."
+msgstr ""
+"Om te beginnen moet u een bestaandbestand laden van <b>Bestand</b> -> <b>Openen</b> of door notes "
+"toe te voegen in een nieuw bestand."
+
+#: gui_kuma.py:1284
+msgid ""
+"You can choose your preferred <b>controller type</b> and <b>language</b> using the dropdown menus at "
+"the top of the screen."
+msgstr ""
+"Je kan je <b>controller type</b> en <b>language</b> door de dropdown menu's te gebruiken boven aan "
+"het programma."
+
+#: gui_kuma.py:1285
+msgid ""
+"When placing a note, the accuracy is <b>{ms} milliseconds</b>. You can change the position more "
+"accurately in <b>note edit mode."
+msgstr ""
+"Wanneer je een note plaatst, is de nauwkeurigheid <b>{ms} milliseconden</ b>. Je kan de positie "
+"nauwkeuriger aanpassen in <b>note edit mode</b>."
+
+#: gui_kuma.py:1287
+msgid ""
+"You can play songs by loading them from the <b>Music</b> tab and then pressing the <b>Play</b> "
+"button in the left corner."
+msgstr ""
+"Je kan tracks afspelen vanuit de <b>Music</b> tab of als je drukt op de <b>Play</b> knop in de "
+"linker hoek."
+
+#: gui_kuma.py:1288
+msgid ""
+"If you want to save, you can save by going to <b>File</b> -> <b>Save</b> or <b>Save as...</b> to "
+"either create a new file or overwrite an existing one."
+msgstr ""
+"Als je wilt opslaan kan door naar <b>Bestand</b> -> <b>Opslaan</b> of <b>Opslaan als...</b> te "
+"selecteren je kan een bestaand bestand overscrijven of een nieuw bestand aanmaken."
+
+#: gui_kuma.py:1289
+msgid "Key binds"
+msgstr ""
+
+#: gui_kuma.py:1290
+msgid "<b>Left click</b> - Place and pick up notes."
+msgstr "<b>Linker muisknop</b> - Plaats en beweeg notes."
+
+#: gui_kuma.py:1291
+msgid "<b>Right click</b> - Change held note type."
+msgstr "<b>Rechter muisknop</b> - Verander held note type."
+
+#: gui_kuma.py:1292
+msgid ""
+"<b>E</b> - Note edit mode. You can accurately change note timings, position, type and more. Pressing "
+"E again saves the note."
+msgstr ""
+"<b>E</b> - Note edit mode. Je kan de note timings, positie, type en meer nauwkeurig veranderen. Op E "
+"drukken slaat de note op."
+
+#: gui_kuma.py:1293
+msgid "<b>Arrow keys, Page Up, Page Down</b> - Move the scrollbar."
+msgstr "<b>Pijltoetsen, Page Up, Page Down</b> - Beweeg de scrollbar."
+
+#: gui_kuma.py:1294
+msgid "<b>Delete</b> - Removes currently selected/edited note."
+msgstr "<b>Verwijderen</b> - Verwijder huidig geselecteerde note(s)."
+
+#: gui_kuma.py:1295
+msgid "<b>End</b> - Jump to the last note."
+msgstr "<b>End</b> - Spring naar de laatste note."
+
+#: gui_kuma.py:1296
+msgid "<b>Left Ctrl + S</b> - Save."
+msgstr "<b>Linker Ctrl + S</b> - Opslaan."
+
+#: gui_kuma.py:1297
+msgid "<b>Left Ctrl + Z</b> - Undo."
+msgstr "<b>Linker Ctrl + Z</b> - Ongedaan maken."
+
+#: gui_kuma.py:1298
+msgid "<b>Left Ctrl + F</b> - Select a note."
+msgstr "<b>Linker Ctrl + F</b> - Selecteer een note."
+
+#: gui_kuma.py:1299
+msgid "<b>Left Ctrl + C</b> - Copy selected notes."
+msgstr "<b>Linker Ctrl + C</b> - Kopieer geselecteerde notes."
+
+#: gui_kuma.py:1300
+msgid "<b>Left Ctrl + V</b> - Paste copied notes (Vertical position does not change)."
+msgstr "<b>Linker Ctrl + V</b> - Plak gekopieerde notes (Verticale positie veranderd niet)."
+
+#: gui_kuma.py:1301
+msgid "<b>Left Ctrl + Left Shift + V</b> - Paste copied notes (Vertical position changes)."
+msgstr "<b>Linker Ctrl + Linker Shift + V</b> - Plak gekopieerde notes (Verticale positie veranderd)."
+
+#: gui_kuma.py:1308 gui_kuma.py:1324
 msgid "Close"
 msgstr "Sluiten"
 
-#: gui_kuma.py:1082
+#: gui_kuma.py:1314
 msgid ""
-"<br><b>KUMA</b><br>---------------<br><br><b>A karaoke editor for Dragon "
-"Engine games.<br><b>Version: </b>{ver}<br><b>Created by: </b>{creators}"
-"<br><b>Icon by: </b>{mink}<br><b>Testers: </b>{testers}<br><b>Translators: </"
-"b>{translators}<br>"
+"<br><b>KUMA</b><br>---------------<br><br><b>A karaoke editor for Dragon Engine games."
+"<br><b>Version: </b>{ver}<br><b>Created by: </b>{creators}<br><b>Icon by: </b>{mink}<br><b>Testers: "
+"</b>{testers}<br><b>Translators: </b>{translators}<br>"
 msgstr ""
-"<br><b>KUMA</b><br>---------------<br><br><b>Een karaoke editor voor Dragon "
-"Engine games.<br><b>Versie: </b>{ver}<br><b>Gemaakt door: </b>{creators}"
-"<br><b>Icoon door: </b>{mink}<br><b>Testers: </b>{testers}<br><b>Vertalers: "
-"</b>{translators}<br>"
+"<br><b>KUMA</b><br>---------------<br><br><b>Een karaoke editor voor Dragon Engine games."
+"<br><b>Versie: </b>{ver}<br><b>Gemaakt door: </b>{creators}<br><b>Icoon door: </b>{mink}"
+"<br><b>Testers: </b>{testers}<br><b>Vertalers: </b>{translators}<br>"
 
-#: gui_kuma.py:1161
+#: gui_kuma.py:1394
 msgid "Are you sure you want to undo changes made to this note?"
 msgstr "Weet je zeker dat je de veranderingen wilt terugdraaien van deze note?"
 
-#: gui_kuma.py:1161
+#: gui_kuma.py:1394
 msgid "Undo changes"
 msgstr "Draai veranderingen terug"
 
-#: gui_kuma.py:1198
+#: gui_kuma.py:1440
 msgid "No open file, unable to save!"
 msgstr "Geen bestand geopend, kan niet opslaan!"
+
+#~ msgid "Are you sure you want to remove this note? This change cannot be undone."
+#~ msgstr "Weet je zeker dat je deze note wil verwijderen? Deze actie kan niet worden teruggedraaid."
+
+#~ msgid ""
+#~ "<b>How to use</b><br>---------------<br><b>KUMA - A karaoke editor for Dragon Engine games.</"
+#~ "b><br>To begin using the tool, you can add start by loading an existing file from <b>File</b> -> "
+#~ "<b>Open</b> or just by adding notes to a new file.<br>You can choose your preferred <b>controller "
+#~ "type</b> and <b>language</b> using the dropdown menus at the top of the screen.<br>When placing a "
+#~ "note, the accuracy is <b>100 milliseconds</b>. You can change the position more accurately in "
+#~ "<b>note edit mode.</b><br>You can play songs by loading them from the <b>Music</b> tab and then "
+#~ "pressing the <b>Play</b> button in the left corner.<br>If you want to save, you can save by going "
+#~ "to <b>File</b> -> <b>Save</b> or <b>Save as...</b> to either create a new file or overwrite an "
+#~ "existing one.<br>---------------<br><br><b>Key binds</b><br>---------------<br><br><b>Left click</"
+#~ "b> - Place and pick up notes.<br><b>Right click</b> - Change held note type.<br><b>Left Alt</b> - "
+#~ "Change held note type to \"Hold\" note.<br><b>Left Shift</b> - Change held note type to \"Rapid\" "
+#~ "note.<br><b>E</b> - Note edit mode. You can accurately change note timings, position, type and "
+#~ "more. Pressing E again saves the note.<br><b>Arrow keys, Page Up, Page Down</b> - Move the "
+#~ "scrollbar.<br><b>Delete</b> - Removes currently selected/edited note.<br><b>End</b> - Jump to the "
+#~ "last note."
+#~ msgstr ""
+#~ "<b>Gebruikershandleiding</b><br>---------------<br><b>KUMA - Een karaoke editor voor Dragon "
+#~ "Engine games.</b><br>Om te beginnen moet u een bestaandbestand laden van <b>Bestand</b> -> "
+#~ "<b>Openen</b> of door notes toe te voegen in een nieuw bestand.<br>Je kan je <b>controller type</"
+#~ "b> en <b>language</b> door de dropdown menu's te gebruiken boven aan het programma.<br>Wanneer je "
+#~ "een note plaatst, is de nauwkeurigheid <b>100 milliseconden</b>. Je kan de positie nauwkeuriger "
+#~ "aanpassen in <b>note edit mode.</b><br> Je kan tracks afspelen vanuit de <b>Music</b> tab of als "
+#~ "je drukt op de <b>Play</b> knop in de linker hoek.<br>Als je wilt opslaan kan door naar "
+#~ "<b>Bestand</b> -> <b>Opslaan</b> of <b>Opslaan als...</b> te selecteren je kan een bestaand "
+#~ "bestand overscrijven of een nieuw bestand aanmaken.<br>---------------<br><br><b>Key binds</"
+#~ "b><br>---------------<br><br><b>Linker muisknop</b> - Plaats en beweeg notes.<br><b>Rechter "
+#~ "muisknop</b> - Verander held note type.<br><b>Linker Alt</b> - Verander held note type naar \"Hold"
+#~ "\" note.<br><b>Linker Shift</b> - Verander geselecteerde note type naar \"Rapid\" note.<br><b>E</"
+#~ "b> - Note edit mode. Je kan de note timings, positie, type en meer nauwkeurig veranderen. Op E "
+#~ "drukken slaat de note op.<br><b>Pijltoetsen, Page Up, Page Down</b> - Beweeg de scrollbar."
+#~ "<br><b>Verwijderen</b> - Verwijder huidig geselecteerde note(s).<br><b>End</b> - Spring naar de "
+#~ "laatste note."

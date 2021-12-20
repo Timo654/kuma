@@ -583,10 +583,10 @@ def load_kpm(file, cutscene_box, refresh=1):
         data = kpm.read_file(file)
     except(ValueError):
         print(_('Unable to read file.'))
-        return False
+        return None
     except(PermissionError):
         print(_('Unable to open file.'))
-        return False
+        return None
     else:
         if refresh:
             cutscene_box.set_text(

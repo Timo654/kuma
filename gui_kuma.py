@@ -7,12 +7,15 @@ import modules.kpm_reader as kpm
 from modules.ui_menu_bar import UIMenuBar
 from pathlib import Path
 from math import ceil, floor
+from ctypes import windll
+from os import name
 import json
 import configparser
 import gettext
 import locale
 import mutagen
 import sys
+
 
 # general info
 VERSION = "v0.9.4"
@@ -40,6 +43,9 @@ else:
 asset_path = assets['Assets folder']
 controllers = [key for key in assets['Button prompts']]
 languages = [key for key in assets['Languages']]
+# fix UI getting too big when using a different scale from 100%
+if name == 'nt':
+    windll.user32.SetProcessDPIAware()
 
 # get default language
 
@@ -59,6 +65,8 @@ if Path(settings_file).is_file():
     config.read(settings_file, encoding='UTF-8')
 if not config.has_section("CONFIG"):
     config.add_section("CONFIG")
+    config.set("CONFIG", "RESOLUTION X", str(1600))
+    config.set("CONFIG", "RESOLUTION Y", str(500))
     config.set("CONFIG", "FPS", str(100))
     config.set("CONFIG", "FPS COUNTER", str(0))
     config.set("CONFIG", "BUTTONS", controllers[0])
@@ -751,7 +759,14 @@ def main():
         current_controller = controllers[0]
         config.set("CONFIG", "BUTTONS", current_controller)
 
-    scr_size = (1600, 490)
+    # size limits, the UI breaks below this
+    if int(config["CONFIG"]["RESOLUTION X"]) < 1100:
+        config.set("CONFIG", "RESOLUTION X", str(1100))
+    if int(config["CONFIG"]["RESOLUTION X"]) < 480:
+        config.set("CONFIG", "RESOLUTION Y", str(480))
+
+    scr_size = (int(config["CONFIG"]["RESOLUTION X"]),
+                int(config["CONFIG"]["RESOLUTION Y"]))
     screen = pygame.display.set_mode((scr_size))
     karaoke = Karaoke()
     accurate_size = (karaoke.col) * (karaoke.box_size + karaoke.border)
@@ -778,17 +793,17 @@ def main():
                          menu_item_data=menu_data,
                          manager=manager)
     # buttons
-    undo_button = UIButton(relative_rect=pygame.Rect((385, 400), (230, 30)),
+    undo_button = UIButton(relative_rect=pygame.Rect((880, 400), (230, 30)),
                            text=_('Undo note changes'),
                            manager=manager)
     undo_button.hide()
-    load_kpm_button = UIButton(relative_rect=pygame.Rect((225, 340), (150, 30)),
+    load_kpm_button = UIButton(relative_rect=pygame.Rect((215, 340), (150, 30)),
                                text=_('Load time'),
                                manager=manager)
-    save_kpm_button = UIButton(relative_rect=pygame.Rect((225, 365), (150, 30)),
+    save_kpm_button = UIButton(relative_rect=pygame.Rect((215, 365), (150, 30)),
                                text=_('Save time'),
                                manager=manager)
-    play_button = UIButton(relative_rect=pygame.Rect((355, 400), (30, 30)),
+    play_button = UIButton(relative_rect=pygame.Rect((345, 400), (30, 30)),
                            text='▶',
                            manager=manager)
 
@@ -806,14 +821,14 @@ def main():
 
     note_picker = UIDropDownMenu(options_list=assets['Button prompts'][current_controller][1],
                                  starting_option=assets['Button prompts'][current_controller][1][0],
-                                 relative_rect=pygame.Rect(1180, 365, 150, 30),
+                                 relative_rect=pygame.Rect(700, 365, 150, 30),
                                  manager=manager, object_id='#note_picker')
 
     note_types = [_('Regular'), _('Hold'), _('Rapid')]
     note_type_picker = UIDropDownMenu(options_list=note_types,
                                       starting_option=note_types[0],
                                       relative_rect=pygame.Rect(
-                                          1335, 365, 200, 30),
+                                          855, 365, 200, 30),
                                       manager=manager, object_id='#type_picker')
 
     dropdowns = [note_picker, note_type_picker]  # hide some dropdowns
@@ -830,11 +845,11 @@ def main():
     end_box = UITextEntryLine(relative_rect=pygame.Rect(
         (540, 365), (150, 50)), manager=manager)
     vert_box = UITextEntryLine(relative_rect=pygame.Rect(
-        (695, 365), (170, 50)), manager=manager)
+        (385, 425), (170, 50)), manager=manager)
     cue_box = UITextEntryLine(relative_rect=pygame.Rect(
-        (870, 365), (150, 50)), manager=manager)
+        (565, 425), (150, 50)), manager=manager)
     cuesheet_box = UITextEntryLine(relative_rect=pygame.Rect(
-        (1025, 365), (150, 50)), manager=manager)
+        (725, 425), (150, 50)), manager=manager)
     music_box = UITextEntryLine(relative_rect=pygame.Rect(
         (10, 425), (200, 50)), manager=manager, object_id="#song_position")
     music_box.set_text(str(0))
@@ -858,19 +873,19 @@ def main():
     end_label = UILabel(pygame.Rect((540, 340), (150, 22)),
                         _("End position"),
                         manager=manager)
-    vert_label = UILabel(pygame.Rect((695, 340), (170, 22)),
+    vert_label = UILabel(pygame.Rect((385, 400), (170, 22)),
                          _("Vertical position"),
                          manager=manager)
-    cue_label = UILabel(pygame.Rect((870, 340), (150, 22)),
+    cue_label = UILabel(pygame.Rect((565, 400), (150, 22)),
                         _("Cue ID"),
                         manager=manager)
-    cuesheet_label = UILabel(pygame.Rect((1025, 340), (150, 22)),
+    cuesheet_label = UILabel(pygame.Rect((725, 400), (150, 22)),
                              _("Cuesheet ID"),
                              manager=manager)
-    note_button_label = UILabel(pygame.Rect((1180, 340), (150, 22)),
+    note_button_label = UILabel(pygame.Rect((700, 340), (150, 22)),
                                 _("Note button"),
                                 manager=manager)
-    note_type_label = UILabel(pygame.Rect((1335, 340), (200, 22)),
+    note_type_label = UILabel(pygame.Rect((855, 340), (200, 22)),
                               _("Note type"),
                               manager=manager)
     if fps_counter:
@@ -880,7 +895,7 @@ def main():
     song_label = UILabel(pygame.Rect((10, 400), (200, 22)),
                          _("Song position"),
                          manager=manager)
-    volume_label = UILabel(pygame.Rect((225, 402), (130, 25)),
+    volume_label = UILabel(pygame.Rect((215, 402), (130, 25)),
                            _("Volume {}").format(
                                round(float(config['CONFIG']['VOLUME']) * 100)),
                            manager=manager)
@@ -906,13 +921,13 @@ def main():
     # Horizontal ScrollBar
     thick_h = 30
     scrollbar_size = accurate_size - scr_size[0]
-    scrollbar = UIHorizontalSlider(relative_rect=pygame.Rect(-3, scr_size[1] - thick_h + 2, 1605, thick_h),
+    scrollbar = UIHorizontalSlider(relative_rect=pygame.Rect(-3, scr_size[1] - thick_h + 2, scr_size[0] + 5, thick_h),
                                    start_value=0,
                                    value_range=(0, scrollbar_size),
                                    manager=manager, object_id='#scrollbar')
 
     # volume slider
-    volume_slider = UIHorizontalSlider(relative_rect=pygame.Rect((225, 430), (160, 25)),
+    volume_slider = UIHorizontalSlider(relative_rect=pygame.Rect((215, 430), (160, 25)),
                                        start_value=round(
                                            float(config['CONFIG']['VOLUME']) * 100),
                                        value_range=(0, 100),
@@ -962,16 +977,16 @@ def main():
             ) - (scrollbar_value - (worlds[0].get_width() * surface_nr))
             if world_end > 0:
                 worlds[surface_nr].fill((fill_colour), rect=pygame.Rect(
-                    scrollbar_value - worlds[0].get_width() * surface_nr, 0, world_end, 480))  # clean the screen
+                    scrollbar_value - worlds[0].get_width() * surface_nr, 0, world_end, scr_size[1]))  # clean the screen
                 worlds[next_surface].fill((fill_colour), rect=pygame.Rect(
-                    scrollbar_value - worlds[0].get_width() * next_surface, 0, 1600, 480))  # clean the screen
+                    scrollbar_value - worlds[0].get_width() * next_surface, 0, scr_size[0], scr_size[1]))  # clean the screen
                 karaoke.draw(worlds[surface_nr], surface_nr, scrollbar_value,
                              scr_size[0], sheet_bg, line_bg, world_count)
                 karaoke.draw(worlds[next_surface], next_surface, scrollbar_value,
                              scr_size[0], sheet_bg, line_bg, world_count)
         else:
             worlds[surface_nr].fill((fill_colour), rect=pygame.Rect(
-                scrollbar_value - worlds[0].get_width() * surface_nr, 0, 1600, 480))  # clean the screen
+                scrollbar_value - worlds[0].get_width() * surface_nr, 0, scr_size[0], scr_size[1]))  # clean the screen
             karaoke.draw(worlds[surface_nr], surface_nr, scrollbar_value,
                          scr_size[0], sheet_bg, line_bg, world_count)
 
@@ -1021,7 +1036,7 @@ def main():
                 with open(settings_file, 'w', encoding='UTF-8') as configfile:  # save config
                     config.write(configfile)
                 print('(^ _ ^)/')
-                exit()
+                sys.exit()
 
             # delete held button when entering menu bar to prevent accidentally adding notes
             if (event.type == pygame.USEREVENT and
@@ -1119,9 +1134,9 @@ def main():
                     pos = karaoke.Get_pos(scrollbar_value, worlds[0])
                     if karaoke.items[pos[0]][pos[1]] not in currently_selected:
                         if karaoke.In_grid(pos[0], pos[1]):
-                            if karaoke.items[pos[0]][pos[1]] not in currently_selected:
-                                if not currently_edited:
-                                    if karaoke.items[pos[0]][pos[1]] != None:
+                            if not currently_edited:
+                                if karaoke.items[pos[0]][pos[1]] != None:
+                                    if karaoke.items[pos[0]][pos[1]].id < 4 and karaoke.items[pos[0]][pos[1]].note_type < 3:
                                         currently_selected.append(
                                             karaoke.items[pos[0]][pos[1]])
                     else:

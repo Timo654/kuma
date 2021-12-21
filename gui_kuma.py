@@ -2,9 +2,11 @@ import pygame
 from pygame_gui import UIManager, UI_BUTTON_START_PRESS, UI_BUTTON_PRESSED, UI_DROP_DOWN_MENU_CHANGED, UI_CONFIRMATION_DIALOG_CONFIRMED, UI_HORIZONTAL_SLIDER_MOVED, UI_TEXT_ENTRY_CHANGED
 from pygame_gui.windows import UIFileDialog, UIConfirmationDialog, UIMessageWindow
 from pygame_gui.elements import UIDropDownMenu, UILabel, UIButton, UITextEntryLine, UIHorizontalSlider
-import modules.kbd_reader as kbd
-import modules.kpm_reader as kpm
-from modules.ui_menu_bar import UIMenuBar
+import modules.parsers.de.kbd_reader as kbd
+import modules.parsers.de.kpm_reader as kpm
+import modules.importers.lbd_import as lbd
+import modules.importers.kara_import as kara
+from modules.ui.ui_menu_bar import UIMenuBar
 from pathlib import Path
 from math import ceil, floor
 import ctypes
@@ -21,7 +23,7 @@ import sys
 VERSION = "v0.9.5"
 CREATORS = 'Timo654'
 TRANSLATORS = 'Timo654, ketrub, Mink, jason098, Capitán Retraso, Kent, Edness, JustAnyone, Tervel, RyuHachii, Foas, Biggelskog'
-TESTERS = "ketrub, KaarelJ98"
+TESTERS = "ketrub, KaarelJ98, Ono Michio"
 print("""
    _     _      _     _      _     _      _     _
   (c).-.(c)    (c).-.(c)    (c).-.(c)    (c).-.(c)
@@ -327,11 +329,46 @@ class Karaoke:
         else:
             return int(new_pos + (scale * 1.5))
 
+# add notes to karaoke
+    def add_notes_from_data(self, data):
+        if undo_kbd:
+                prev_list = self.get_list()
+        self.reset(undo_kbd)  # reset data
+        for note in data['Notes']:
+                if note['Note type'] < 3:  # ignore any note types above 3, because those shouldn't exist
+                    start_pos = self.game_to_pos(note['Start position'])
+                    self.Add(Item(start_pos, note['Vertical position'], note['Button type'], note['Note type'],
+                                  note['Start position'], end_pos=note['End position'], cue_id=note['Cue ID'], cuesheet_id=note['Cuesheet ID']))
+                    if note['Note type'] != 0:  # if note is hold or rapid
+                        self.Add_long(note['Start position'], note['End position'],
+                                      note['Vertical position'], note['Note type'], note['Button type'])
+        if undo_kbd:
+                self.add_to_undo_list(prev_list)
+
+# file importing code
+    def import_file(self, file, mode):
+        file = Path(file)  # ensure it is actually path
+        try:
+            if mode == 'kara':
+                data = kara.load_kara(file)
+            elif mode == 'lbd':
+                data = lbd.load_lbd(file)
+            print(_('File loaded.'))
+        except(ValueError):
+            print(_('Unable to read file.'))
+            return
+        except(PermissionError):
+            print(_('Unable to open file.'))
+            return
+        else:
+            self.add_notes_from_data(data)
+
     # KBD loading code
     def load_kbd(self, file, cutscene_box):
         file = Path(file)  # ensure it is actually path
         try:
             data = kbd.read_file(file)
+            print(_('File loaded.'))
         except(ValueError):
             print(_('Unable to read file.'))
             return False, None
@@ -339,21 +376,11 @@ class Karaoke:
             print(_('Unable to open file.'))
             return False, None
         else:
-            self.reset(undo_kbd)  # reset data
-            for note in data['Notes']:
-                if note['Note type'] < 3:  # ignore any notes above 3, because those shouldn't exist
-                    start_pos = self.game_to_pos(note['Start position'])
-                    self.Add(Item(start_pos, note['Vertical position'], note['Button type'], note['Note type'],
-                                  note['Start position'], end_pos=note['End position'], cue_id=note['Cue ID'], cuesheet_id=note['Cuesheet ID']))
-                    if note['Note type'] != 0:  # if note is hold or rapid
-                        self.Add_long(note['Start position'], note['End position'],
-                                      note['Vertical position'], note['Note type'], note['Button type'])
+            self.add_notes_from_data(data)
             kpm_file = f"{str(file.parent)}/{file.stem.split('_')[0]}_param.kpm"
             if Path(kpm_file).exists():
                 kpm_data = load_kpm(kpm_file, cutscene_box)
                 return True, kpm_data
-            if undo_kbd:
-                self.add_to_undo_list(prev_list)
         return True, None
 
     # KBD writing code
@@ -692,6 +719,13 @@ def get_menu_data():
         '#save_as': {'display_name': _('Save As...')}
     },
     },
+    '#import_menu': {'display_name': _('Import'),
+                        'items':
+                        {
+            '#load_kara': {'display_name': _('Import OE karaoke...')},
+            '#load_lbd': {'display_name': _('Import LBD...')}
+        },
+    },
         '#music_menu': {'display_name': _('Music'),
                         'items':
                         {
@@ -816,13 +850,13 @@ def main():
     # dropdown menus
     button_picker = UIDropDownMenu(options_list=controllers,
                                    starting_option=current_controller,
-                                   relative_rect=pygame.Rect(190, 0, 200, 25),
+                                   relative_rect=pygame.Rect(240, 0, 200, 25),
                                    manager=manager, object_id='#button_picker')
 
     language_picker = UIDropDownMenu(options_list=languages,
                                      starting_option=current_language,
                                      relative_rect=pygame.Rect(
-                                         390, 0, 150, 25),
+                                         440, 0, 150, 25),
                                      manager=manager, object_id='#language_picker')
 
     note_picker = UIDropDownMenu(options_list=assets['Button prompts'][current_controller][1],
@@ -1251,6 +1285,21 @@ def main():
                                         _('Unable to play the song from the given position, restarting from the beginning.'))
                                     audio_start_pos = 0
                                     pygame.mixer.music.play()
+
+                    if event.ui_object_id == 'menu_bar.#import_menu_items.#load_lbd':
+                        gui_button_mode = 'Input_LBD'
+                        lbd_selection = UIFileDialog(
+                            rect=pygame.Rect(0, 0, 300, 300), manager=manager, allow_picking_directories=True, allow_existing_files_only=True, window_title=_('Select an input file (lbd)'), initial_file_path=Path(config['PATHS']['Input']))
+                        lbd_selection.ok_button.set_text(_('OK'))
+                        lbd_selection.cancel_button.set_text(_('Cancel'))
+
+                    if event.ui_object_id == 'menu_bar.#import_menu_items.#load_kara':
+                        gui_button_mode = 'Input_KARA'
+                        kara_selection = UIFileDialog(
+                            rect=pygame.Rect(0, 0, 300, 300), manager=manager, allow_picking_directories=True, allow_existing_files_only=True, window_title=_('Select an input file (bin)'), initial_file_path=Path(config['PATHS']['Input']))
+                        kara_selection.ok_button.set_text(_('OK'))
+                        kara_selection.cancel_button.set_text(_('Cancel'))
+
                     if event.ui_object_id == 'menu_bar.#file_menu_items.#open':
                         gui_button_mode = 'Input'
                         input_selection = UIFileDialog(
@@ -1291,7 +1340,7 @@ def main():
                         how_4 = _(
                             'You can choose your preferred <b>controller type</b> and <b>language</b> using the dropdown menus at the top of the screen.')
                         how_5 = _('When placing a note, the accuracy is <b>{ms} milliseconds</b>. You can change the position more accurately in <b>note edit mode.').format(
-                            ms=karaoke.scaler)
+                            ms=karaoke.scale)
                         how_6 = _(
                             'You can play songs by loading them from the <b>Music</b> tab and then pressing the <b>Play</b> button in the left corner.')
                         how_7 = _(
@@ -1359,6 +1408,20 @@ def main():
                     scrollbar_moved = True
 
                 if event.user_type == UI_BUTTON_PRESSED:
+                    if gui_button_mode == 'Input_LBD':
+                        if event.ui_element == lbd_selection.ok_button:
+                            gui_button_mode = None
+                            karaoke.import_file(lbd_selection.current_file_path, 'lbd')
+                            currently_selected.clear()  # empty the list
+                            currently_edited = None
+
+                    if gui_button_mode == 'Input_KARA':
+                        if event.ui_element == kara_selection.ok_button:
+                            gui_button_mode = None
+                            karaoke.import_file(kara_selection.current_file_path, 'kara')
+                            currently_selected.clear()  # empty the list
+                            currently_edited = None
+
                     if gui_button_mode == 'Input':
                         if event.ui_element == input_selection.ok_button:
                             gui_button_mode = None

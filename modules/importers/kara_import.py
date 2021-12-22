@@ -59,7 +59,7 @@ def convert_to_kbd(data):
                 actual_e_pos = data['Lines'][i]['Settings']['Line start time (ms)'] + (line_length * end_pos)
             else:
                 actual_e_pos = 0 
-            note = (actual_s_pos * 3, actual_e_pos * 3, note['Button type'], note['Note type'])
+            note = (int(actual_s_pos * 3), int(actual_e_pos * 3), note['Button type'], note['Note type'])
             notes.append(note)
 
         notes_list = list()

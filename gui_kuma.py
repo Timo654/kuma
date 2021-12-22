@@ -6,6 +6,7 @@ import modules.parsers.de.kbd_reader as kbd
 import modules.parsers.de.kpm_reader as kpm
 import modules.importers.lbd_import as lbd
 import modules.importers.kara_import as kara
+import modules.importers.wtfl_import as wtfl
 from modules.ui.ui_menu_bar import UIMenuBar
 from pathlib import Path
 from math import ceil, floor
@@ -353,6 +354,8 @@ class Karaoke:
                 data = kara.load_kara(file)
             elif mode == 'lbd':
                 data = lbd.load_lbd(file)
+            elif mode == 'wtfl':
+                data = wtfl.load_wtfl(file)
             print(_('File loaded.'))
         except(ValueError):
             print(_('Unable to read file.'))
@@ -722,8 +725,9 @@ def get_menu_data():
     '#import_menu': {'display_name': _('Import'),
                         'items':
                         {
-            '#load_kara': {'display_name': _('Import OE karaoke...')},
-            '#load_lbd': {'display_name': _('Import LBD...')}
+            '#load_kara': {'display_name': _('OE karaoke...')},
+            '#load_lbd': {'display_name': _('OE LBD...')},
+            '#load_wtfl': {'display_name': _('Kenzan Waterfall...')}
         },
     },
         '#music_menu': {'display_name': _('Music'),
@@ -993,6 +997,7 @@ def main():
     stopped_editing = False
     gui_button_mode = None
     open_file = None
+    import_mode = None
     scrollbar_moved = False  # has scrollbar been moved yet
     loaded = False  # is audio file loaded
     audio_start_pos = 0  # audio start position
@@ -1286,19 +1291,19 @@ def main():
                                     audio_start_pos = 0
                                     pygame.mixer.music.play()
 
-                    if event.ui_object_id == 'menu_bar.#import_menu_items.#load_lbd':
-                        gui_button_mode = 'Input_LBD'
-                        lbd_selection = UIFileDialog(
-                            rect=pygame.Rect(0, 0, 300, 300), manager=manager, allow_picking_directories=True, allow_existing_files_only=True, window_title=_('Select an input file (lbd)'), initial_file_path=Path(config['PATHS']['Input']))
-                        lbd_selection.ok_button.set_text(_('OK'))
-                        lbd_selection.cancel_button.set_text(_('Cancel'))
+                    # importing maps
+                    if event.ui_object_id in ['menu_bar.#import_menu_items.#load_lbd', 'menu_bar.#import_menu_items.#load_kara', 'menu_bar.#import_menu_items.#load_wtfl']:
+                        if event.ui_object_id == 'menu_bar.#import_menu_items.#load_lbd':
+                            import_mode = 'lbd'
+                        elif event.ui_object_id == 'menu_bar.#import_menu_items.#load_kara':
+                            import_mode = 'kara'
+                        elif event.ui_object_id == 'menu_bar.#import_menu_items.#load_wtfl':
+                            import_mode = 'wtfl'
+                        import_selection = UIFileDialog(
+                            rect=pygame.Rect(0, 0, 300, 300), manager=manager, allow_picking_directories=True, allow_existing_files_only=True, window_title=_('Select a file to import'), initial_file_path=Path(config['PATHS']['Input']))
+                        import_selection.ok_button.set_text(_('OK'))
+                        import_selection.cancel_button.set_text(_('Cancel'))
 
-                    if event.ui_object_id == 'menu_bar.#import_menu_items.#load_kara':
-                        gui_button_mode = 'Input_KARA'
-                        kara_selection = UIFileDialog(
-                            rect=pygame.Rect(0, 0, 300, 300), manager=manager, allow_picking_directories=True, allow_existing_files_only=True, window_title=_('Select an input file (bin)'), initial_file_path=Path(config['PATHS']['Input']))
-                        kara_selection.ok_button.set_text(_('OK'))
-                        kara_selection.cancel_button.set_text(_('Cancel'))
 
                     if event.ui_object_id == 'menu_bar.#file_menu_items.#open':
                         gui_button_mode = 'Input'
@@ -1408,19 +1413,12 @@ def main():
                     scrollbar_moved = True
 
                 if event.user_type == UI_BUTTON_PRESSED:
-                    if gui_button_mode == 'Input_LBD':
-                        if event.ui_element == lbd_selection.ok_button:
-                            gui_button_mode = None
-                            karaoke.import_file(lbd_selection.current_file_path, 'lbd')
-                            currently_selected.clear()  # empty the list
-                            currently_edited = None
-
-                    if gui_button_mode == 'Input_KARA':
-                        if event.ui_element == kara_selection.ok_button:
-                            gui_button_mode = None
-                            karaoke.import_file(kara_selection.current_file_path, 'kara')
-                            currently_selected.clear()  # empty the list
-                            currently_edited = None
+                    if import_mode != None:
+                        if event.ui_element == import_selection.ok_button:
+                                karaoke.import_file(import_selection.current_file_path, import_mode)
+                                currently_selected.clear()  # empty the list
+                                currently_edited = None
+                                import_mode = None
 
                     if gui_button_mode == 'Input':
                         if event.ui_element == input_selection.ok_button:

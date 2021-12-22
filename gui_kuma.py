@@ -722,19 +722,19 @@ def get_menu_data():
         '#save_as': {'display_name': _('Save As...')}
     },
     },
+        '#music_menu': {'display_name': _('Music'),
+                        'items':
+                        {
+            '#load_song': {'display_name': _('Load song...')}
+        },
+    },
     '#import_menu': {'display_name': _('Import'),
                         'items':
                         {
             '#load_kara': {'display_name': _('OE karaoke...')},
             '#load_lbd': {'display_name': _('OE LBD...')},
             '#load_wtfl': {'display_name': _('Kenzan Waterfall...')}
-        },
-    },
-        '#music_menu': {'display_name': _('Music'),
-                        'items':
-                        {
-            '#load_song': {'display_name': _('Load song...')}
-        },
+        },    
     },
         '#help_menu': {'display_name': _('Help'),
                        'items':
@@ -1074,9 +1074,19 @@ def main():
             karaoke.highlight_note(note, (255, 0, 0),
                                    worlds, surface_nr, next_surface)
 
+
+        # TODO - rewrite events code, it's horrible
         # Application events
         events = pygame.event.get()
         for event in events:
+            # drag and drop support
+            if event.type == pygame.DROPFILE:
+                gui_button_mode = 'Input_drag'
+                drag_file = event.file
+                input_selection = UIConfirmationDialog(
+                            rect=pygame.Rect(0, 0, 300, 300), manager=manager, action_long_desc=_('Are you sure you want to load this file?'), window_title=_('Open file'), action_short_name=_('OK'))
+                input_selection.cancel_button.set_text(_('Cancel'))
+
             if event.type == pygame.QUIT:
                 with open(settings_file, 'w', encoding='UTF-8') as configfile:  # save config
                     config.write(configfile)
@@ -1307,6 +1317,7 @@ def main():
 
                     if event.ui_object_id == 'menu_bar.#file_menu_items.#open':
                         gui_button_mode = 'Input'
+                        file_mode = 'pick'
                         input_selection = UIFileDialog(
                             rect=pygame.Rect(0, 0, 300, 300), manager=manager, allow_picking_directories=True, allow_existing_files_only=True, window_title=_('Select an input file (kbd)'), initial_file_path=Path(config['PATHS']['Input']))
                         input_selection.ok_button.set_text(_('OK'))
@@ -1429,13 +1440,13 @@ def main():
                                              dropdowns, undo_button)
                                 currently_edited = None
                             can_save, kpm_data = karaoke.load_kbd(
-                                input_selection.current_file_path, cutscene_box)
+                                open_file, cutscene_box)
                             currently_selected.clear()  # empty the list
                             if can_save:
                                 config.set("PATHS", "Input", str(
-                                    input_selection.current_file_path))
+                                    open_file))
                             currently_edited = None
-
+                    
                     if gui_button_mode == 'Output':
                         if event.ui_element == output_selection.ok_button:
                             gui_button_mode = None
@@ -1517,6 +1528,21 @@ def main():
                                 open_file, cutscene_box)
                         else:
                             raise Exception(_('No open file, unable to save!'))
+                    
+                    if gui_button_mode == 'Input_drag':
+                            gui_button_mode = None
+                            open_file = drag_file
+                            if currently_edited:
+                                stop_editing(boxes, box_labels,
+                                             dropdowns, undo_button)
+                                currently_edited = None
+                            can_save, kpm_data = karaoke.load_kbd(
+                                open_file, cutscene_box)
+                            currently_selected.clear()  # empty the list
+                            if can_save:
+                                config.set("PATHS", "Input", str(
+                                    open_file))
+                            currently_edited = None
 
             manager.process_events(event)
 

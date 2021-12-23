@@ -70,8 +70,10 @@ def convert_to_kbd(data):
                 oldnote['Button type'], data['Header']['Version'])
             newnote['Vertical position'] = get_vert_pos(newnote['Button type'])
             newnote['Note type'] = get_note_type(oldnote['End position'])
-            newnote['Cue ID'] = 0
-            newnote['Cuesheet ID'] = 0
+            newnote['Start Cue ID'] = 0
+            newnote['Start Cuesheet ID'] = 0
+            newnote['End Cue ID'] = 0
+            newnote['End Cuesheet ID'] = 0
             if newnote['Button type'] < 4:
                 notes_list.append(newnote)
 

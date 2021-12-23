@@ -15,12 +15,13 @@ def write_file(data, filename, cutscene_start=0):
         kbd_n.write_uint32(note['Start position'])
         kbd_n.write_uint32(note['End position'])
         kbd_n.write_uint32(note['Vertical position'])
-        kbd_n.write_uint32(0)  # Padding
+        kbd_n.write_uint32(note['Display offset'])
         kbd_n.write_uint32(note['Button type'])
         kbd_n.write_uint32(note['Note type']) # 0 regular, 1 hold, 2 rapid
-        kbd_n.write_uint16(note['Cue ID'])
-        kbd_n.write_uint16(note['Cuesheet ID'])
-        kbd_n.write_uint32(0)  # Padding
+        kbd_n.write_uint16(note['Start Cue ID'])
+        kbd_n.write_uint16(note['Start Cuesheet ID'])
+        kbd_n.write_uint16(note['End Cue ID'])
+        kbd_n.write_uint16(note['End Cuesheet ID'])
 
         # counting score
         if note['Note type'] == 0:
@@ -79,12 +80,13 @@ def read_file(input_file):
         note['Start position'] = kbd.read_uint32()
         note['End position'] = kbd.read_uint32()
         note['Vertical position'] = kbd.read_uint32()
-        kbd.seek(4, 1)  # unused, so we're skipping it
+        note['Display offset'] = kbd.read_uint32() # no clue if it even does anything
         note['Button type'] = kbd.read_uint32()
         note['Note type'] = kbd.read_uint32() # 0 regular, 1 hold, 2 rapid
-        note['Cue ID'] = kbd.read_uint16()  # Audio cheer ID
-        note['Cuesheet ID'] = kbd.read_uint16()  # Audio cheer container ID
-        kbd.seek(4, 1)  # unused, so we're skipping it
+        note['Start Cue ID'] = kbd.read_uint16()  # Audio cheer ID
+        note['Start Cuesheet ID'] = kbd.read_uint16()  # Audio cheer container ID
+        note['End Cue ID'] = kbd.read_uint16()  # Audio cheer ID
+        note['End Cuesheet ID'] = kbd.read_uint16()  # Audio cheer container ID
         note_list.append(note)
 
     data['Notes'] = note_list

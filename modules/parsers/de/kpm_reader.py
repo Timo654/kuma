@@ -20,8 +20,8 @@ def write_file(data, filename):
         kpm_p.write_float(param['Scale'])
         kpm_p.write_float(param['Cutscene start time'])
         if data['Header']['Version'] > 0:
-            # no idea what it does, was introduced in YLAD
-            kpm_p.write_float(param['Unknown 1'])
+            # was introduced in YLAD
+            kpm_p.write_float(param['BPM'])
 
     # writing the header
     kpm_h = BinaryReader(bytearray())  # this is where we will write the header
@@ -75,8 +75,8 @@ def read_file(input_file):
         param['Scale'] = kpm.read_float()
         param['Cutscene start time'] = kpm.read_float()
         if data['Header']['Version'] > 0:
-            # no idea what it does, was introduced in YLAD
-            param['Unknown 1'] = kpm.read_float()
+            # was introduced in YLAD
+            param['BPM'] = kpm.read_float()
         param_list.append(param)
 
     data['Parameters'] = param_list

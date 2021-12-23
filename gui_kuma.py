@@ -19,7 +19,6 @@ import locale
 import mutagen
 import sys
 
-
 # general info
 VERSION = "v0.9.5"
 CREATORS = 'Timo654'
@@ -125,13 +124,16 @@ pygame.mixer.music.set_volume(float(config["CONFIG"]["VOLUME"]))
 
 class Item:
     # default end pos, cue id and cuesheet id is 0
-    def __init__(self, x, y, id, note_type, start_pos, end_pos=0, cue_id=0, cuesheet_id=0):
+    def __init__(self, x, y, id, note_type, start_pos, end_pos=0, start_cue_id=0, start_cuesheet_id=0, end_cue_id=0, end_cuesheet_id=0, display_offset=0):
         self.id = id
         self.note_type = note_type
         self.start_pos = start_pos
         self.end_pos = end_pos
-        self.cue_id = cue_id
-        self.cuesheet_id = cuesheet_id
+        self.start_cue_id = start_cue_id
+        self.start_cuesheet_id = start_cuesheet_id
+        self.end_cue_id = end_cue_id
+        self.end_cuesheet_id = end_cuesheet_id
+        self.display_offset = display_offset
         self.surface = items[id]
         self.x = x
         self.y = y
@@ -333,18 +335,18 @@ class Karaoke:
 # add notes to karaoke
     def add_notes_from_data(self, data):
         if undo_kbd:
-                prev_list = self.get_list()
+            prev_list = self.get_list()
         self.reset(undo_kbd)  # reset data
         for note in data['Notes']:
-                if note['Note type'] < 3:  # ignore any note types above 3, because those shouldn't exist
-                    start_pos = self.game_to_pos(note['Start position'])
-                    self.Add(Item(start_pos, note['Vertical position'], note['Button type'], note['Note type'],
-                                  note['Start position'], end_pos=note['End position'], cue_id=note['Cue ID'], cuesheet_id=note['Cuesheet ID']))
-                    if note['Note type'] != 0:  # if note is hold or rapid
-                        self.Add_long(note['Start position'], note['End position'],
-                                      note['Vertical position'], note['Note type'], note['Button type'])
+            if note['Note type'] < 3:  # ignore any note types above 3, because those shouldn't exist
+                start_pos = self.game_to_pos(note['Start position'])
+                self.Add(Item(start_pos, note['Vertical position'], note['Button type'], note['Note type'],
+                              note['Start position'], end_pos=note['End position'], start_cue_id=note['Start Cue ID'], start_cuesheet_id=note['Start Cuesheet ID'], end_cue_id=note['End Cue ID'], end_cuesheet_id=note['End Cuesheet ID']))
+                if note['Note type'] != 0:  # if note is hold or rapid
+                    self.Add_long(note['Start position'], note['End position'],
+                                  note['Vertical position'], note['Note type'], note['Button type'])
         if undo_kbd:
-                self.add_to_undo_list(prev_list)
+            self.add_to_undo_list(prev_list)
 
 # file importing code
     def import_file(self, file, mode):
@@ -403,8 +405,12 @@ class Karaoke:
                         note['Vertical position'] = y
                         note['Button type'] = current_note.id
                         note['Note type'] = current_note.note_type
-                        note['Cue ID'] = current_note.cue_id
-                        note['Cuesheet ID'] = current_note.cuesheet_id
+                        # doesnt seem to do anything
+                        note['Display offset'] = current_note.display_offset
+                        note['Start Cue ID'] = current_note.start_cue_id
+                        note['Start Cuesheet ID'] = current_note.start_cuesheet_id
+                        note['End Cue ID'] = current_note.end_cue_id
+                        note['End Cuesheet ID'] = current_note.end_cuesheet_id
                         if current_note.end_pos > 0:
                             note['End position'] = current_note.end_pos
                         else:
@@ -465,14 +471,22 @@ class Karaoke:
                 self.items[note.x][note.y] = None
                 note.y = int(boxes[2].get_text())
                 self.items[note.x][note.y] = note
-        # cue id
+        # start cue id
         if len(boxes[3].get_text()) > 0:
             if int(boxes[3].get_text()) <= 65535:  # uint16 max
-                note.cue_id = int(boxes[3].get_text())
-        # cuesheet id
+                note.start_cue_id = int(boxes[3].get_text())
+        # start cuesheet id
         if len(boxes[4].get_text()) > 0:
             if int(boxes[4].get_text()) <= 65535:  # uint16 max
-                note.cuesheet_id = int(boxes[4].get_text())
+                note.end_cue_id = int(boxes[4].get_text())
+        # end cue id
+        if len(boxes[5].get_text()) > 0:
+            if int(boxes[5].get_text()) <= 65535:  # uint16 max
+                note.start_cuesheet_id = int(boxes[5].get_text())
+        # end cuesheet id
+        if len(boxes[6].get_text()) > 0:
+            if int(boxes[6].get_text()) <= 65535:  # uint16 max
+                note.end_cuesheet_id = int(boxes[6].get_text())
         # note id
         note.id = dropdowns[0].options_list.index(dropdowns[0].selected_option)
         # note type
@@ -548,7 +562,7 @@ class Karaoke:
             new_notes = list()
             for note in currently_copied:
                 new_notes.append(
-                    (note.start_pos, note.end_pos, note.y, note.id, note.note_type, note.cue_id, note.cuesheet_id))
+                    (note.start_pos, note.end_pos, note.y, note.id, note.note_type, note.start_cue_id, note.end_cue_id, note.start_cuesheet_id, note.end_cuesheet_id))
             new_notes.sort()
             x_offset = new_notes[0][0]
             if cool:
@@ -571,7 +585,7 @@ class Karaoke:
 
                 if self.In_grid(grid_start_pos, y_pos):
                     self.Add(Item(grid_start_pos, y=y_pos, id=note[3], note_type=note[4],
-                                  start_pos=start_pos, end_pos=end_pos, cue_id=note[5], cuesheet_id=note[6]))
+                                  start_pos=start_pos, end_pos=end_pos, start_cue_id=note[5], end_cue_id=note[6], start_cuesheet_id=note[7], end_cuesheet_id=note[8]))
                     if note[4] != 0:
                         self.Add_long(
                             start_pos, end_pos, y_pos, note[4], note[3])
@@ -640,8 +654,10 @@ def update_text_boxes(note, boxes, dropdowns):
     boxes[0].set_text(str(game_to_ms(note.start_pos)))
     boxes[1].set_text(str(game_to_ms(note.end_pos)))
     boxes[2].set_text(str(note.y))
-    boxes[3].set_text(str(note.cue_id))
-    boxes[4].set_text(str(note.cuesheet_id))
+    boxes[3].set_text(str(note.start_cue_id))
+    boxes[4].set_text(str(note.end_cue_id))
+    boxes[5].set_text(str(note.start_cuesheet_id))
+    boxes[6].set_text(str(note.end_cuesheet_id))
     update_dropdown(dropdowns[0], mode='update selection', index=note.id)
     update_dropdown(dropdowns[1], mode='update selection',
                     index=note.note_type)
@@ -728,13 +744,13 @@ def get_menu_data():
             '#load_song': {'display_name': _('Load song...')}
         },
     },
-    '#import_menu': {'display_name': _('Import'),
-                        'items':
-                        {
+        '#import_menu': {'display_name': _('Import'),
+                         'items':
+                         {
             '#load_kara': {'display_name': _('OE karaoke...')},
             '#load_lbd': {'display_name': _('OE LBD...')},
             '#load_wtfl': {'display_name': _('Kenzan Waterfall...')}
-        },    
+        },
     },
         '#help_menu': {'display_name': _('Help'),
                        'items':
@@ -755,17 +771,19 @@ def update_text(params):
     params[3].set_text(_('Cutscene start'))
     params[4].set_text(_('Start position'))
     params[5].set_text(_('Vertical position'))
-    params[6].set_text(_('Cue ID'))
-    params[7].set_text(_('Cuesheet ID'))
-    params[8].set_text(_('Note button'))
-    params[9].set_text(_('Note type'))
-    params[11].set_text(_('End position'))
+    params[6].set_text(_('Start Cue ID'))
+    params[7].set_text(_('Start Cuesheet ID'))
+    params[8].set_text(_('Start Cue ID'))
+    params[9].set_text(_('Start Cuesheet ID'))
+    params[10].set_text(_('Note button'))
+    params[11].set_text(_('Note type'))
+    params[13].set_text(_('End position'))
     update_dropdown(params[10], mode='update all', new_list=[_('Regular'), _('Hold'), _(
-        'Rapid')], index=params[10].options_list.index(params[10].selected_option))
+        'Rapid')], index=params[10].options_list.index(params[12].selected_option))
     menu_data = get_menu_data()
-    params[12].set_text(menu_data)
-    params[13].set_text(_("Song position"))
-    params[14].set_text(_("Volume {}").format(
+    params[14].set_text(menu_data)
+    params[15].set_text(_("Song position"))
+    params[16].set_text(_("Volume {}").format(
         round(float(config['CONFIG']['VOLUME']) * 100)))
 
 # save box
@@ -837,7 +855,7 @@ def main():
                          menu_item_data=menu_data,
                          manager=manager)
     # buttons
-    undo_button = UIButton(relative_rect=pygame.Rect((880, 400), (230, 30)),
+    undo_button = UIButton(relative_rect=pygame.Rect((1205, 400), (230, 30)),
                            text=_('Undo note changes'),
                            manager=manager)
     undo_button.hide()
@@ -890,15 +908,20 @@ def main():
         (540, 365), (150, 50)), manager=manager)
     vert_box = UITextEntryLine(relative_rect=pygame.Rect(
         (385, 425), (170, 50)), manager=manager)
-    cue_box = UITextEntryLine(relative_rect=pygame.Rect(
+    start_cue_box = UITextEntryLine(relative_rect=pygame.Rect(
         (565, 425), (150, 50)), manager=manager)
-    cuesheet_box = UITextEntryLine(relative_rect=pygame.Rect(
+    start_cuesheet_box = UITextEntryLine(relative_rect=pygame.Rect(
         (725, 425), (150, 50)), manager=manager)
+    end_cue_box = UITextEntryLine(relative_rect=pygame.Rect(
+        (885, 425), (150, 50)), manager=manager)
+    end_cuesheet_box = UITextEntryLine(relative_rect=pygame.Rect(
+        (1045, 425), (150, 50)), manager=manager)
     music_box = UITextEntryLine(relative_rect=pygame.Rect(
         (10, 425), (200, 50)), manager=manager, object_id="#song_position")
     music_box.set_text(str(0))
 
-    boxes = [start_box, end_box, vert_box, cue_box, cuesheet_box]
+    boxes = [start_box, end_box, vert_box, start_cue_box,
+             end_cue_box, start_cuesheet_box, end_cuesheet_box]
 
     for i in range(len(boxes)):
         if i == 2:
@@ -920,12 +943,18 @@ def main():
     vert_label = UILabel(pygame.Rect((385, 400), (170, 22)),
                          _("Vertical position"),
                          manager=manager)
-    cue_label = UILabel(pygame.Rect((565, 400), (150, 22)),
-                        _("Cue ID"),
-                        manager=manager)
-    cuesheet_label = UILabel(pygame.Rect((725, 400), (150, 22)),
-                             _("Cuesheet ID"),
-                             manager=manager)
+    start_cue_label = UILabel(pygame.Rect((565, 400), (150, 22)),
+                              _("Start Cue ID"),
+                              manager=manager)
+    start_cuesheet_label = UILabel(pygame.Rect((725, 400), (150, 22)),
+                                   _("Start Cuesheet ID"),
+                                   manager=manager)
+    end_cue_label = UILabel(pygame.Rect((885, 400), (150, 22)),
+                            _("End Cue ID"),
+                            manager=manager)
+    end_cuesheet_label = UILabel(pygame.Rect((1045, 400), (150, 22)),
+                                 _("End Cuesheet ID"),
+                                 manager=manager)
     note_button_label = UILabel(pygame.Rect((700, 340), (150, 22)),
                                 _("Note button"),
                                 manager=manager)
@@ -944,8 +973,8 @@ def main():
                                round(float(config['CONFIG']['VOLUME']) * 100)),
                            manager=manager)
 
-    box_labels = [start_label, end_label, vert_label, cue_label,
-                  cuesheet_label, note_button_label, note_type_label]
+    box_labels = [start_label, end_label, vert_label, start_cue_label, end_cue_label,
+                  start_cuesheet_label, end_cuesheet_label, note_button_label, note_type_label]
     for label in box_labels:
         label.hide()
 
@@ -1074,7 +1103,6 @@ def main():
             karaoke.highlight_note(note, (255, 0, 0),
                                    worlds, surface_nr, next_surface)
 
-
         # TODO - rewrite events code, it's horrible
         # Application events
         events = pygame.event.get()
@@ -1084,7 +1112,7 @@ def main():
                 gui_button_mode = 'Input_drag'
                 drag_file = event.file
                 input_selection = UIConfirmationDialog(
-                            rect=pygame.Rect(0, 0, 300, 300), manager=manager, action_long_desc=_('Are you sure you want to load this file?'), window_title=_('Open file'), action_short_name=_('OK'))
+                    rect=pygame.Rect(0, 0, 300, 300), manager=manager, action_long_desc=_('Are you sure you want to load this file?'), window_title=_('Open file'), action_short_name=_('OK'))
                 input_selection.cancel_button.set_text(_('Cancel'))
 
             if event.type == pygame.QUIT:
@@ -1314,7 +1342,6 @@ def main():
                         import_selection.ok_button.set_text(_('OK'))
                         import_selection.cancel_button.set_text(_('Cancel'))
 
-
                     if event.ui_object_id == 'menu_bar.#file_menu_items.#open':
                         gui_button_mode = 'Input'
                         file_mode = 'pick'
@@ -1426,10 +1453,11 @@ def main():
                 if event.user_type == UI_BUTTON_PRESSED:
                     if import_mode != None:
                         if event.ui_element == import_selection.ok_button:
-                                karaoke.import_file(import_selection.current_file_path, import_mode)
-                                currently_selected.clear()  # empty the list
-                                currently_edited = None
-                                import_mode = None
+                            karaoke.import_file(
+                                import_selection.current_file_path, import_mode)
+                            currently_selected.clear()  # empty the list
+                            currently_edited = None
+                            import_mode = None
 
                     if gui_button_mode == 'Input':
                         if event.ui_element == input_selection.ok_button:
@@ -1446,7 +1474,7 @@ def main():
                                 config.set("PATHS", "Input", str(
                                     open_file))
                             currently_edited = None
-                    
+
                     if gui_button_mode == 'Output':
                         if event.ui_element == output_selection.ok_button:
                             gui_button_mode = None
@@ -1493,7 +1521,7 @@ def main():
                     config.set("CONFIG", "LANGUAGE", str(
                         language_picker.selected_option))
                     switch_language(language_picker.selected_option, params=[undo_button, load_kpm_button, save_kpm_button, cutscene_label, start_label,
-                                                                             vert_label, cue_label, cuesheet_label, note_button_label, note_type_label, note_type_picker, end_label, menu_bar, song_label, volume_label])
+                                                                             vert_label, start_cue_label, end_cue_label, start_cuesheet_label, end_cuesheet_label, note_button_label, note_type_label, note_type_picker, end_label, menu_bar, song_label, volume_label])
                 if event.user_type == UI_CONFIRMATION_DIALOG_CONFIRMED:  # reset event
                     if gui_button_mode == 'Reset':
                         gui_button_mode = None
@@ -1528,21 +1556,21 @@ def main():
                                 open_file, cutscene_box)
                         else:
                             raise Exception(_('No open file, unable to save!'))
-                    
+
                     if gui_button_mode == 'Input_drag':
-                            gui_button_mode = None
-                            open_file = drag_file
-                            if currently_edited:
-                                stop_editing(boxes, box_labels,
-                                             dropdowns, undo_button)
-                                currently_edited = None
-                            can_save, kpm_data = karaoke.load_kbd(
-                                open_file, cutscene_box)
-                            currently_selected.clear()  # empty the list
-                            if can_save:
-                                config.set("PATHS", "Input", str(
-                                    open_file))
+                        gui_button_mode = None
+                        open_file = drag_file
+                        if currently_edited:
+                            stop_editing(boxes, box_labels,
+                                         dropdowns, undo_button)
                             currently_edited = None
+                        can_save, kpm_data = karaoke.load_kbd(
+                            open_file, cutscene_box)
+                        currently_selected.clear()  # empty the list
+                        if can_save:
+                            config.set("PATHS", "Input", str(
+                                open_file))
+                        currently_edited = None
 
             manager.process_events(event)
 

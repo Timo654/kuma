@@ -7,6 +7,7 @@ import modules.parsers.de.kpm_reader as kpm
 import modules.importers.lbd_import as lbd
 import modules.importers.kara_import as kara
 import modules.importers.wtfl_import as wtfl
+import modules.importers.mns_import as mns
 from modules.ui.ui_menu_bar import UIMenuBar
 from pathlib import Path
 from math import ceil, floor
@@ -358,6 +359,8 @@ class Karaoke:
                 data = lbd.load_lbd(file)
             elif mode == 'wtfl':
                 data = wtfl.load_wtfl(file)
+            elif mode == 'mns':
+                data = mns.load_mns(file)
             print(_('File loaded.'))
         except(ValueError):
             print(_('Unable to read file.'))
@@ -747,9 +750,10 @@ def get_menu_data():
         '#import_menu': {'display_name': _('Import'),
                          'items':
                          {
-            '#load_kara': {'display_name': _('OE karaoke...')},
-            '#load_lbd': {'display_name': _('OE LBD...')},
-            '#load_wtfl': {'display_name': _('Kenzan Waterfall...')}
+            '#load_kara': {'display_name': _('OE karaoke')},
+            '#load_lbd': {'display_name': _('OE LBD')},
+            '#load_wtfl': {'display_name': _('Kenzan Waterfall')},
+            '#load_mns': {'display_name': _('Persona Dancing')}
         },
     },
         '#help_menu': {'display_name': _('Help'),
@@ -1139,21 +1143,20 @@ def main():
                             note_id = 0
                     held_note = Item(0, 0, note_id, 0, 0)  # add item
                 elif event.button == 1:  # left click
+                    prev_list = karaoke.get_list()
                     pos = karaoke.Get_pos(
                         scrollbar_value, worlds[0])
                     if karaoke.In_grid(pos[0], pos[1]):
                         if held_note:
-                            prev_list = karaoke.get_list()
                             held_note.start_pos = karaoke.pos_to_game(pos[0])
                             held_note.x = pos[0]
                             held_note.y = pos[1]
                             held_note = karaoke.Add(held_note)
-                            karaoke.add_to_undo_list(prev_list)
                         elif karaoke.items[pos[0]][pos[1]]:
                             if karaoke.items[pos[0]][pos[1]] != currently_edited:
                                 held_note = karaoke.items[pos[0]][pos[1]]
                                 karaoke.items[pos[0]][pos[1]] = None
-
+                    karaoke.add_to_undo_list(prev_list)
             if event.type == pygame.KEYDOWN:
                 # scrollbar moving
                 if event.key in [pygame.K_RIGHT, pygame.K_PAGEUP]:
@@ -1330,13 +1333,15 @@ def main():
                                     pygame.mixer.music.play()
 
                     # importing maps
-                    if event.ui_object_id in ['menu_bar.#import_menu_items.#load_lbd', 'menu_bar.#import_menu_items.#load_kara', 'menu_bar.#import_menu_items.#load_wtfl']:
+                    if event.ui_object_id in ['menu_bar.#import_menu_items.#load_lbd', 'menu_bar.#import_menu_items.#load_kara', 'menu_bar.#import_menu_items.#load_wtfl', 'menu_bar.#import_menu_items.#load_mns']:
                         if event.ui_object_id == 'menu_bar.#import_menu_items.#load_lbd':
                             import_mode = 'lbd'
                         elif event.ui_object_id == 'menu_bar.#import_menu_items.#load_kara':
                             import_mode = 'kara'
                         elif event.ui_object_id == 'menu_bar.#import_menu_items.#load_wtfl':
                             import_mode = 'wtfl'
+                        elif event.ui_object_id == 'menu_bar.#import_menu_items.#load_mns':
+                            import_mode = 'mns'
                         import_selection = UIFileDialog(
                             rect=pygame.Rect(0, 0, 300, 300), manager=manager, allow_picking_directories=True, allow_existing_files_only=True, window_title=_('Select a file to import'), initial_file_path=Path(config['PATHS']['Input']))
                         import_selection.ok_button.set_text(_('OK'))

@@ -2,7 +2,6 @@ from typing import Union, Dict, Tuple
 
 import pygame
 import pygame_gui
-from pygame_gui import ui_manager
 
 from pygame_gui.core.interfaces import IContainerLikeInterface, IUIManagerInterface
 from pygame_gui.core import UIElement, UIContainer
@@ -61,22 +60,20 @@ class UIMenuBar(UIElement):
                                               object_id='#menu_bar_container')
 
         top_level_button_x = 0
-        self.top_level_buttons = list()
         for menu_item_key, menu_item_data in self.menu_item_data.items():
             # create top level menu buttons
             default_font = self.ui_manager.get_theme().get_font_dictionary().get_default_font()
-            item_text_size = default_font.size(menu_item_data['display_name'])
-            button = UIButton(pygame.Rect(top_level_button_x,
+            _, item_text_rect = default_font.render(menu_item_data['display_name'], (0, 0, 0))
+            UIButton(pygame.Rect(top_level_button_x,
                                  0,
-                                 item_text_size[0]+10,
+                                 item_text_rect.width + 20,
                                  self.menu_bar_container.rect.height),
                      text=menu_item_data['display_name'],
                      manager=self.ui_manager,
                      container=self.menu_bar_container,
                      object_id=menu_item_key,
                      parent_element=self)
-            self.top_level_buttons.append(button)
-            top_level_button_x += item_text_size[0]+10
+            top_level_button_x += item_text_rect.width + 20
 
     def unfocus(self):
         if self.open_menu is not None:
@@ -121,8 +118,7 @@ class UIMenuBar(UIElement):
             if self.hover_point(scaled_mouse_pos[0], scaled_mouse_pos[1]):
                 consumed_event = True
 
-        if (event.type == pygame.USEREVENT and
-                event.user_type == pygame_gui.UI_BUTTON_START_PRESS and
+        if (event.type == pygame_gui.UI_BUTTON_START_PRESS and
                 event.ui_element in self.menu_bar_container.elements):
             if self._selected_menu_bar_button is not None:
                 self._selected_menu_bar_button.unselect()
@@ -130,8 +126,7 @@ class UIMenuBar(UIElement):
             self._selected_menu_bar_button.select()
             self._open_top_level_menu(event)
 
-        if (event.type == pygame.USEREVENT and
-                event.user_type == pygame_gui.UI_BUTTON_ON_HOVERED and
+        if (event.type == pygame_gui.UI_BUTTON_ON_HOVERED and
                 self.open_menu is not None and
                 event.ui_element in self.menu_bar_container.elements):
             if self._selected_menu_bar_button is not None:
@@ -261,17 +256,6 @@ class UIMenuBar(UIElement):
 
         if has_any_changed:
             self.rebuild()
-    def set_text(self, data):
-        """
-        For reloading the text.
-
-        """
-        self.menu_item_data = data
-        i = 0
-        for _, menu_item_data in data.items():
-            # change top level menu button text
-            self.top_level_buttons[i].set_text(menu_item_data['display_name'])
-            i += 1
 
     def rebuild(self):
         """

@@ -1,5 +1,37 @@
 from binary_reader import BinaryReader
 
+def write_file(data, filename):
+    """Writes the mns from dict to the specified filename.\n
+    The first parameter is a dict containing info read from mns and\n
+    the second parameter is the filename."""
+    mns = BinaryReader(bytearray())
+    # writing the header
+
+    mns.write_str('MNS', null=True)
+    mns.write_uint32(data['Header']['Field04'])
+    mns.write_uint32(data['Header']['Field08'])
+    mns.write_uint32(data['Header']['Music ID'])
+    mns.write_float(data['Header']['BPM'])
+    mns.write_uint16(data['Header']['Music ID Major'])
+    mns.write_uint16(data['Header']['Music ID Minor'])
+    mns.write_uint32(data['Header']['Field18'])
+    mns.write_uint32(data['Header']['Number of notes'])
+    mns.write_uint32(data['Header']['Field20'])
+
+    # writing the notes
+    for i in range(len(data['Notes'])):
+        note = data['Notes'][i]
+        mns.write_uint16(note['Beat'])
+        mns.write_uint16(note['Measure'])
+        mns.write_uint8(note['Button type'])
+        mns.write_int8(note['Hold duration'])
+        mns.write_int16(note['Type'])
+        if note['Type'] != 0:
+            print(note['Type'])
+
+    # saving the file
+    with open(filename, 'wb') as f:
+        f.write(mns.buffer())
 
 def read_file(input_file):
     """Reads the mns file and returns a dict.\n

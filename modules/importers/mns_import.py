@@ -68,7 +68,7 @@ def convert_to_kbd(data):
     kbd['Header']['Max score'] = 0
     kbd['Header']['Max score pre-cutscene'] = 0
     bpm = data['Header']['BPM']
-    bps = bpm / 60
+    bps = 60 / bpm
     half = 0x8000
     notes_list = list()
     for i in range(len(data['Notes'])):
@@ -78,12 +78,12 @@ def convert_to_kbd(data):
         if (oldnote['Beat'] & half):
             beat_decimal = (oldnote['Beat'] & ~half) + 0.5
         total_ms = ((oldnote['Measure'] * 4) +
-                    beat_decimal) * (60.0 / bpm) * 1000
+                    beat_decimal) * bps * 1000
 
         newnote['Start position'] = int(total_ms * 3)
         if oldnote['Hold duration']:
-            hold_length = (oldnote['Hold duration'] / 4) / bps
-            newnote['End position'] = int((total_ms + (hold_length * 500)) * 3)
+            hold_length = (((oldnote['Hold duration'] / 8 ) ) * bps) * 1000
+            newnote['End position'] = int((total_ms + (hold_length)) * 3)
             newnote['Note type'] = 1
         else:
             newnote['End position'] = 0

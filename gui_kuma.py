@@ -782,10 +782,10 @@ def update_text(params):
     params[10].set_text(_('Note button'))
     params[11].set_text(_('Note type'))
     params[13].set_text(_('End position'))
-    update_dropdown(params[10], mode='update all', new_list=[_('Regular'), _('Hold'), _(
-        'Rapid')], index=params[10].options_list.index(params[12].selected_option))
+    update_dropdown(params[12], mode='update all', new_list=[_('Regular'), _('Hold'), _(
+        'Rapid')], index=params[12].options_list.index(params[12].selected_option))
     menu_data = get_menu_data()
-    params[14].set_text(menu_data)
+    #params[14].set_text(menu_data)
     params[15].set_text(_("Song position"))
     params[16].set_text(_("Volume {}").format(
         round(float(config['CONFIG']['VOLUME']) * 100)))
@@ -904,24 +904,24 @@ def main():
     # textboxes
     valid_chars = [str(x) for x in range(0, 10)] + ['.']
     cutscene_box = UITextEntryLine(relative_rect=pygame.Rect(
-        (10, 365), (200, 50)), manager=manager)
+        (10, 365), (200, 30)), manager=manager)
     cutscene_box.set_text(str(0))
     start_box = UITextEntryLine(relative_rect=pygame.Rect(
-        (385, 365), (150, 50)), manager=manager)
+        (385, 365), (150, 30)), manager=manager)
     end_box = UITextEntryLine(relative_rect=pygame.Rect(
-        (540, 365), (150, 50)), manager=manager)
+        (540, 365), (150, 30)), manager=manager)
     vert_box = UITextEntryLine(relative_rect=pygame.Rect(
-        (385, 425), (170, 50)), manager=manager)
+        (385, 425), (170, 30)), manager=manager)
     start_cue_box = UITextEntryLine(relative_rect=pygame.Rect(
-        (565, 425), (150, 50)), manager=manager)
+        (565, 425), (150, 30)), manager=manager)
     start_cuesheet_box = UITextEntryLine(relative_rect=pygame.Rect(
-        (725, 425), (150, 50)), manager=manager)
+        (725, 425), (150, 30)), manager=manager)
     end_cue_box = UITextEntryLine(relative_rect=pygame.Rect(
-        (885, 425), (150, 50)), manager=manager)
+        (885, 425), (150, 30)), manager=manager)
     end_cuesheet_box = UITextEntryLine(relative_rect=pygame.Rect(
-        (1045, 425), (150, 50)), manager=manager)
+        (1045, 425), (150, 30)), manager=manager)
     music_box = UITextEntryLine(relative_rect=pygame.Rect(
-        (10, 425), (200, 50)), manager=manager, object_id="#song_position")
+        (10, 425), (200, 30)), manager=manager, object_id="#song_position")
     music_box.set_text(str(0))
 
     boxes = [start_box, end_box, vert_box, start_cue_box,
@@ -935,44 +935,44 @@ def main():
     music_box.set_allowed_characters(valid_chars)
 
     # labels
-    cutscene_label = UILabel(pygame.Rect((10, 340), (200, 22)),
+    cutscene_label = UILabel(pygame.Rect((10, 340), (-1, 22)),
                              _("Cutscene start"),
                              manager=manager)
-    start_label = UILabel(pygame.Rect((385, 340), (150, 22)),
+    start_label = UILabel(pygame.Rect((385, 340), (-1, 22)),
                           _("Start position"),
                           manager=manager)
-    end_label = UILabel(pygame.Rect((540, 340), (150, 22)),
+    end_label = UILabel(pygame.Rect((540, 340), (-1, 22)),
                         _("End position"),
                         manager=manager)
-    vert_label = UILabel(pygame.Rect((385, 400), (170, 22)),
+    vert_label = UILabel(pygame.Rect((385, 400), (-1, 22)),
                          _("Vertical position"),
                          manager=manager)
-    start_cue_label = UILabel(pygame.Rect((565, 400), (150, 22)),
+    start_cue_label = UILabel(pygame.Rect((565, 400), (-1, 22)),
                               _("Start Cue ID"),
                               manager=manager)
-    start_cuesheet_label = UILabel(pygame.Rect((725, 400), (150, 22)),
+    start_cuesheet_label = UILabel(pygame.Rect((725, 400), (-1, 22)),
                                    _("Start Cuesheet ID"),
                                    manager=manager)
-    end_cue_label = UILabel(pygame.Rect((885, 400), (150, 22)),
+    end_cue_label = UILabel(pygame.Rect((885, 400), (-1, 22)),
                             _("End Cue ID"),
                             manager=manager)
-    end_cuesheet_label = UILabel(pygame.Rect((1045, 400), (150, 22)),
+    end_cuesheet_label = UILabel(pygame.Rect((1045, 400), (-1, 22)),
                                  _("End Cuesheet ID"),
                                  manager=manager)
-    note_button_label = UILabel(pygame.Rect((700, 340), (150, 22)),
+    note_button_label = UILabel(pygame.Rect((700, 340), (-1, 22)),
                                 _("Note button"),
                                 manager=manager)
-    note_type_label = UILabel(pygame.Rect((855, 340), (200, 22)),
+    note_type_label = UILabel(pygame.Rect((855, 340), (-1, 22)),
                               _("Note type"),
                               manager=manager)
     if fps_counter:
         fps_label = UILabel(pygame.Rect((0, 30), (30, 30)),
                             "0",
                             manager=manager)
-    song_label = UILabel(pygame.Rect((10, 400), (200, 22)),
+    song_label = UILabel(pygame.Rect((10, 400), (-1, 22)),
                          _("Song position"),
                          manager=manager)
-    volume_label = UILabel(pygame.Rect((215, 402), (130, 25)),
+    volume_label = UILabel(pygame.Rect((215, 402), (-1, 25)),
                            _("Volume {}").format(
                                round(float(config['CONFIG']['VOLUME']) * 100)),
                            manager=manager)

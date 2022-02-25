@@ -56,7 +56,6 @@ def write_file(data, filename):
         settings_pnt_pos = kar.pos()
         kar.write_uint32(0)  # settings pointer
 
-
         kar.write_uint32(line['Unknown 14'])
         texture_pnt_pos = kar.pos()
         kar.write_uint32(0)  # texture name pointer
@@ -175,9 +174,10 @@ def read_file(input_file, y3_mode=False):
         with kar.seek_to(0, 1):
             data['Header']['Version'] = get_version(kar.read_uint16())
 
-    if data['Header']['Version'] > 3:
+    if data['Header']['Version'] < 3:
         data['Header']['Line count'] = kar.read_uint8()
         data['Header']['Unknown 1'] = kar.read_uint8()
+        data['Header']['Unknown 2'] = kar.read_uint32()
 
     else:
         kar.seek(2, 1)
@@ -188,7 +188,6 @@ def read_file(input_file, y3_mode=False):
         data['Header']['Line count'] = kar.read_uint8()
         data['Header']['Unknown 1'] = kar.read_uint8()
         kar.seek(14, 1)
-
     # MAIN TABLE
     data['Main table'] = {}
     data['Main table']['Unknown 2'] = kar.read_uint32()

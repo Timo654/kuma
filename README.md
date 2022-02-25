@@ -6,8 +6,8 @@ To find instructions on how to use the tool, go to the menu bar, pick 'Help' and
 
 ## TODO list
 * Fix import not disabling param editing
-* Update to pygame-gui 6, whenever it comes out
-* Rewrite event code
+* Weird issues with file saving (can't pick new file?)
+* Text background gone
 
 ## Credits
 https://github.com/SutandoTsukai181/PyBinaryReader

@@ -36,7 +36,7 @@
             "dark_bg": "#25292e"
         },
         "misc": {
-            "text_horiz_alignment_padding": "12"
+            "text_horiz_alignment_padding": "6"
         }
     }
 }

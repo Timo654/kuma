@@ -5,7 +5,7 @@ After that, run 'gui_kuma.py'.
 To find instructions on how to use the tool, go to the menu bar, pick 'Help' and 'How to use'.
 
 ## TODO list
-* Text background gone
+* Update translations to json format
 
 ## Credits
 https://github.com/SutandoTsukai181/PyBinaryReader

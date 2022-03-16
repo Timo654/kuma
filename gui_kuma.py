@@ -731,9 +731,9 @@ def get_menu_data():
                            {
         '#new': {'display_name': _('New...')},
         '#open': {'display_name': _('Open...')},
+        '#import': {'display_name': _('Import')},
         '#save': {'display_name': _('Save')},
-        '#save_as': {'display_name': _('Save As...')},
-        '#import': {'display_name': _('Import')}
+        '#save_as': {'display_name': _('Save As...')}
     },
     },
         '#music_menu': {'display_name': _('Music'),

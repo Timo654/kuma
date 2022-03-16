@@ -5,8 +5,6 @@ After that, run 'gui_kuma.py'.
 To find instructions on how to use the tool, go to the menu bar, pick 'Help' and 'How to use'.
 
 ## TODO list
-* Fix import not disabling param editing
-* Weird issues with file saving (can't pick new file?)
 * Text background gone
 
 ## Credits

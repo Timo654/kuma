@@ -1,5 +1,5 @@
 import pygame
-from pygame_gui import UIManager, UI_BUTTON_START_PRESS, UI_BUTTON_PRESSED, UI_DROP_DOWN_MENU_CHANGED, UI_CONFIRMATION_DIALOG_CONFIRMED, UI_HORIZONTAL_SLIDER_MOVED, UI_TEXT_ENTRY_CHANGED
+from pygame_gui import UIManager, UI_BUTTON_START_PRESS, UI_DROP_DOWN_MENU_CHANGED, UI_CONFIRMATION_DIALOG_CONFIRMED, UI_HORIZONTAL_SLIDER_MOVED, UI_TEXT_ENTRY_CHANGED
 from pygame_gui.windows import UIConfirmationDialog, UIMessageWindow
 from pygame_gui.elements import UIDropDownMenu, UILabel, UIButton, UITextEntryLine, UIHorizontalSlider
 import modules.parsers.de.kbd_reader as kbd
@@ -11,7 +11,6 @@ from math import ceil, floor
 import ctypes
 from os import name
 import tkinter as tk
-from tkinter import filedialog
 import json
 import configparser
 import gettext
@@ -786,7 +785,7 @@ def save_file(open_file, manager, karaoke, cutscene_box):
         save.cancel_button.set_text(_('Cancel'))
         return open_file
     else:
-        output_selection = filedialog.asksaveasfilename(
+        output_selection = tk.filedialog.asksaveasfilename(
             title='Save karaoke button data', initialdir=config['PATHS']['Output'], defaultextension='.kbd', filetypes=[("Dragon Engine karaoke data", "*.kbd")])
         if len(output_selection) == 0:
             return None  # empty
@@ -1281,7 +1280,7 @@ def main():
                 if event.ui_element in menu_bar.menu_bar_container.elements:
                     held_note = None
                 elif event.ui_element == load_kpm_button:
-                    kpm_input_selection = filedialog.askopenfilename(title='Select a karaoke parameter file', filetypes=[
+                    kpm_input_selection = tk.filedialog.askopenfilename(title='Select a karaoke parameter file', filetypes=[
                                                                      ("Karaoke parameter", "*.kpm")], initialdir=config['PATHS']['KPM_Input'])
                     if len(kpm_input_selection) != 0:
                         kpm_data = load_kpm(
@@ -1290,7 +1289,7 @@ def main():
                             config.set("PATHS", "KPM_Input", str(
                                 kpm_input_selection))
                 elif event.ui_element == save_kpm_button:
-                    kpm_output_selection = filedialog.asksaveasfilename(
+                    kpm_output_selection = tk.filedialog.asksaveasfilename(
                         title='Save karaoke parameter file', initialdir=config['PATHS']['KPM_Output'], defaultextension='.kpm', filetypes=[("Karaoke parameter", "*.kpm")])
                     if len(kpm_output_selection) != 0:
                         config.set("PATHS", "KPM_Output", str(
@@ -1326,7 +1325,7 @@ def main():
                 # menu bar item related code
                 # importing maps
                 elif event.ui_object_id == 'menu_bar.#file_menu_items.#import':
-                    import_selection = filedialog.askopenfilename(title='Select a rhythm minigame file', filetypes=[(
+                    import_selection = tk.filedialog.askopenfilename(title='Select a rhythm minigame file', filetypes=[(
                         "Persona 4 Dancing map", "*.bin"), (
                         "Kenzan waterfall training", "*.bin"), (
                         "OE Karaoke", "*.bin"), ("Yakuza Rhythm Format", "*.lbd")], initialdir=config['PATHS']['Import_Input'])
@@ -1341,7 +1340,7 @@ def main():
                                      dropdowns, undo_button)
                 # open file
                 elif event.ui_object_id == 'menu_bar.#file_menu_items.#open':
-                    input_selection = filedialog.askopenfilename(title='Select karaoke button data', filetypes=[
+                    input_selection = tk.filedialog.askopenfilename(title='Select karaoke button data', filetypes=[
                                                                  ("Dragon Engine karaoke data", "*.kbd")], initialdir=config['PATHS']['Input'])
                     if len(input_selection) != 0:
                         if currently_edited:
@@ -1369,7 +1368,7 @@ def main():
                     open_file = output_selection
                 # load song
                 elif event.ui_object_id == 'menu_bar.#music_menu_items.#load_song':
-                    music_selection = filedialog.askopenfilename(title='Select a music file', filetypes=[(
+                    music_selection = tk.filedialog.askopenfilename(title='Select a music file', filetypes=[(
                         "MP3", "*.mp3"), ("OGG", "*.ogg"), ("FLAC", "*.flac")], initialdir=config['PATHS']['Music'])
                     if len(music_selection) != 0:
                         loaded, length = load_song(

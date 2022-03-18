@@ -298,7 +298,7 @@ class Karaoke:
         seconds = i // self.scaler
         minutes = seconds // 60
         if minutes:
-            if seconds % 60 == 0:
+            if seconds % 60 == 0: # TODO - translate
                 return "{min} min".format(min=minutes)
             else:
                 seconds = seconds - (minutes * 60)
@@ -745,10 +745,10 @@ def get_menu_data():
 
 
 def save_file(open_file, manager, karaoke, cutscene_box):
-    if open_file != None:
+    if open_file != None: # TODO - translate this
         save = UIConfirmationDialog(
-            rect=pygame.Rect(0, 0, 300, 300), manager=manager, action_long_desc="Are you sure you want to overwrite {}?".format(open_file), window_title='Save file', action_short_name='OK', object_id='#save_overwrite')
-        save.cancel_button.set_text('Cancel')
+            rect=pygame.Rect(0, 0, 300, 300), manager=manager, action_long_desc="Are you sure you want to overwrite {}?".format(open_file), window_title='kuma_ui.save_file_text', action_short_name='kuma_ui.confirm_button_text', object_id='#save_overwrite')
+        save.cancel_button.set_text('kuma_ui.cancel_button_text')
         return open_file
     else:
         output_selection = filedialog.asksaveasfilename(
@@ -817,7 +817,6 @@ def main():
         manager.set_locale('en')
     elif current_language == 'Eesti':
         manager.set_locale('et')
-        print('b')
 
     # menu bar related things, menu bar from https://github.com/MyreMylar/pygame_paint
     menu_data = get_menu_data()
@@ -1163,12 +1162,12 @@ def main():
                 elif keys[pygame.K_DELETE]:
                     if currently_edited:
                         delete_note = UIConfirmationDialog(
-                            rect=pygame.Rect(0, 0, 300, 300), manager=manager, action_long_desc='Are you sure you want to remove this note?', window_title='Delete note', action_short_name='OK', object_id='#delete_one')
-                        delete_note.cancel_button.set_text('Cancel')
+                            rect=pygame.Rect(0, 0, 300, 300), manager=manager, action_long_desc='kuma_ui.delete_note_single', window_title='kuma_ui.delete_note_text', action_short_name='kuma_ui.confirm_button_text', object_id='#delete_one')
+                        delete_note.cancel_button.set_text('kuma_ui.cancel_button_text')
                     elif currently_selected:
                         delete_note = UIConfirmationDialog(
-                            rect=pygame.Rect(0, 0, 300, 300), manager=manager, action_long_desc='Are you sure you want to remove these notes?', window_title='Delete note', action_short_name='OK', object_id='#delete_multi')
-                        delete_note.cancel_button.set_text('Cancel')
+                            rect=pygame.Rect(0, 0, 300, 300), manager=manager, action_long_desc='kuma_ui.delete_note_multiple', window_title='kuma_ui.delete_note_text', action_short_name='kuma_ui.confirm_button_text', object_id='#delete_multi')
+                        delete_note.cancel_button.set_text('kuma_ui.cancel_button_text')
 
                     held_note = None  # deletes selected note
 
@@ -1296,8 +1295,8 @@ def main():
                                 pygame.mixer.music.play()
                 if event.ui_element == undo_button:
                     undo_note = UIConfirmationDialog(
-                        rect=pygame.Rect(0, 0, 300, 300), manager=manager, action_long_desc='Are you sure you want to undo changes made to this note?', window_title='Undo changes', action_short_name='OK', object_id='#undo_note')
-                    undo_note.cancel_button.set_text('Cancel')
+                        rect=pygame.Rect(0, 0, 300, 300), manager=manager, action_long_desc='kuma_ui.undo_changes_long', window_title='kuma_ui.undo_changes_text', action_short_name='kuma_ui.confirm_button_text', object_id='#undo_note')
+                    undo_note.cancel_button.set_text('kuma_ui.cancel_button_text')
                 # menu bar item related code
                 # importing maps
                 elif event.ui_object_id == 'menu_bar.#file_menu_items.#import':
@@ -1335,8 +1334,8 @@ def main():
                 # create a new file
                 elif event.ui_object_id == 'menu_bar.#file_menu_items.#new':
                     reset_all = UIConfirmationDialog(
-                        rect=pygame.Rect(0, 0, 300, 300), manager=manager, action_long_desc='Are you sure you want to create a new file? Any unsaved changes will be lost.', window_title='Create a new file', action_short_name='OK', object_id='#reset')
-                    reset_all.cancel_button.set_text('Cancel')
+                        rect=pygame.Rect(0, 0, 300, 300), manager=manager, action_long_desc='kuma_ui.new_file_long', window_title='kuma_ui.new_file_text', action_short_name='kuma_ui.confirm_button_text', object_id='#reset')
+                    reset_all.cancel_button.set_text('kuma_ui.cancel_button_text')
                 # save
                 elif event.ui_object_id == 'menu_bar.#file_menu_items.#save':
                     output_selection = save_file(
@@ -1359,7 +1358,7 @@ def main():
                         None, manager, karaoke, cutscene_box)
                     open_file = output_selection
                 # how to use page
-                elif event.ui_object_id == 'menu_bar.#help_menu_items.#how_to_use':
+                elif event.ui_object_id == 'menu_bar.#help_menu_items.#how_to_use': # TODO - translate
                     info_window_rect = pygame.Rect(0, 0, 500, 400)
                     info_window_rect.center = screen.get_rect().center
                     # separated text so it would be easier for translators
@@ -1389,10 +1388,10 @@ def main():
                                                   html_message=(
                                                       f'<b>{how_1}</b><br>---------------<br><b>{how_2}</b><br>{how_3}.<br>{how_4}<br>{how_5}</b><br>{how_6}<br>{how_7}<br>---------------<br><br><b>{how_8}</b><br>---------------<br><br>{how_9}<br>{how_10}<br>{how_11}<br>{how_12}<br>{how_13}<br>{how_14}<br>{how_15}<br>{how_16}<br>{how_17}<br>{how_18}<br>{how_19}<br>{how_20}'),
                                                   manager=manager,
-                                                  window_title='Help')
-                    help_window.dismiss_button.set_text('Close')
+                                                  window_title='menu_bar.help_text')
+                    help_window.dismiss_button.set_text('kuma_ui.close_button_text')
                 # about page
-                elif event.ui_object_id == 'menu_bar.#help_menu_items.#about':
+                elif event.ui_object_id == 'menu_bar.#help_menu_items.#about': # TODO - translate
                     about_window_rect = pygame.Rect(0, 0, 400, 300)
                     about_window_rect.center = screen.get_rect().center
                     about_window = UIMessageWindow(rect=about_window_rect,
@@ -1406,8 +1405,8 @@ def main():
                                                    '<b>Translators: </b>{translators}<br>'.format(
                                                        ver=VERSION, mink='Mink', creators=CREATORS, testers=TESTERS, translators=TRANSLATORS),
                                                    manager=manager,
-                                                   window_title='About')
-                    about_window.dismiss_button.set_text('Close')
+                                                   window_title='kuma_ui.credits_about')
+                    about_window.dismiss_button.set_text('kuma_ui.close_button_text')
             # more stuff to do after pressing confirm button
             elif event.type == UI_CONFIRMATION_DIALOG_CONFIRMED:
                 # reset file
@@ -1497,8 +1496,8 @@ def main():
             elif event.type == pygame.DROPFILE:
                 drag_file = event.file
                 input_selection = UIConfirmationDialog(
-                    rect=pygame.Rect(0, 0, 300, 300), manager=manager, action_long_desc='Are you sure you want to load this file?', window_title='Open file', action_short_name='OK', object_id='#drag_file')
-                input_selection.cancel_button.set_text('Cancel')
+                    rect=pygame.Rect(0, 0, 300, 300), manager=manager, action_long_desc='kuma_ui.open_file_long', window_title='kuma_ui.open_file_title', action_short_name='kuma_ui.confirm_button_text', object_id='#drag_file')
+                input_selection.cancel_button.set_text('kuma_ui.cancel_button_text')
             # process UI events
             manager.process_events(event)
 

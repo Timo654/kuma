@@ -17,6 +17,20 @@
 	"note_button_label": "Noodi nupp",
 	"note_type_label": "Noodi tüüp",
 	"song_position_label": "Laulu positsioon",
-	"volume_label": "Heli"
+	"volume_label": "Heli",
+	"cancel_button_text": "Tühista",
+	"save_file_text": "Salvesta fail",
+	"confirm_button_text": "OK",
+	"delete_note_text": "Kustuta noot",
+	"delete_note_single": "Kas olete kindel, et soovite kustutada selle noodi?",
+	"delete_note_multiple": "Kas olete kindel, et soovite kustutada need noodid?",
+	"undo_changes_text": "Tühista muudatused",
+	"undo_changes_long": "Kas olete kindel, et soovite noodi muutused tühistada?",
+	"new_file_text": "Loo uus fail",
+	"new_file_long": "Kas olete kindel, et soovite uue faili luua? Salvestamata muudatused kaovad.",
+	"open_file_title": "Ava fail",
+	"open_file_long": "Kas olete kindel, et soovite selle faili avada?",
+	"close_button_text": "Sulge",
+	"credits_about": "Meie kohta"
   }
 }

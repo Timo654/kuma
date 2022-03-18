@@ -1,0 +1,22 @@
+{
+  "et": {
+    "undo_button_text": "Lähtesta noot",
+	"load_kpm_button_text": "Lae aeg",
+	"save_kpm_button_text": "Salvesta aeg",
+	"note_type_regular": "Tavaline",
+	"note_type_rapid": "Kiire",
+	"note_type_hold": "Hoia",
+	"cutscene_start_label": "Klipi algus",
+	"start_position_label": "Algus",
+	"end_position_label": "Lõpp",
+	"vertical_position_label": "Vertikaalne asend",
+	"start_cue_id_label": "Alg Heli ID",
+	"start_cuesheet_label": "Alg Helifaili ID",
+	"end_cue_id_label": "Lõpp Heli ID",
+	"end_cuesheet_label": "Lõpp Helifaili ID",
+	"note_button_label": "Noodi nupp",
+	"note_type_label": "Noodi tüüp",
+	"song_position_label": "Laulu positsioon",
+	"volume_label": "Heli"
+  }
+}

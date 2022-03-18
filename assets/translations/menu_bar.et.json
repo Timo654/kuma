@@ -1,0 +1,15 @@
+{
+  "et": {
+    "file_menu_text": "Fail",
+	"new_text": "Uus",
+	"open_text": "Ava...",
+	"import_text": "Impordi",
+	"save_text": "Salvesta",
+	"save_as_text": "Salvesta nimega...",
+	"music_text": "Muusika",
+	"load_song_text": "Lae laul...",
+	"help_text": "Abi",
+	"how_to_use_text": "Kuidas kasutada",
+	"about_text": "Meie kohta"
+  }
+}

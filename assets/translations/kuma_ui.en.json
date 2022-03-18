@@ -1,0 +1,22 @@
+{
+  "en": {
+    "undo_button_text": "Undo note changes",
+	"load_kpm_button_text": "Load time",
+	"save_kpm_button_text": "Save time",
+	"note_type_regular": "Regular",
+	"note_type_rapid": "Rapid",
+	"note_type_hold": "Hold",
+	"cutscene_start_label": "Cutscene start",
+	"start_position_label": "Start position",
+	"end_position_label": "End position",
+	"vertical_position_label": "Vertical position",
+	"start_cue_id_label": "Start Cue ID",
+	"start_cuesheet_label": "Start Cuesheet ID",
+	"end_cue_id_label": "End Cue ID",
+	"end_cuesheet_label": "End Cuesheet ID",
+	"note_button_label": "Note button",
+	"note_type_label": "Note type",
+	"song_position_label": "Song position",
+	"volume_label": "Volume"
+  }
+}

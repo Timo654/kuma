@@ -716,27 +716,27 @@ def load_song(filename, music_elements):
 
 
 def get_menu_data():
-    return {'#file_menu': {'display_name': 'File',
+    return {'#file_menu': {'display_name': 'menu_bar.file_menu_text',
                            'items':
                            {
-                               '#new': {'display_name': 'New...'},
-                               '#open': {'display_name': 'Open...'},
-                               '#import': {'display_name': 'Import'},
-                               '#save': {'display_name': 'Save'},
-                               '#save_as': {'display_name': 'Save As...'}
+                               '#new': {'display_name': 'menu_bar.new_text'},
+                               '#open': {'display_name': 'menu_bar.open_text'},
+                               '#import': {'display_name': 'menu_bar.import_text'},
+                               '#save': {'display_name': 'menu_bar.save_text'},
+                               '#save_as': {'display_name': 'menu_bar.save_as_text'}
                            },
                            },
-            '#music_menu': {'display_name': 'Music',
+            '#music_menu': {'display_name': 'menu_bar.music_text',
                             'items':
                             {
-                                '#load_song': {'display_name': 'Load song...'}
+                                '#load_song': {'display_name': 'menu_bar.load_song_text'}
                             },
                             },
-            '#help_menu': {'display_name': 'Help',
+            '#help_menu': {'display_name': 'menu_bar.help_text',
                            'items':
                            {
-                               '#how_to_use': {'display_name': 'How to use'},
-                               '#about': {'display_name': 'About'}
+                               '#how_to_use': {'display_name': 'menu_bar.how_to_use_text'},
+                               '#about': {'display_name': 'menu_bar.about_text'}
                            }
                            }
             }
@@ -756,7 +756,6 @@ def save_file(open_file, manager, karaoke, cutscene_box):
         if len(output_selection) == 0:
             return None  # empty
 
-        print('maybe')
         open_file = output_selection
         config.set("PATHS", "Output", str(
             output_selection))
@@ -776,7 +775,6 @@ def main():
     if current_language not in languages:
         current_language = languages[0]
         config.set("CONFIG", "LANGUAGE", current_language)
-    #switch_language(current_language, boot=True)
 
     # get current controller
     current_controller = config['CONFIG']['BUTTONS']
@@ -811,7 +809,16 @@ def main():
             'Surface size is too big! Increase surface or decrease column count!')
 
     # ui manager
-    manager = UIManager(scr_size, theme_path=f'{asset_path}/ui_theme.json')
+    manager = UIManager(scr_size, theme_path=f'{asset_path}/ui_theme.json',
+                        starting_language='en',
+                        translation_directory_paths=[f'{asset_path}/translations'])
+
+    if current_language == 'English': # TODO - fix this and make it more universal
+        manager.set_locale('en')
+    elif current_language == 'Eesti':
+        manager.set_locale('et')
+        print('b')
+
     # menu bar related things, menu bar from https://github.com/MyreMylar/pygame_paint
     menu_data = get_menu_data()
     menu_bar = UIMenuBar(relative_rect=pygame.Rect(0, 0, scr_size[0], 25),
@@ -819,16 +826,16 @@ def main():
                          manager=manager)
     # buttons
     undo_button = UIButton(relative_rect=pygame.Rect((1205, 400), (230, 30)),
-                           text='Undo note changes',
+                           text='kuma_ui.undo_button_text',
                            manager=manager, object_id='#undo_button')
     undo_button.hide()
     load_kpm_button = UIButton(relative_rect=pygame.Rect((215, 340), (150, 30)),
-                               text='Load time',
+                               text='kuma_ui.load_kpm_button_text',
                                manager=manager, object_id='#load_kpm')
     save_kpm_button = UIButton(relative_rect=pygame.Rect((215, 365), (150, 30)),
-                               text='Save time', object_id='#save_kpm',
+                               text='kuma_ui.save_kpm_button_text', object_id='#save_kpm',
                                manager=manager)
-    save_kpm_button.disable()
+    save_kpm_button.hide()
     play_button = UIButton(relative_rect=pygame.Rect((345, 400), (30, 30)),
                            text='▶',
                            manager=manager, object_id='#play_button')
@@ -850,7 +857,8 @@ def main():
                                  relative_rect=pygame.Rect(700, 365, 150, 30),
                                  manager=manager, object_id='#note_picker')
 
-    note_types = ['Regular', 'Hold', 'Rapid']
+    note_types = ['kuma_ui.note_type_regular',
+                  'kuma_ui.note_type_hold', 'kuma_ui.note_type_rapid']
     note_type_picker = UIDropDownMenu(options_list=note_types,
                                       starting_option=note_types[0],
                                       relative_rect=pygame.Rect(
@@ -896,45 +904,45 @@ def main():
 
     # labels
     cutscene_label = UILabel(pygame.Rect((10, 340), (-1, 22)),
-                             "Cutscene start",
+                             "kuma_ui.cutscene_start_label",
                              manager=manager)
     start_label = UILabel(pygame.Rect((385, 340), (-1, 22)),
-                          "Start position",
+                          "kuma_ui.start_position_label",
                           manager=manager)
     end_label = UILabel(pygame.Rect((540, 340), (-1, 22)),
-                        "End position",
+                        "kuma_ui.end_position_label",
                         manager=manager)
     vert_label = UILabel(pygame.Rect((385, 400), (-1, 22)),
-                         "Vertical position",
+                         "kuma_ui.vertical_position_label",
                          manager=manager)
     start_cue_label = UILabel(pygame.Rect((565, 400), (-1, 22)),
-                              "Start Cue ID",
+                              "kuma_ui.start_cue_id_label",
                               manager=manager)
     start_cuesheet_label = UILabel(pygame.Rect((725, 400), (-1, 22)),
-                                   "Start Cuesheet ID",
+                                   "kuma_ui.start_cuesheet_label",
                                    manager=manager)
     end_cue_label = UILabel(pygame.Rect((885, 400), (-1, 22)),
-                            "End Cue ID",
+                            "kuma_ui.end_cue_id_label",
                             manager=manager)
     end_cuesheet_label = UILabel(pygame.Rect((1045, 400), (-1, 22)),
-                                 "End Cuesheet ID",
+                                 "kuma_ui.end_cuesheet_label",
                                  manager=manager)
     note_button_label = UILabel(pygame.Rect((700, 340), (-1, 22)),
-                                "Note button",
+                                "kuma_ui.note_button_label",
                                 manager=manager)
     note_type_label = UILabel(pygame.Rect((855, 340), (-1, 22)),
-                              "Note type",
+                              "kuma_ui.note_type_label",
                               manager=manager)
     if fps_counter:
         fps_label = UILabel(pygame.Rect((0, 30), (30, 30)),
                             "0",
                             manager=manager)
     song_label = UILabel(pygame.Rect((10, 400), (-1, 22)),
-                         "Song position",
+                         "kuma_ui.song_position_label",
                          manager=manager)
     volume_label = UILabel(pygame.Rect((215, 402), (-1, 25)),
                            "Volume {}".format(
-                               round(float(config['CONFIG']['VOLUME']) * 100)),
+                               round(float(config['CONFIG']['VOLUME']) * 100)),  # TODO - figure out if variables work in localization
                            manager=manager)
 
     box_labels = [start_label, end_label, vert_label, start_cue_label, end_cue_label,
@@ -1255,7 +1263,7 @@ def main():
                         if kpm_data:
                             config.set("PATHS", "KPM_Input", str(
                                 kpm_input_selection))
-                        save_kpm_button.enable()
+                        save_kpm_button.show()
                 elif event.ui_element == save_kpm_button:
                     kpm_output_selection = filedialog.asksaveasfilename(
                         title='Save karaoke parameter file', initialdir=config['PATHS']['KPM_Output'], defaultextension='.kpm', filetypes=[("Karaoke parameter files", "*.kpm")])
@@ -1462,8 +1470,10 @@ def main():
                 elif event.ui_object_id == '#language_picker':
                     config.set("CONFIG", "LANGUAGE", str(
                         language_picker.selected_option))
-                    # switch_language(language_picker.selected_option, params=[undo_button, load_kpm_button, save_kpm_button, cutscene_label, start_label,
-                    #                                                         vert_label, start_cue_label, end_cue_label, start_cuesheet_label, end_cuesheet_label, note_button_label, note_type_label, note_type_picker, end_label, menu_bar, song_label, volume_label])
+                    if event.text == 'English':
+                        manager.set_locale('en')
+                    elif event.text == 'Eesti':
+                        manager.set_locale('et')
             # adjust song position
             elif event.type == UI_TEXT_ENTRY_CHANGED and event.ui_object_id == "#song_position":
                 if not pygame.mixer.get_busy():

@@ -3,6 +3,7 @@ from typing import Union, Dict, Tuple
 import pygame
 import pygame_gui
 
+from pygame_gui.core.utility import translate
 from pygame_gui.core.interfaces import IContainerLikeInterface, IUIManagerInterface
 from pygame_gui.core import UIElement, UIContainer
 from pygame_gui.core.drawable_shapes import RectDrawableShape
@@ -50,7 +51,8 @@ class UIMenuBar(UIElement):
                                      self.relative_rect.top +
                                      (self.shadow_width + self.border_width),
                                      self.relative_rect.width -
-                                     2 * (self.shadow_width + self.border_width),
+                                     2 * (self.shadow_width +
+                                          self.border_width),
                                      self.relative_rect.height -
                                      2 * (self.shadow_width + self.border_width))
 
@@ -63,10 +65,11 @@ class UIMenuBar(UIElement):
         for menu_item_key, menu_item_data in self.menu_item_data.items():
             # create top level menu buttons
             default_font = self.ui_manager.get_theme().get_font_dictionary().get_default_font()
-            _, item_text_rect = default_font.render(menu_item_data['display_name'], (0, 0, 0))
+            _, item_text_rect = default_font.render(
+                translate(menu_item_data['display_name']), (0, 0, 0))
             UIButton(pygame.Rect(top_level_button_x,
                                  0,
-                                 item_text_rect.width + 20,
+                                 -1,
                                  self.menu_bar_container.rect.height),
                      text=menu_item_data['display_name'],
                      manager=self.ui_manager,
@@ -186,7 +189,8 @@ class UIMenuBar(UIElement):
         super().set_dimensions(dimensions)
 
         new_container_dimensions = (self.relative_rect.width -
-                                    2 * (self.shadow_width + self.border_width),
+                                    2 * (self.shadow_width +
+                                         self.border_width),
                                     self.relative_rect.height -
                                     2 * (self.shadow_width + self.border_width))
         if new_container_dimensions != self.menu_bar_container.relative_rect.size:
@@ -243,7 +247,8 @@ class UIMenuBar(UIElement):
             has_any_changed = True
 
         # misc
-        shape_type_string = self.ui_theme.get_misc_data('shape', self.combined_element_ids)
+        shape_type_string = self.ui_theme.get_misc_data(
+            'shape', self.combined_element_ids)
         if (shape_type_string is not None and shape_type_string in ['rectangle'] and
                 shape_type_string != self.shape_type):
             self.shape_type = shape_type_string

@@ -1,0 +1,15 @@
+{
+  "de": {
+    "file_menu_text": "Datei",
+	"new_text": "Neu",
+	"open_text": "Öffnen...",
+	"import_text": "Import",
+	"save_text": "Speichern",
+	"save_as_text": "Speichern unter...",
+	"music_text": "Musik",
+	"load_song_text": "Song laden...",
+	"help_text": "Hilfe",
+	"how_to_use_text": "Verwendung",
+	"about_text": "Über"
+  }
+}

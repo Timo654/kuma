@@ -19,18 +19,17 @@
 	"song_position_label": "Song position",
 	"volume_label": "Volume",
 	"cancel_button_text": "Cancel",
-	"save_file_text": "Save file",
+	"save_file_title": "Save file",
 	"confirm_button_text": "OK",
-	"delete_note_text": "Delete note",
+	"delete_note_title": "Delete note",
 	"delete_note_single": "Are you sure you want to remove this note?",
 	"delete_note_multiple": "Are you sure you want to remove these notes?",
-	"undo_changes_text": "Undo changes",
+	"undo_changes_title": "Undo changes",
 	"undo_changes_long": "Are you sure you want to undo changes made to this note?",
 	"new_file_text": "Create a new file",
 	"new_file_long": "Are you sure you want to create a new file? Any unsaved changes will be lost.",
 	"open_file_title": "Open file",
 	"open_file_long": "Are you sure you want to load this file?",
-	"close_button_text": "Close",
-	"credits_about": "About"
+	"close_button_text": "Close"
   }
 }

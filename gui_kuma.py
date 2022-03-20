@@ -832,9 +832,10 @@ def main():
                                text='kuma_ui.save_kpm_button_text', object_id='#save_kpm',
                                manager=manager)
     save_kpm_button.hide()
-    play_button = UIButton(relative_rect=pygame.Rect((345, 400), (30, 30)),
-                           text='▶',
+    play_button = UIButton(relative_rect=pygame.Rect((345, 400), (30, 30)), text="",
                            manager=manager, object_id='#play_button')
+    pause_button = UIButton(relative_rect=pygame.Rect((345, 400), (30, 30)), text="",
+                            manager=manager, object_id='#pause_button')
 
     # dropdown menus
     button_picker = UIDropDownMenu(options_list=controllers,
@@ -940,7 +941,6 @@ def main():
                            "Volume {}".format(
                                round(float(config['CONFIG']['VOLUME']) * 100)),  # TODO - figure out if variables work in localization
                            manager=manager)
-
     box_labels = [start_label, end_label, vert_label, start_cue_label, end_cue_label,
                   start_cuesheet_label, end_cuesheet_label, note_button_label, note_type_label]
     for label in box_labels:
@@ -977,6 +977,7 @@ def main():
                       play_button, volume_slider, music_box]
     for item in music_elements:
         item.hide()
+    pause_button.hide()
 
     if len(sys.argv) > 1:
         if Path(sys.argv[1]).is_file():
@@ -1271,10 +1272,11 @@ def main():
                         kpm_data = save_kpm(
                             kpm_output_selection, cutscene_box, kpm_data)
                 # music buttons
-                elif event.ui_element == play_button:
+                elif event.ui_element in [play_button, pause_button]:
                     if loaded:
                         if pygame.mixer.music.get_busy():  # if song is playing
-                            play_button.set_text('▶')
+                            pause_button.hide()
+                            play_button.show()
                             pygame.mixer.music.stop()
                         else:
                             if len(music_box.get_text()) > 0:
@@ -1283,7 +1285,8 @@ def main():
                                 audio_start_pos = 0
 
                             # TODO - get a nicer pause button, might not be possible before pygame-gui 6
-                            play_button.set_text('▌▌')
+                            play_button.hide()
+                            pause_button.show()
                             try:
                                 pygame.mixer.music.play(
                                     start=(audio_start_pos / 1000))
@@ -1487,6 +1490,7 @@ def main():
                     volume_value = volume_slider.get_current_value() / 100
                     pygame.mixer.music.set_volume(volume_value)
                     config.set("CONFIG", "VOLUME", str(volume_value))
+                    # TODO - figure out how to do this
                     volume_label.set_text('Volume {}'.format(
                         volume_slider.get_current_value()))
                 elif event.ui_object_id == '#scrollbar':
@@ -1523,8 +1527,9 @@ def main():
             converted_time = karaoke.song_pos_to_scroll(
                 current_time, worlds[0].get_width())
             scrollbar.set_current_value(converted_time)
-        elif play_button.text != "▶":  # when song ends, change button to play button
-            play_button.set_text('▶')
+        elif pause_button.visible:  # when song ends, change button to play button
+            pause_button.hide()
+            play_button.show()
         pygame.draw.line(screen, (222, 175, 74), (karaoke.x, karaoke.y + 10), (karaoke.x, ((
             karaoke.box_size + karaoke.border) * karaoke.rows) + 70), width=5)  # helpful line for music
         if scrollbar_moved:

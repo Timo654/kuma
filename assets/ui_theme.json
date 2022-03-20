@@ -31,6 +31,24 @@
             "bold": "1"
         }
     },
+	"#play_button":
+	{
+        "images":
+        {
+            "normal_image": {
+                "path": "assets/textures/play.png"
+            }
+        }
+    },
+	"#pause_button":
+	{
+        "images":
+        {
+            "normal_image": {
+                "path": "assets/textures/pause.png"
+            }
+        }
+    },
     "label": {
         "colours": {
             "dark_bg": "#25292e"

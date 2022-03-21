@@ -1,0 +1,15 @@
+{
+  "ru": {
+    "file_menu_text": "Файл",
+	"new_text": "Создать",
+	"open_text": "Открыть...",
+	"import_text": "Import",
+	"save_text": "Сохранить",
+	"save_as_text": "Сохранить как...",
+	"music_text": "Музыка",
+	"load_song_text": "Загрузить трек...",
+	"help_text": "Помощь",
+	"how_to_use_text": "Как использовать",
+	"about_text": "О программе"
+  }
+}

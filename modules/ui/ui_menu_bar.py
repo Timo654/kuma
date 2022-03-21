@@ -62,20 +62,22 @@ class UIMenuBar(UIElement):
                                               object_id='#menu_bar_container')
 
         top_level_button_x = 0
+        self.buttons = list()
         for menu_item_key, menu_item_data in self.menu_item_data.items():
             # create top level menu buttons
             default_font = self.ui_manager.get_theme().get_font_dictionary().get_default_font()
             _, item_text_rect = default_font.render(
                 translate(menu_item_data['display_name']), (0, 0, 0))
-            UIButton(pygame.Rect(top_level_button_x,
-                                 0,
-                                 -1,
-                                 self.menu_bar_container.rect.height),
-                     text=menu_item_data['display_name'],
-                     manager=self.ui_manager,
-                     container=self.menu_bar_container,
-                     object_id=menu_item_key,
-                     parent_element=self)
+            button = UIButton(pygame.Rect(top_level_button_x,
+                                          0,
+                                          -1,
+                                          self.menu_bar_container.rect.height),
+                              text=menu_item_data['display_name'],
+                              manager=self.ui_manager,
+                              container=self.menu_bar_container,
+                              object_id=menu_item_key,
+                              parent_element=self)
+            self.buttons.append(button)
             top_level_button_x += item_text_rect.width + 20
 
     def unfocus(self):
@@ -277,3 +279,18 @@ class UIMenuBar(UIElement):
                                                     ['normal'], self.ui_manager)
 
         self.on_fresh_drawable_shape_ready()
+
+    def on_locale_changed(self):
+        top_level_button_x = 0
+        i = 0
+        for _, menu_item_data in self.menu_item_data.items():
+            default_font = self.ui_manager.get_theme().get_font_dictionary().get_default_font()
+            _, item_text_rect = default_font.render(
+                translate(menu_item_data['display_name']), (0, 0, 0))
+            self.buttons[i].relative_rect = pygame.Rect(top_level_button_x,
+                                                        0,
+                                                        -1,
+                                                        self.menu_bar_container.rect.height)
+            top_level_button_x += item_text_rect.width + 20
+            i += 1
+        self.rebuild()

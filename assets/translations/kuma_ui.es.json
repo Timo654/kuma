@@ -17,7 +17,7 @@
 	"note_button_label": "Botón de la nota",
 	"note_type_label": "Tipo de nota",
 	"song_position_label": "Posición de la canción",
-	"volume_label": "Volumen",
+	"volume_label": "Volumen %{volume}",
 	"cancel_button_text": "Cancelar",
 	"save_file_title": "Guardar archivo",
 	"confirm_button_text": "OK",

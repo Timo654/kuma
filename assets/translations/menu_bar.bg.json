@@ -1,0 +1,15 @@
+{
+  "bg": {
+    "file_menu_text": "Файл",
+	"new_text": "Нов",
+	"open_text": "Отвори...",
+	"import_text": "Import",
+	"save_text": "Запази",
+	"save_as_text": "Запиши като...",
+	"music_text": "Музика",
+	"load_song_text": "Зареди песен...",
+	"help_text": "Помощ",
+	"how_to_use_text": "Как се използва",
+	"about_text": "Относно"
+  }
+}

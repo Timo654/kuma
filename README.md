@@ -6,7 +6,6 @@ To find instructions on how to use the tool, go to the menu bar, pick 'Help' and
 
 ## TODO list
 * Update translations to json format
-* Fix menu bar sizes when switching to longer languages
 
 ## Credits
 https://github.com/SutandoTsukai181/PyBinaryReader

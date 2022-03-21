@@ -17,7 +17,7 @@
 	"note_button_label": "Przycisk nuty",
 	"note_type_label": "Rodzaj nuty",
 	"song_position_label": "Pozycja piosenki",
-	"volume_label": "Głośność",
+	"volume_label": "Głośność %{volume}",
 	"cancel_button_text": "Anuluj",
 	"save_file_title": "Zapisz plik",
 	"confirm_button_text": "OK",

@@ -17,7 +17,7 @@
 	"note_button_label": "Notenknopf",
 	"note_type_label": "Notentyp",
 	"song_position_label": "Liedposition",
-	"volume_label": "Lautstärke",
+	"volume_label": "Lautstärke %{volume}",
 	"cancel_button_text": "Abbrechen",
 	"save_file_title": "Datei speichern",
 	"confirm_button_text": "OK",

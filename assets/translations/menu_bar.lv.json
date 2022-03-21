@@ -1,0 +1,15 @@
+{
+  "lv": {
+    "file_menu_text": "Fails",
+	"new_text": "Jauns",
+	"open_text": "Atvērt...",
+	"import_text": "Import",
+	"save_text": "Saglabāt",
+	"save_as_text": "Saglabāt kā...",
+	"music_text": "Mūzika",
+	"load_song_text": "Ielādēt dziesmu...",
+	"help_text": "Palīgs",
+	"how_to_use_text": "Kā izmantot",
+	"about_text": "Par"
+  }
+}

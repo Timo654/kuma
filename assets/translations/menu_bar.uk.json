@@ -1,0 +1,15 @@
+{
+  "uk": {
+    "file_menu_text": "Файл",
+	"new_text": "Створити",
+	"open_text": "Вiдкрити...",
+	"import_text": "Import",
+	"save_text": "Зберегти",
+	"save_as_text": "Зберегти як...",
+	"music_text": "Музика",
+	"load_song_text": "Загрузити трек...",
+	"help_text": "Допомога",
+	"how_to_use_text": "Як користуватися",
+	"about_text": "Про програму"
+  }
+}

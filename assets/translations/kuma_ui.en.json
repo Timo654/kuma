@@ -17,7 +17,7 @@
 	"note_button_label": "Note button",
 	"note_type_label": "Note type",
 	"song_position_label": "Song position",
-	"volume_label": "Volume",
+	"volume_label": "Volume %{volume}",
 	"cancel_button_text": "Cancel",
 	"save_file_title": "Save file",
 	"confirm_button_text": "OK",

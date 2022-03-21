@@ -634,7 +634,6 @@ def load_kpm(file, cutscene_box, refresh=1):
 
 
 def save_kpm(file, cutscene_box, data):
-    print(file)
     if Path.exists(Path(file)):
         data = load_kpm(file, cutscene_box, refresh=0)
     if data != None:
@@ -937,10 +936,8 @@ def main():
     song_label = UILabel(pygame.Rect((10, 400), (-1, 22)),
                          "kuma_ui.song_position_label",
                          manager=manager)
-    volume_label = UILabel(pygame.Rect((215, 402), (-1, 25)),
-                           "Volume {}".format(
-                               round(float(config['CONFIG']['VOLUME']) * 100)),  # TODO - figure out if variables work in localization
-                           manager=manager)
+    volume_label = UILabel(pygame.Rect((215, 402), (-1, 25)), 'kuma_ui.volume_label',
+                           manager=manager, volume=round(float(config['CONFIG']['VOLUME']) * 100))
     box_labels = [start_label, end_label, vert_label, start_cue_label, end_cue_label,
                   start_cuesheet_label, end_cuesheet_label, note_button_label, note_type_label]
     for label in box_labels:
@@ -966,7 +963,6 @@ def main():
                                    start_value=0,
                                    value_range=(0, scrollbar_size),
                                    manager=manager, object_id='#scrollbar')
-
     # volume slider
     volume_slider = UIHorizontalSlider(relative_rect=pygame.Rect((215, 430), (160, 25)),
                                        start_value=round(
@@ -1153,7 +1149,7 @@ def main():
                                         karaoke.border) + 2 * karaoke.x - screen.get_width()
                         if note_loc < 0:
                             note_loc = 0
-                        scrollbar.set_current_value(note_loc)
+                        scrollbar.set_current_value(note_loc, warn=False)
 
                 # UI related functions
                 # delete notes
@@ -1284,7 +1280,6 @@ def main():
                             else:
                                 audio_start_pos = 0
 
-                            # TODO - get a nicer pause button, might not be possible before pygame-gui 6
                             play_button.hide()
                             pause_button.show()
                             try:
@@ -1490,9 +1485,8 @@ def main():
                     volume_value = volume_slider.get_current_value() / 100
                     pygame.mixer.music.set_volume(volume_value)
                     config.set("CONFIG", "VOLUME", str(volume_value))
-                    # TODO - figure out how to do this
-                    volume_label.set_text('Volume {}'.format(
-                        volume_slider.get_current_value()))
+                    volume_label.set_text(
+                        'kuma_ui.volume_label', volume=volume_slider.get_current_value())
                 elif event.ui_object_id == '#scrollbar':
                     scrollbar_moved = True
 

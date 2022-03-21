@@ -17,7 +17,7 @@
 	"note_button_label": "Noodi nupp",
 	"note_type_label": "Noodi tüüp",
 	"song_position_label": "Laulu positsioon",
-	"volume_label": "Heli",
+	"volume_label": "Heli %{volume}",
 	"cancel_button_text": "Tühista",
 	"save_file_title": "Salvesta fail",
 	"confirm_button_text": "OK",

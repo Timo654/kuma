@@ -17,7 +17,7 @@
 	"note_button_label": "Note knop",
 	"note_type_label": "Note type",
 	"song_position_label": "Track positie",
-	"volume_label": "Volume",
+	"volume_label": "Volume %{volume}",
 	"cancel_button_text": "Annuleren",
 	"save_file_title": "Bestand opslaan",
 	"confirm_button_text": "OK",

@@ -1,0 +1,15 @@
+{
+  "lt": {
+    "file_menu_text": "Failas",
+	"new_text": "Naujas",
+	"open_text": "Atverti...",
+	"import_text": "Import",
+	"save_text": "Išsaugoti",
+	"save_as_text": "Išsaugoti Kaip...",
+	"music_text": "Muzika",
+	"load_song_text": "Užkrauti dainą...",
+	"help_text": "Pagalba",
+	"how_to_use_text": "Kaip naudoti",
+	"about_text": "Apie"
+  }
+}

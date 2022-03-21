@@ -30,6 +30,9 @@
 	"new_file_long": "¿Estás seguro/a de que quieres crear un nuevo archivo? Se perderán los cambios no guardados.",
 	"open_file_title": "Open file",
 	"open_file_long": "Are you sure you want to load this file?",
-	"close_button_text": "Cerrar"
+	"close_button_text": "Cerrar",
+	"time_minutes": "%{min} min",
+	"time_seconds": "%{sec} s",
+	"time_minutes_seconds": "%{min} min %{sec} s"
   }
 }

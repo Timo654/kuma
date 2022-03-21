@@ -30,6 +30,9 @@
 	"new_file_long": "Kas olete kindel, et soovite uue faili luua? Salvestamata muudatused kaovad.",
 	"open_file_title": "Ava fail",
 	"open_file_long": "Kas olete kindel, et soovite selle faili avada?",
-	"close_button_text": "Sulge"
+	"close_button_text": "Sulge",
+	"time_minutes": "%{min} min",
+	"time_seconds": "%{sec} s",
+	"time_minutes_seconds": "%{min} min %{sec} s"
   }
 }

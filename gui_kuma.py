@@ -15,6 +15,7 @@ from tkinter import filedialog
 import json
 import configparser
 import locale
+import i18n
 import mutagen
 import sys
 
@@ -298,13 +299,13 @@ class Karaoke:
         seconds = i // self.scaler
         minutes = seconds // 60
         if minutes:
-            if seconds % 60 == 0:  # TODO - translate
-                return "{min} min".format(min=minutes)
+            if seconds % 60 == 0:
+                return i18n.t('kuma_ui.time_minutes', min=minutes)
             else:
                 seconds = seconds - (minutes * 60)
-                return "{min} min {sec} s".format(min=minutes, sec=seconds)
+                return i18n.t('kuma_ui.time_minutes_seconds', min=minutes, sec=seconds)
         else:
-            return "{sec} s".format(sec=seconds)
+            return i18n.t('kuma_ui.time_seconds', sec=seconds)
 
     # convert game to grid pos
     def game_to_pos(self, pos):
@@ -930,7 +931,7 @@ def main():
                               "kuma_ui.note_type_label",
                               manager=manager)
     if fps_counter:
-        fps_label = UILabel(pygame.Rect((0, 30), (30, 30)),
+        fps_label = UILabel(pygame.Rect((0, 30), (-1, 30)),
                             "0",
                             manager=manager)
     song_label = UILabel(pygame.Rect((10, 400), (-1, 22)),

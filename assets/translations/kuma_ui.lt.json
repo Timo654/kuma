@@ -30,6 +30,9 @@
 	"new_file_long": "Ar tu įsitikinęs, kad nori sukurti naują failą? Neišsaugoti pakitimai bus prarasti.",
 	"open_file_title": "TODO - Open file",
 	"open_file_long": "TODO - Are you sure you want to load this file?",
-	"close_button_text": "Uždaryti"
+	"close_button_text": "Uždaryti",
+	"time_minutes": "%{min} min",
+	"time_seconds": "%{sec} s",
+	"time_minutes_seconds": "%{min} min %{sec} s"
   }
 }

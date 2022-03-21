@@ -30,6 +30,9 @@
 	"new_file_long": "Вы действительно хотите создать новый файл? Все несохранённые изменения будут утеряны.",
 	"open_file_title": "TODO - Open file",
 	"open_file_long": "TODO - Are you sure you want to load this file?",
-	"close_button_text": "Закрыть"
+	"close_button_text": "Закрыть",
+	"time_minutes": "%{min} мин.",
+	"time_seconds": "%{sec} сек.",
+	"time_minutes_seconds": "%{min} мин. %{sec} сек."
   }
 }

@@ -30,6 +30,9 @@
 	"new_file_long": "Czy napewno chcesz utworzyć nowy plik? Niezapisane zmiany zostaną utracone.",
 	"open_file_title": "TODO - Open file",
 	"open_file_long": "TODO - Are you sure you want to load this file?",
-	"close_button_text": "Zamknij"
+	"close_button_text": "Zamknij",
+	"time_minutes": "%{min} min",
+	"time_seconds": "%{sec} s",
+	"time_minutes_seconds": "%{min} min %{sec} s"
   }
 }

@@ -30,6 +30,9 @@
 	"new_file_long": "Er du sikker på at du vil lave en ny fil? Alle ugemte ændringer vil gå tabt.",
 	"open_file_title": "TODO - Open file",
 	"open_file_long": "TODO - Are you sure you want to load this file?",
-	"close_button_text": "Luk"
+	"close_button_text": "Luk",
+	"time_minutes": "%{min} min",
+	"time_seconds": "%{sec} s",
+	"time_minutes_seconds": "%{min} min %{sec} s"
   }
 }

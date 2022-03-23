@@ -831,7 +831,6 @@ def main():
     save_kpm_button = UIButton(relative_rect=pygame.Rect((215, 365), (150, 30)),
                                text='kuma_ui.save_kpm_button_text', object_id='#save_kpm',
                                manager=manager)
-    save_kpm_button.hide()
     play_button = UIButton(relative_rect=pygame.Rect((345, 400), (30, 30)), text="",
                            manager=manager, object_id='#play_button')
     pause_button = UIButton(relative_rect=pygame.Rect((345, 400), (30, 30)), text="",
@@ -983,6 +982,8 @@ def main():
     else:
         kpm_data = None
 
+    if kpm_data == None:  # hide the kpm if theres no file
+        save_kpm_button.hide()
     # what the player is holding
     held_note = None
     # what the player is currently editing
@@ -1259,7 +1260,8 @@ def main():
                         if kpm_data:
                             config.set("PATHS", "KPM_Input", str(
                                 kpm_input_selection))
-                        save_kpm_button.show()
+                        if kpm_data != None:
+                            save_kpm_button.show()
                 elif event.ui_element == save_kpm_button:
                     kpm_output_selection = filedialog.asksaveasfilename(
                         title='Save karaoke parameter file', initialdir=config['PATHS']['KPM_Output'], defaultextension='.kpm', filetypes=[("Karaoke parameter files", "*.kpm")])
@@ -1329,6 +1331,8 @@ def main():
                                 input_selection))
                         currently_edited = None
                         open_file = input_selection
+                        if kpm_data == None:
+                            save_kpm_button.hide()
 
                 # create a new file
                 elif event.ui_object_id == 'menu_bar.#file_menu_items.#new':
@@ -1459,6 +1463,8 @@ def main():
                         config.set("PATHS", "Input", str(
                             open_file))
                     currently_edited = None
+                    if kpm_data == None:
+                        save_kpm_button.hide()
             # dropdown menu stuff
             elif event.type == UI_DROP_DOWN_MENU_CHANGED:
                 # buttons changed

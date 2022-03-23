@@ -15,11 +15,9 @@ from tkinter import filedialog
 import json
 import configparser
 import locale
-import time
 import i18n
 import mutagen
 import sys
-import threading
 
 # general info
 VERSION = "v0.9.6"
@@ -765,27 +763,10 @@ def save_file(open_file, manager, karaoke, cutscene_box):
             output_selection, cutscene_box)
         return output_selection
 
-# thread testing
-def thread_testing(ding_sound):
-    running = True
-    while running:
-        current_time = time.time()
-        # actual code goes here
-        pygame.mixer.Sound.play(ding_sound)
-        print('ding')
-        # so we dont run it all the time
-        while current_time + 2 > time.time():
-            if stop_threads:
-                running = False
-                break
-        
-
 # the main loop where all the cool stuff happens
 
 
 def main():
-    global stop_threads
-    stop_threads = False
     # make a tkinter root window for file dialogs
     root = tk.Tk()
     root.withdraw()
@@ -1017,9 +998,6 @@ def main():
     note_id = 0  # note that you get when you want to add one, first is circle
     fill_colour = (44, 52, 58)
     FPS = int(config['CONFIG']['FPS'])
-    ding_sound = pygame.mixer.Sound("assets/ding.wav")
-    funny_thread = threading.Thread(target=thread_testing, args=(ding_sound,))
-    funny_thread.start()
     # -------------------------------------------------------------------------
     # Main loop
     # -------------------------------------------------------------------------
@@ -1097,7 +1075,6 @@ def main():
                 with open(settings_file, 'w', encoding='UTF-8') as configfile:  # save config
                     config.write(configfile)
                 print('(^ _ ^)/')
-                stop_threads = True
                 sys.exit()
             # add / move notes
             elif event.type == pygame.MOUSEBUTTONDOWN:

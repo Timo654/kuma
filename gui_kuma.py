@@ -166,16 +166,6 @@ class Karaoke:
         self.border = 3
         self.undo_list = list()
 
-    def get_note_positions(self, start=0):
-        notes = list()
-        for row in self.items:
-            for item in row:
-                if item != None:
-                    start_position = item.start_pos
-                    if start_position >= start:
-                        notes.append(item.start_pos / 3)
-        return notes
-
     def undo(self):
         if len(self.undo_list) > 0:
             self.items = self.undo_list[-1]  # set last list as items
@@ -775,26 +765,20 @@ def save_file(open_file, manager, karaoke, cutscene_box):
             output_selection, cutscene_box)
         return output_selection
 
-# function for handling button sound playing
-
-
-def play_note_sounds(ding_sound, all_notes):
+# thread testing
+def thread_testing(ding_sound):
     running = True
-    i = 0
     while running:
-        if i < len(all_notes):
-            song_pos = pygame.mixer.music.get_pos()
-            if song_pos == all_notes[i]:
-                # TODO - remove print for final, here only for testing
-                print('ding at', song_pos)
-                pygame.mixer.Sound.play(ding_sound)
-                i += 1
+        current_time = time.time()
+        # actual code goes here
+        pygame.mixer.Sound.play(ding_sound)
+        print('ding')
+        # so we dont run it all the time
+        while current_time + 2 > time.time():
             if stop_threads:
                 running = False
                 break
-        else:
-            break
-
+        
 
 # the main loop where all the cool stuff happens
 
@@ -1034,6 +1018,8 @@ def main():
     fill_colour = (44, 52, 58)
     FPS = int(config['CONFIG']['FPS'])
     ding_sound = pygame.mixer.Sound("assets/ding.wav")
+    funny_thread = threading.Thread(target=thread_testing, args=(ding_sound,))
+    funny_thread.start()
     # -------------------------------------------------------------------------
     # Main loop
     # -------------------------------------------------------------------------
@@ -1312,7 +1298,6 @@ def main():
                             pause_button.hide()
                             play_button.show()
                             pygame.mixer.music.stop()
-                            stop_threads = True
                         else:
                             if len(music_box.get_text()) > 0:
                                 audio_start_pos = int(music_box.get_text())
@@ -1321,12 +1306,6 @@ def main():
 
                             play_button.hide()
                             pause_button.show()
-                            note_positions = karaoke.get_note_positions(
-                                start=int(music_box.get_text())*3)
-                            stop_threads = False
-                            note_sound_thread = threading.Thread(
-                                target=play_note_sounds, args=(ding_sound, note_positions, ))
-                            note_sound_thread.start()
                             try:
                                 pygame.mixer.music.play(
                                     start=(audio_start_pos / 1000))
@@ -1560,14 +1539,13 @@ def main():
                         (trunc_world_orig, trunc_world))
 
         if pygame.mixer.music.get_busy():
-            song_time = pygame.mixer.music.get_pos() + audio_start_pos
-            music_box.set_text(str(song_time))
+            current_time = pygame.mixer.music.get_pos() + audio_start_pos
+            music_box.set_text(str(current_time))
             # makes the scrollbar move when song is playing
             converted_time = karaoke.song_pos_to_scroll(
-                song_time, worlds[0].get_width())
+                current_time, worlds[0].get_width())
             scrollbar.set_current_value(converted_time)
         elif pause_button.visible:  # when song ends, change button to play button
-            stop_threads = True
             pause_button.hide()
             play_button.show()
         pygame.draw.line(screen, (222, 175, 74), (karaoke.x, karaoke.y + 10), (karaoke.x, ((

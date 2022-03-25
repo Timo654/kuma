@@ -1,0 +1,19 @@
+{
+  "et": {
+	"open_kbd_file": "Vali karaoke andmete fail",
+	"save_kbd_file": "Salvesta karaoke andmete fail",
+	"open_kpm_title": "Vali karaoke parameetrite fail",
+	"save_kpm_title": "Salvesta karaoke parameetrite fail",
+	"import_file_title": "Vali rütmimängu fail",
+	"open_music_title": "Vali helifail",
+	"file_desc_kbd": "Dragon Engine karaoke andmed",
+	"file_desc_kpm": "Karaoke parameetrite failid",
+	"file_desc_mns": "Persona Dancing map failid",
+	"file_desc_wtfl": "Kenzan kosetreeningu failid",
+	"file_desc_kara": "OE Karaoke failid",
+	"file_desc_lbd": "OE Rütmimängu Formaadi failid",
+	"file_desc_mp3": "MP3 failid",
+	"file_desc_ogg": "OGG Vorbis failid",
+	"file_desc_flac": "FLAC failid"
+  }
+}

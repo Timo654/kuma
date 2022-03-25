@@ -1,0 +1,19 @@
+{
+  "en": {
+	"open_kbd_file": "Select a karaoke button data file",
+	"save_kbd_file": "Save karaoke button data file",
+	"open_kpm_title": "Select a karaoke parameter file",
+	"save_kpm_title": "Save karaoke parameter file",
+	"import_file_title": "Select a rhythm minigame file",
+	"open_music_title": "Select a music file",
+	"file_desc_kbd": "Dragon Engine karaoke data",
+	"file_desc_kpm": "Karaoke parameter files",
+	"file_desc_mns": "Persona Dancing map files",
+	"file_desc_wtfl": "Kenzan waterfall training files",
+	"file_desc_kara": "OE Karaoke files",
+	"file_desc_lbd": "OE Rhythm Format files",
+	"file_desc_mp3": "MP3 files",
+	"file_desc_ogg": "OGG Vorbis files",
+	"file_desc_flac": "FLAC files"
+  }
+}

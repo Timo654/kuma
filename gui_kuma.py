@@ -72,6 +72,7 @@ if not config.has_section("CONFIG"):
     config.set("CONFIG", "LANGUAGE", get_default_language())
     config.set("CONFIG", "VOLUME", str(1))
     config.set("CONFIG", "UNDO KBD LOAD", str(0))
+    config.set("CONFIG", "FIRST LAUNCH", str(1))
 if not config.has_section("PATHS"):
     config.add_section("PATHS")
     config.set("PATHS", "Input", f'{str(Path().resolve())}')
@@ -588,6 +589,40 @@ class Karaoke:
                             start_pos, end_pos, y_pos, note[4], note[3])
             self.add_to_undo_list(prev_list)
 
+    def show_help_window(self, manager, screen):
+        info_window_rect = pygame.Rect(0, 0, 500, 400)
+        info_window_rect.center = screen.get_rect().center
+        # separated text so it would be easier for translators
+        how_1 = 'How to use'
+        how_2 = 'KUMA - A karaoke editor for Dragon Engine games.'
+        how_3 = 'To begin using the tool, you can add start by loading an existing file from <b>File</b> -> <b>Open</b> or just by adding notes to a new file.'
+        how_4 = 'You can choose your preferred <b>controller type</b> and <b>language</b> using the dropdown menus at the top of the screen.'
+        how_5 = 'When placing a note, the accuracy is <b>{ms} milliseconds</b>. You can change the position more accurately in <b>note edit mode.'.format(
+            ms=self.scale)
+        how_6 = 'You can play songs by loading them from the <b>Music</b> tab and then pressing the <b>Play</b> button in the left corner.'
+        how_7 = 'If you want to save, you can save by going to <b>File</b> -> <b>Save</b> or <b>Save as...</b> to either create a new file or overwrite an existing one.'
+        how_8 = 'Key binds'
+        how_9 = '<b>Left click</b> - Place and pick up notes.'
+        how_10 = '<b>Right click</b> - Change held note type.'
+        how_11 = '<b>E</b> - Note edit mode. You can accurately change note timings, position, type and more. Pressing E again saves the note.'
+        how_12 = '<b>Arrow keys, Page Up, Page Down</b> - Move the scrollbar.'
+        how_13 = '<b>Delete</b> - Removes currently selected/edited note.'
+        how_14 = '<b>End</b> - Jump to the last note.'
+        how_15 = '<b>Left Ctrl + S</b> - Save.'
+        how_16 = '<b>Left Ctrl + Z</b> - Undo.'
+        how_17 = '<b>Left Ctrl + F</b> - Select a note.'
+        how_18 = '<b>Left Ctrl + C</b> - Copy selected notes.'
+        how_19 = '<b>Left Ctrl + V</b> - Paste copied notes (Vertical position does not change).'
+        how_20 = '<b>Left Ctrl + Left Shift + V</b> - Paste copied notes (Vertical position changes).'
+
+        help_window = UIMessageWindow(rect=info_window_rect,
+                                      html_message=(
+                                          f'<b>{how_1}</b><br>---------------<br><b>{how_2}</b><br>{how_3}.<br>{how_4}<br>{how_5}</b><br>{how_6}<br>{how_7}<br>---------------<br><br><b>{how_8}</b><br>---------------<br><br>{how_9}<br>{how_10}<br>{how_11}<br>{how_12}<br>{how_13}<br>{how_14}<br>{how_15}<br>{how_16}<br>{how_17}<br>{how_18}<br>{how_19}<br>{how_20}'),
+                                      manager=manager,
+                                      window_title='menu_bar.help_text')
+        help_window.dismiss_button.set_text(
+            'kuma_ui.close_button_text')
+
 # strip from sheet https://python-forum.io/thread-403.html
 
 
@@ -752,7 +787,7 @@ def save_file(open_file, manager, karaoke, cutscene_box):
         return open_file
     else:
         output_selection = filedialog.asksaveasfilename(
-            title='Save karaoke button data', initialdir=config['PATHS']['Output'], defaultextension='.kbd', filetypes=[("Dragon Engine karaoke data", "*.kbd")])
+            title=i18n.t("kuma_files.save_kbd_file"), initialdir=config['PATHS']['Output'], defaultextension='.kbd', filetypes=[(i18n.t("kuma_files.file_desc_kbd"), "*.kbd")])
         if len(output_selection) == 0:
             return None  # empty
 
@@ -999,6 +1034,9 @@ def main():
     note_id = 0  # note that you get when you want to add one, first is circle
     fill_colour = (44, 52, 58)
     FPS = int(config['CONFIG']['FPS'])
+    if int(config["CONFIG"]["FIRST LAUNCH"]):
+        karaoke.show_help_window(manager, screen)
+        config.set("CONFIG", "FIRST LAUNCH", str(0))
     # -------------------------------------------------------------------------
     # Main loop
     # -------------------------------------------------------------------------
@@ -1252,8 +1290,8 @@ def main():
                 if event.ui_element in menu_bar.menu_bar_container.elements:
                     held_note = None
                 elif event.ui_element == load_kpm_button:
-                    kpm_input_selection = filedialog.askopenfilename(title='Select a karaoke parameter file', filetypes=[
-                                                                     ("Karaoke parameter files", "*.kpm")], initialdir=config['PATHS']['KPM_Input'])
+                    kpm_input_selection = filedialog.askopenfilename(title=i18n.t("kuma_files.open_kpm_title"), filetypes=[
+                                                                     (i18n.t("kuma_files.file_desc_kpm"), "*.kpm")], initialdir=config['PATHS']['KPM_Input'])
                     if len(kpm_input_selection) != 0:
                         kpm_data = load_kpm(
                             kpm_input_selection, cutscene_box)
@@ -1264,7 +1302,7 @@ def main():
                             save_kpm_button.show()
                 elif event.ui_element == save_kpm_button:
                     kpm_output_selection = filedialog.asksaveasfilename(
-                        title='Save karaoke parameter file', initialdir=config['PATHS']['KPM_Output'], defaultextension='.kpm', filetypes=[("Karaoke parameter files", "*.kpm")])
+                        title=i18n.t("kuma_files.save_kpm_title"), initialdir=config['PATHS']['KPM_Output'], defaultextension='.kpm', filetypes=[(i18n.t("kuma_files.file_desc_kpm"), "*.kpm")])
                     if len(kpm_output_selection) != 0:
                         config.set("PATHS", "KPM_Output", str(
                             kpm_output_selection))
@@ -1301,10 +1339,10 @@ def main():
                 # menu bar item related code
                 # importing maps
                 elif event.ui_object_id == 'menu_bar.#file_menu_items.#import':
-                    import_selection = filedialog.askopenfilename(title='Select a rhythm minigame file', filetypes=[(
-                        "Persona 4 Dancing map files", "*.bin"), (
-                        "Kenzan waterfall training files", "*.bin"), (
-                        "OE Karaoke files", "*.bin"), ("Yakuza Rhythm Format files", "*.lbd")], initialdir=config['PATHS']['Import_Input'])
+                    import_selection = filedialog.askopenfilename(title=i18n.t("kuma_files.import_file_title"), filetypes=[(
+                        i18n.t("kuma_files.file_desc_mns"), "*.bin"), (
+                        i18n.t("kuma_files.file_desc_wtfl"), "*.bin"), (
+                        i18n.t("kuma_files.file_desc_kara"), "*.bin"), (i18n.t("kuma_files.file_desc_lbd"), "*.lbd")], initialdir=config['PATHS']['Import_Input'])
                     if len(import_selection) != 0:
                         config.set("PATHS", "Import_Input", str(
                             import_selection))
@@ -1316,8 +1354,8 @@ def main():
                                      dropdowns, undo_button)
                 # open file
                 elif event.ui_object_id == 'menu_bar.#file_menu_items.#open':
-                    input_selection = filedialog.askopenfilename(title='Select karaoke button data', filetypes=[
-                                                                 ("Dragon Engine karaoke data files", "*.kbd")], initialdir=config['PATHS']['Input'])
+                    input_selection = filedialog.askopenfilename(title=i18n.t("kuma_files.open_kbd_file"), filetypes=[
+                                                                 (i18n.t("kuma_files.file_desc_kbd"), "*.kbd")], initialdir=config['PATHS']['Input'])
                     if len(input_selection) != 0:
                         if currently_edited:
                             stop_editing(boxes, box_labels,
@@ -1347,8 +1385,8 @@ def main():
                     open_file = output_selection
                 # load song
                 elif event.ui_object_id == 'menu_bar.#music_menu_items.#load_song':
-                    music_selection = filedialog.askopenfilename(title='Select a music file', filetypes=[(
-                        "MP3 files", "*.mp3"), ("OGG Vorbis files", "*.ogg"), ("FLAC files", "*.flac")], initialdir=config['PATHS']['Music'])
+                    music_selection = filedialog.askopenfilename(title=i18n.t("kuma_files.open_music_title"), filetypes=[(
+                        i18n.t("kuma_files.file_desc_mp3"), "*.mp3"), (i18n.t("kuma_files.file_desc_ogg"), "*.ogg"), (i18n.t("kuma_files.file_desc_flac"), "*.flac")], initialdir=config['PATHS']['Music'])
                     if len(music_selection) != 0:
                         loaded, length = load_song(
                             music_selection, music_elements)
@@ -1363,38 +1401,7 @@ def main():
                     open_file = output_selection
                 # how to use page
                 elif event.ui_object_id == 'menu_bar.#help_menu_items.#how_to_use':  # TODO - translate
-                    info_window_rect = pygame.Rect(0, 0, 500, 400)
-                    info_window_rect.center = screen.get_rect().center
-                    # separated text so it would be easier for translators
-                    how_1 = 'How to use'
-                    how_2 = 'KUMA - A karaoke editor for Dragon Engine games.'
-                    how_3 = 'To begin using the tool, you can add start by loading an existing file from <b>File</b> -> <b>Open</b> or just by adding notes to a new file.'
-                    how_4 = 'You can choose your preferred <b>controller type</b> and <b>language</b> using the dropdown menus at the top of the screen.'
-                    how_5 = 'When placing a note, the accuracy is <b>{ms} milliseconds</b>. You can change the position more accurately in <b>note edit mode.'.format(
-                        ms=karaoke.scale)
-                    how_6 = 'You can play songs by loading them from the <b>Music</b> tab and then pressing the <b>Play</b> button in the left corner.'
-                    how_7 = 'If you want to save, you can save by going to <b>File</b> -> <b>Save</b> or <b>Save as...</b> to either create a new file or overwrite an existing one.'
-                    how_8 = 'Key binds'
-                    how_9 = '<b>Left click</b> - Place and pick up notes.'
-                    how_10 = '<b>Right click</b> - Change held note type.'
-                    how_11 = '<b>E</b> - Note edit mode. You can accurately change note timings, position, type and more. Pressing E again saves the note.'
-                    how_12 = '<b>Arrow keys, Page Up, Page Down</b> - Move the scrollbar.'
-                    how_13 = '<b>Delete</b> - Removes currently selected/edited note.'
-                    how_14 = '<b>End</b> - Jump to the last note.'
-                    how_15 = '<b>Left Ctrl + S</b> - Save.'
-                    how_16 = '<b>Left Ctrl + Z</b> - Undo.'
-                    how_17 = '<b>Left Ctrl + F</b> - Select a note.'
-                    how_18 = '<b>Left Ctrl + C</b> - Copy selected notes.'
-                    how_19 = '<b>Left Ctrl + V</b> - Paste copied notes (Vertical position does not change).'
-                    how_20 = '<b>Left Ctrl + Left Shift + V</b> - Paste copied notes (Vertical position changes).'
-
-                    help_window = UIMessageWindow(rect=info_window_rect,
-                                                  html_message=(
-                                                      f'<b>{how_1}</b><br>---------------<br><b>{how_2}</b><br>{how_3}.<br>{how_4}<br>{how_5}</b><br>{how_6}<br>{how_7}<br>---------------<br><br><b>{how_8}</b><br>---------------<br><br>{how_9}<br>{how_10}<br>{how_11}<br>{how_12}<br>{how_13}<br>{how_14}<br>{how_15}<br>{how_16}<br>{how_17}<br>{how_18}<br>{how_19}<br>{how_20}'),
-                                                  manager=manager,
-                                                  window_title='menu_bar.help_text')
-                    help_window.dismiss_button.set_text(
-                        'kuma_ui.close_button_text')
+                    karaoke.show_help_window(manager, screen)
                 # about page
                 elif event.ui_object_id == 'menu_bar.#help_menu_items.#about':  # TODO - translate
                     about_window_rect = pygame.Rect(0, 0, 400, 300)

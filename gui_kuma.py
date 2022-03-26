@@ -757,6 +757,7 @@ def get_menu_data():
                                '#new': {'display_name': 'menu_bar.new_text'},
                                '#open': {'display_name': 'menu_bar.open_text'},
                                '#import': {'display_name': 'menu_bar.import_text'},
+                               '#export': {'display_name': 'menu_bar.export_text'},
                                '#save': {'display_name': 'menu_bar.save_text'},
                                '#save_as': {'display_name': 'menu_bar.save_as_text'}
                            },
@@ -1078,7 +1079,7 @@ def main():
             if key_pressed == 'right':
                 if scrollbar.get_current_value() + diff <= scrollbar_size:
                     scrollbar.set_current_value(
-                        scrollbar.get_current_value() + scrollbar_add)
+                        scrollbar.get_current_value() + diff)
                 else:
                     scrollbar.set_current_value(scrollbar_size)
             elif key_pressed == 'left':
@@ -1115,6 +1116,9 @@ def main():
                     config.write(configfile)
                 print('(^ _ ^)/')
                 sys.exit()
+            # scroll scrollbar
+            if event.type == pygame.MOUSEWHEEL:
+                scrollbar.set_current_value(scrollbar.get_current_value() + 50 * event.y, warn=False)
             # add / move notes
             elif event.type == pygame.MOUSEBUTTONDOWN:
                 # if right clicked, get a note
@@ -1343,6 +1347,11 @@ def main():
                         i18n.t("kuma_files.file_desc_mns"), "*.bin"), (
                         i18n.t("kuma_files.file_desc_wtfl"), "*.bin"), (
                         i18n.t("kuma_files.file_desc_kara"), "*.bin"), (i18n.t("kuma_files.file_desc_lbd"), "*.lbd")], initialdir=config['PATHS']['Import_Input'])
+                elif event.ui_object_id == 'menu_bar.#file_menu_items.#export':
+                    import_selection = filedialog.askopenfilename(title='Select a rhythm minigame file', filetypes=[(
+                        "Persona 4 Dancing map files", "*.bin"), (
+                        "Kenzan waterfall training files", "*.bin"), (
+                        "OE Karaoke files", "*.bin"), ("Yakuza Rhythm Format files", "*.lbd")], initialdir=config['PATHS']['Import_Input'])
                     if len(import_selection) != 0:
                         config.set("PATHS", "Import_Input", str(
                             import_selection))

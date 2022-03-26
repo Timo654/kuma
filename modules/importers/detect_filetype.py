@@ -1,5 +1,6 @@
 from io import UnsupportedOperation
 from binary_reader import BinaryReader
+import json
 from modules.importers.lbd_import import load_lbd
 from modules.importers.kara_import import load_kara
 from modules.importers.mns_import import load_mns
@@ -7,8 +8,12 @@ from modules.importers.wtfl_import import load_wtfl
 
 
 def load_file(filename):
-    if str(filename).endswith('lbd'):
+    filename_str = str(filename)
+    if filename_str.endswith('lbd'):
         return load_lbd(filename)
+    elif filename_str.endswith('json'):
+        with open(filename, 'r') as f:
+            return json.loads(f.read())
     with open(filename, 'rb') as file:
         br = BinaryReader(file.read())
     magic = br.read_uint32()

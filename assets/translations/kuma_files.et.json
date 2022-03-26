@@ -5,6 +5,7 @@
 	"open_kpm_title": "Vali karaoke parameetrite fail",
 	"save_kpm_title": "Salvesta karaoke parameetrite fail",
 	"import_file_title": "Vali rütmimängu fail",
+	"export_file_title": "Ekspordi karaoke andmed",
 	"open_music_title": "Vali helifail",
 	"file_desc_kbd": "Dragon Engine karaoke andmed",
 	"file_desc_kpm": "Karaoke parameetrite failid",
@@ -14,6 +15,7 @@
 	"file_desc_lbd": "OE Rütmimängu Formaadi failid",
 	"file_desc_mp3": "MP3 failid",
 	"file_desc_ogg": "OGG Vorbis failid",
-	"file_desc_flac": "FLAC failid"
+	"file_desc_flac": "FLAC failid",
+	"file_desc_json": "JSON failid"
   }
 }

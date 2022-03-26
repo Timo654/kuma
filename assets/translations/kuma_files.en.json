@@ -5,6 +5,7 @@
 	"open_kpm_title": "Select a karaoke parameter file",
 	"save_kpm_title": "Save karaoke parameter file",
 	"import_file_title": "Select a rhythm minigame file",
+	"export_file_title": "Export karaoke button data",
 	"open_music_title": "Select a music file",
 	"file_desc_kbd": "Dragon Engine karaoke data",
 	"file_desc_kpm": "Karaoke parameter files",
@@ -14,6 +15,7 @@
 	"file_desc_lbd": "OE Rhythm Format files",
 	"file_desc_mp3": "MP3 files",
 	"file_desc_ogg": "OGG Vorbis files",
-	"file_desc_flac": "FLAC files"
+	"file_desc_flac": "FLAC files",
+	"file_desc_json": "JSON files"
   }
 }

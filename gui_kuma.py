@@ -83,6 +83,8 @@ if not config.has_section("PATHS"):
                f'{str(Path().resolve())}')
     config.set("PATHS", "Import_Input",
                f'{str(Path().resolve())}')
+    config.set("PATHS", "Export_Output",
+               f'{str(Path().resolve())}')
     config.set("PATHS", "Music",
                f'{str(Path().resolve())}')
 if not config.has_section("ADV. SETTINGS"):
@@ -387,7 +389,7 @@ class Karaoke:
         return True, None
 
     # KBD writing code
-    def write_kbd(self, file, cutscene_box):
+    def write_kbd(self, file, cutscene_box, mode='save'):
         data = dict()
         note_list = list()
         x = 0
@@ -427,11 +429,19 @@ class Karaoke:
         data['Notes'] = note_list
         data['Header'] = dict()
         data['Header']['Version'] = 2
-        kbd.write_file(data, file, cutscene_start=float(
-            cutscene_box.get_text()))
-        print("File written to {}".format(file))
+        if mode == 'save':
+            kbd.write_file(data, file, cutscene_start=float(
+                cutscene_box.get_text()))
+            print("File written to {}".format(file))
+        elif mode == 'export':
+            with open(file, 'w') as f:
+                json.dump(data, f, indent=2)
+            print("File exported to {}".format(file))
+        else:
+            raise ValueError('Unknown kbd save mode!')
 
     # draw a square around a note
+
     def highlight_note(self, note, color, worlds, surface_nr, next_surface):
         x = 2 + (note.x * (self.box_size + self.border))
         y = 2 + self.y + \
@@ -1118,7 +1128,8 @@ def main():
                 sys.exit()
             # scroll scrollbar
             if event.type == pygame.MOUSEWHEEL:
-                scrollbar.set_current_value(scrollbar.get_current_value() + 50 * event.y, warn=False)
+                scrollbar.set_current_value(
+                    scrollbar.get_current_value() + 50 * event.y, warn=False)
             # add / move notes
             elif event.type == pygame.MOUSEBUTTONDOWN:
                 # if right clicked, get a note
@@ -1342,16 +1353,16 @@ def main():
                         'kuma_ui.cancel_button_text')
                 # menu bar item related code
                 # importing maps
+                elif event.ui_object_id == 'menu_bar.#file_menu_items.#export':
+                    import_selection = filedialog.asksaveasfilename(
+                        title=i18n.t("kuma_files.export_file_title"), initialdir=config['PATHS']['Export_Output'], defaultextension='.json', filetypes=[(i18n.t("kuma_files.file_desc_json"), "*.json")])
+                    karaoke.write_kbd(
+                        import_selection, cutscene_box, mode='export')
                 elif event.ui_object_id == 'menu_bar.#file_menu_items.#import':
                     import_selection = filedialog.askopenfilename(title=i18n.t("kuma_files.import_file_title"), filetypes=[(
                         i18n.t("kuma_files.file_desc_mns"), "*.bin"), (
                         i18n.t("kuma_files.file_desc_wtfl"), "*.bin"), (
-                        i18n.t("kuma_files.file_desc_kara"), "*.bin"), (i18n.t("kuma_files.file_desc_lbd"), "*.lbd")], initialdir=config['PATHS']['Import_Input'])
-                elif event.ui_object_id == 'menu_bar.#file_menu_items.#export':
-                    import_selection = filedialog.askopenfilename(title='Select a rhythm minigame file', filetypes=[(
-                        "Persona 4 Dancing map files", "*.bin"), (
-                        "Kenzan waterfall training files", "*.bin"), (
-                        "OE Karaoke files", "*.bin"), ("Yakuza Rhythm Format files", "*.lbd")], initialdir=config['PATHS']['Import_Input'])
+                        i18n.t("kuma_files.file_desc_kara"), "*.bin"), (i18n.t("kuma_files.file_desc_lbd"), "*.lbd"), (i18n.t("kuma_files.file_desc_json"), "*.json")], initialdir=config['PATHS']['Import_Input'])
                     if len(import_selection) != 0:
                         config.set("PATHS", "Import_Input", str(
                             import_selection))

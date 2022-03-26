@@ -23,7 +23,7 @@ import sys
 VERSION = "v0.9.7"
 CREATORS = 'Timo654'
 TRANSLATORS = 'Timo654, ketrub, Mink, jason098, Capitán Retraso, Kent, Edness, JustAnyone, Tervel, RyuHachii, Foas, Biggelskog'
-TESTERS = "ketrub, KaarelJ98, Ono Michio"
+TESTERS = "ketrub, KaarelJ98, Ono Michio, Emergence"
 print("""
    _     _      _     _      _     _      _     _
   (c).-.(c)    (c).-.(c)    (c).-.(c)    (c).-.(c)

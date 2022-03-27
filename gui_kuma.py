@@ -818,6 +818,7 @@ def main():
     # make a tkinter root window for file dialogs
     root = tk.Tk()
     root.withdraw()
+    root.iconbitmap(f'{asset_path}/textures/icon_small.ico')
     # load language
     current_language = config['CONFIG']['LANGUAGE']
     if current_language not in languages:

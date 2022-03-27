@@ -390,6 +390,8 @@ class Karaoke:
 
     # KBD writing code
     def write_kbd(self, file, cutscene_box, mode='save'):
+        if len(file) == 0:
+            raise ValueError('Filename cannot be empty.')
         data = dict()
         note_list = list()
         x = 0
@@ -1354,10 +1356,11 @@ def main():
                 # menu bar item related code
                 # importing maps
                 elif event.ui_object_id == 'menu_bar.#file_menu_items.#export':
-                    import_selection = filedialog.asksaveasfilename(
+                    export_selection = filedialog.asksaveasfilename(
                         title=i18n.t("kuma_files.export_file_title"), initialdir=config['PATHS']['Export_Output'], defaultextension='.json', filetypes=[(i18n.t("kuma_files.file_desc_json"), "*.json")])
-                    karaoke.write_kbd(
-                        import_selection, cutscene_box, mode='export')
+                    if len(export_selection) != 0:
+                        karaoke.write_kbd(
+                            export_selection, cutscene_box, mode='export')
                 elif event.ui_object_id == 'menu_bar.#file_menu_items.#import':
                     import_selection = filedialog.askopenfilename(title=i18n.t("kuma_files.import_file_title"), filetypes=[(
                         i18n.t("kuma_files.file_desc_mns"), "*.bin"), (

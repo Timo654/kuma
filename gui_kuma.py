@@ -1409,7 +1409,7 @@ def main():
                 # load song
                 elif event.ui_object_id == 'menu_bar.#music_menu_items.#load_song':
                     music_selection = filedialog.askopenfilename(title=i18n.t("kuma_files.open_music_title"), filetypes=[(
-                        i18n.t("kuma_files.file_desc_mp3"), "*.mp3"), (i18n.t("kuma_files.file_desc_ogg"), "*.ogg"), (i18n.t("kuma_files.file_desc_flac"), "*.flac")], initialdir=config['PATHS']['Music'])
+                        i18n.t("kuma_files.file_desc_ogg"), "*.ogg"), (i18n.t("kuma_files.file_desc_flac"), "*.flac"), (i18n.t("kuma_files.file_desc_mp3"), "*.mp3")], initialdir=config['PATHS']['Music'])
                     if len(music_selection) != 0:
                         loaded, length = load_song(
                             music_selection, music_elements)

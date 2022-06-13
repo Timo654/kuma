@@ -5,10 +5,13 @@ from modules.importers.lbd_import import load_lbd
 from modules.importers.kara_import import load_kara
 from modules.importers.mns_import import load_mns
 from modules.importers.wtfl_import import load_wtfl
+from modules.importers.dsc_import import load_dsc
 
 
 def load_file(filename):
     filename_str = str(filename)
+    if filename_str.endswith('txt'):
+        return load_dsc(filename)
     if filename_str.endswith('lbd'):
         return load_lbd(filename)
     elif filename_str.endswith('json'):

@@ -1366,7 +1366,7 @@ def main():
                     import_selection = filedialog.askopenfilename(title=i18n.t("kuma_files.import_file_title"), filetypes=[(
                         i18n.t("kuma_files.file_desc_mns"), "*.bin"), (
                         i18n.t("kuma_files.file_desc_wtfl"), "*.bin"), (
-                        i18n.t("kuma_files.file_desc_kara"), "*.bin"), (i18n.t("kuma_files.file_desc_lbd"), "*.lbd"), (i18n.t("kuma_files.file_desc_json"), "*.json")], initialdir=config['PATHS']['Import_Input'])
+                        i18n.t("kuma_files.file_desc_kara"), "*.bin"), (i18n.t("kuma_files.file_desc_lbd"), "*.lbd"), (i18n.t("kuma_files.file_desc_json"), "*.json"), (i18n.t("kuma_files.file_desc_dsc"), "*.txt")], initialdir=config['PATHS']['Import_Input'])
                     if len(import_selection) != 0:
                         config.set("PATHS", "Import_Input", str(
                             import_selection))

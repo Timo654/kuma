@@ -16,6 +16,7 @@
 	"file_desc_mp3": "MP3 files",
 	"file_desc_ogg": "OGG Vorbis files",
 	"file_desc_flac": "FLAC files",
-	"file_desc_json": "JSON files"
+	"file_desc_json": "JSON files",
+	"file_desc_dsc": "Project DIVA decompiled dsc"
   }
 }

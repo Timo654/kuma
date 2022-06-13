@@ -49,19 +49,16 @@ def convert_button(button):
     elif button == 3:  # square
         return 2, 0
     elif button == 4:  # triangle hold
-        return 3, 1  # unimplemented
+        return 3, 1
     elif button == 5:  # circle hold
-        return 0, 1  # unimplemented
+        return 0, 1
     elif button == 6:  # cross hold
-        return 1, 1  # unimplemented
+        return 1, 1
     elif button == 7:  # square hold
-        return 2, 1  # unimplemented
-    elif button == 12:  # left facing slide
-        return 7, 0  # unimplemented
-    elif button == 13:  # right facing slide
-        return 7, 0  # unimplemented
+        return 2, 1
     else:
-        raise ValueError('Unknown button type', button)
+        # Unimplemented button type
+        return 7, 0
 
 # converts project diva time to yakuza time
 

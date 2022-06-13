@@ -30,6 +30,7 @@ share/python-wheels/
 .installed.cfg
 *.egg
 MANIFEST
+package/
 
 # PyInstaller
 #  Usually these files are written by a python script from a template
@@ -134,7 +135,10 @@ dmypy.json
 
 # Output files
 *.ini
-test_output/*.kbd
+test_output/
 *.zip
 *.bat
 KUMA_settings.ini
+
+# Test files
+test_files/

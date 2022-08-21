@@ -989,8 +989,11 @@ def main():
     song_label = UILabel(pygame.Rect((10, 400), (-1, 22)),
                          "kuma_ui.song_position_label",
                          manager=manager)
-    volume_label = UILabel(pygame.Rect((215, 402), (-1, 25)), 'kuma_ui.volume_label',
-                           manager=manager, volume=round(float(config['CONFIG']['VOLUME']) * 100))
+    # TODO - uncomment when pygame-gui 0.6.5 releases
+    #volume_label = UILabel(pygame.Rect((215, 402), (-1, 25)), 'kuma_ui.volume_label', 
+    #                       manager=manager, volume=round(float(config['CONFIG']['VOLUME']) * 100))
+    volume_label = UILabel(pygame.Rect((215, 402), (-1, 25)), f"Volume {round(float(config['CONFIG']['VOLUME']) * 100)}", 
+                           manager=manager)
     box_labels = [start_label, end_label, vert_label, start_cue_label, end_cue_label,
                   start_cuesheet_label, end_cuesheet_label, note_button_label, note_type_label]
     for label in box_labels:
@@ -1530,8 +1533,11 @@ def main():
                     volume_value = volume_slider.get_current_value() / 100
                     pygame.mixer.music.set_volume(volume_value)
                     config.set("CONFIG", "VOLUME", str(volume_value))
+                    # TODO - uncomment when pygame-gui 0.6.5 releases
+                    #volume_label.set_text(
+                    #    'kuma_ui.volume_label', volume=volume_slider.get_current_value())
                     volume_label.set_text(
-                        'kuma_ui.volume_label', volume=volume_slider.get_current_value())
+                        f"Volume {volume_slider.get_current_value()}")
                 elif event.ui_object_id == '#scrollbar':
                     scrollbar_moved = True
 

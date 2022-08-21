@@ -14,7 +14,7 @@ import tkinter as tk
 from tkinter import filedialog
 import json
 import configparser
-import locale
+#import locale
 import i18n
 import mutagen
 import sys
@@ -50,11 +50,13 @@ languages = [key for key in assets['Languages']]
 
 
 def get_default_language():
-    loc = locale.getdefaultlocale()  # get current locale
-    lang_code = loc[0].split('_')[0]
-    language = list(assets['Languages'].keys())[list(
-        assets['Languages'].values()).index(lang_code)]
-    return language
+    # TODO - re-enable language support when new version of pygame-gui releases
+    # loc = locale.getdefaultlocale()  # get current locale
+    #lang_code = loc[0].split('_')[0]
+    # language = list(assets['Languages'].keys())[list(
+    #    assets['Languages'].values()).index(lang_code)]
+    # return language
+    return "en"
 
 
 # read/create settings
@@ -608,7 +610,8 @@ class Karaoke:
         how_1 = 'How to use'
         how_2 = 'KUMA - A karaoke editor for Dragon Engine games.'
         how_3 = 'To begin using the tool, you can add start by loading an existing file from <b>File</b> -> <b>Open</b> or just by adding notes to a new file.'
-        how_4 = 'You can choose your preferred <b>controller type</b> and <b>language</b> using the dropdown menus at the top of the screen.'
+        # TODO - and <b>language</b>
+        how_4 = 'You can choose your preferred <b>controller type</b> using the dropdown menus at the top of the screen.'
         how_5 = 'When placing a note, the accuracy is <b>{ms} milliseconds</b>. You can change the position more accurately in <b>note edit mode.'.format(
             ms=self.scale)
         how_6 = 'You can play songs by loading them from the <b>Music</b> tab and then pressing the <b>Play</b> button in the left corner.'
@@ -691,7 +694,7 @@ def save_kpm(file, cutscene_box, data):
         print("KPM written to {}".format(file))
         return data
     else:
-        raise Exception('No kpm data found!')
+        raise Exception('No KPM data found!')
 
 
 # update values
@@ -806,7 +809,7 @@ def save_file(open_file, manager, karaoke, cutscene_box):
 
         open_file = output_selection
         config.set("PATHS", "Output", str(
-            output_selection))
+            Path(output_selection).parents[0]))
         karaoke.write_kbd(
             output_selection, cutscene_box)
         return output_selection
@@ -891,11 +894,12 @@ def main():
                                    relative_rect=pygame.Rect(215, 0, 200, 25),
                                    manager=manager, object_id='#button_picker')
 
-    language_picker = UIDropDownMenu(options_list=languages,
-                                     starting_option=current_language,
-                                     relative_rect=pygame.Rect(
-                                         440, 0, 150, 25),
-                                     manager=manager, object_id='#language_picker')
+    # TODO - re-enable when new version of pygame_gui releases
+    # language_picker = UIDropDownMenu(options_list=languages,
+    #                                 starting_option=current_language,
+    #                                 relative_rect=pygame.Rect(
+    #                                     440, 0, 150, 25),
+    #                                 manager=manager, object_id='#language_picker')
 
     note_picker = UIDropDownMenu(options_list=assets['Button prompts'][current_controller][1],
                                  starting_option=assets['Button prompts'][current_controller][1][0],
@@ -1315,7 +1319,7 @@ def main():
                             kpm_input_selection, cutscene_box)
                         if kpm_data:
                             config.set("PATHS", "KPM_Input", str(
-                                kpm_input_selection))
+                                Path(kpm_input_selection).parents[0]))
                         if kpm_data != None:
                             save_kpm_button.show()
                 elif event.ui_element == save_kpm_button:
@@ -1323,7 +1327,7 @@ def main():
                         title=i18n.t("kuma_files.save_kpm_title"), initialdir=config['PATHS']['KPM_Output'], defaultextension='.kpm', filetypes=[(i18n.t("kuma_files.file_desc_kpm"), "*.kpm")])
                     if len(kpm_output_selection) != 0:
                         config.set("PATHS", "KPM_Output", str(
-                            kpm_output_selection))
+                            Path(kpm_output_selection).parents[0]))
                         kpm_data = save_kpm(
                             kpm_output_selection, cutscene_box, kpm_data)
                 # music buttons
@@ -1360,16 +1364,18 @@ def main():
                     export_selection = filedialog.asksaveasfilename(
                         title=i18n.t("kuma_files.export_file_title"), initialdir=config['PATHS']['Export_Output'], defaultextension='.json', filetypes=[(i18n.t("kuma_files.file_desc_json"), "*.json")])
                     if len(export_selection) != 0:
+                        config.set("PATHS", "Export_Output", str(
+                            Path(export_selection).parents[0]))
                         karaoke.write_kbd(
                             export_selection, cutscene_box, mode='export')
                 elif event.ui_object_id == 'menu_bar.#file_menu_items.#import':
                     import_selection = filedialog.askopenfilename(title=i18n.t("kuma_files.import_file_title"), filetypes=[(
                         i18n.t("kuma_files.file_desc_mns"), "*.bin"), (
                         i18n.t("kuma_files.file_desc_wtfl"), "*.bin"), (
-                        i18n.t("kuma_files.file_desc_kara"), "*.bin"), (i18n.t("kuma_files.file_desc_lbd"), "*.lbd"), (i18n.t("kuma_files.file_desc_json"), "*.json"), (i18n.t("kuma_files.file_desc_dsc"), "*.txt")], initialdir=config['PATHS']['Import_Input'])
+                        i18n.t("kuma_files.file_desc_kara"), "*.bin"), (i18n.t("kuma_files.file_desc_lbd"), "*.lbd"), (i18n.t("kuma_files.file_desc_json"), "*.json"), (i18n.t("kuma_files.file_desc_dsc"), "*.txt"), (i18n.t("kuma_files.file_desc_all"), "*.*")], initialdir=config['PATHS']['Import_Input'])
                     if len(import_selection) != 0:
                         config.set("PATHS", "Import_Input", str(
-                            import_selection))
+                            Path(import_selection).parents[0]))
                         karaoke.import_file(
                             import_selection)
                         currently_selected.clear()  # empty the list
@@ -1390,7 +1396,7 @@ def main():
                         currently_selected.clear()  # empty the list
                         if can_save:
                             config.set("PATHS", "Input", str(
-                                input_selection))
+                                Path(input_selection).parents[0]))
                         currently_edited = None
                         open_file = input_selection
                         if kpm_data == None:
@@ -1410,13 +1416,13 @@ def main():
                 # load song
                 elif event.ui_object_id == 'menu_bar.#music_menu_items.#load_song':
                     music_selection = filedialog.askopenfilename(title=i18n.t("kuma_files.open_music_title"), filetypes=[(
-                        i18n.t("kuma_files.file_desc_ogg"), "*.ogg"), (i18n.t("kuma_files.file_desc_flac"), "*.flac"), (i18n.t("kuma_files.file_desc_mp3"), "*.mp3")], initialdir=config['PATHS']['Music'])
+                        i18n.t("kuma_files.file_desc_audio"), "*.ogg  *.flac  *.mp3")], initialdir=config['PATHS']['Music'])
                     if len(music_selection) != 0:
                         loaded, length = load_song(
                             music_selection, music_elements)
                         if loaded:
                             config.set("PATHS", "Music", str(
-                                music_selection))
+                                Path(music_selection).parents[0]))
 
                 # save as
                 elif event.ui_object_id == 'menu_bar.#file_menu_items.#save_as':
@@ -1492,7 +1498,7 @@ def main():
                     currently_selected.clear()  # empty the list
                     if can_save:
                         config.set("PATHS", "Input", str(
-                            open_file))
+                            Path(open_file).parents[0]))
                     currently_edited = None
                     if kpm_data == None:
                         save_kpm_button.hide()
@@ -1504,11 +1510,12 @@ def main():
                         button_picker.selected_option))
                     karaoke.load_item_tex(
                         button_picker.selected_option, held_note, note_picker)
+                # TODO - add lang stuff back when pygame-gui updates
                 # language changed
-                elif event.ui_object_id == '#language_picker':
-                    config.set("CONFIG", "LANGUAGE", str(
-                        language_picker.selected_option))
-                    manager.set_locale(assets['Languages'][event.text])
+                # elif event.ui_object_id == '#language_picker':
+                #    config.set("CONFIG", "LANGUAGE", str(
+                #        language_picker.selected_option))
+                #    manager.set_locale(assets['Languages'][event.text])
             # adjust song position
             elif event.type == UI_TEXT_ENTRY_CHANGED and event.ui_object_id == "#song_position":
                 if not pygame.mixer.get_busy():

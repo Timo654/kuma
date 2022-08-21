@@ -5,8 +5,7 @@ After that, run 'gui_kuma.py'.
 To find instructions on how to use the tool, go to the menu bar, pick 'Help' and 'How to use'.
 
 ## TODO list
-* Translate text
-* Wait for pygame-gui update to translate rest of the UI
+* Add back translations
 
 ## Credits
 https://github.com/SutandoTsukai181/PyBinaryReader

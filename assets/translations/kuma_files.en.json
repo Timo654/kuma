@@ -8,15 +8,14 @@
 	"export_file_title": "Export karaoke button data",
 	"open_music_title": "Select a music file",
 	"file_desc_kbd": "Dragon Engine karaoke data",
-	"file_desc_kpm": "Karaoke parameter files",
-	"file_desc_mns": "Persona Dancing map files",
-	"file_desc_wtfl": "Kenzan waterfall training files",
-	"file_desc_kara": "OE Karaoke files",
-	"file_desc_lbd": "OE Rhythm Format files",
-	"file_desc_mp3": "MP3 files",
-	"file_desc_ogg": "OGG Vorbis files",
-	"file_desc_flac": "FLAC files",
-	"file_desc_json": "JSON files",
-	"file_desc_dsc": "Project DIVA decompiled dsc"
+	"file_desc_kpm": "Karaoke Parameter Files",
+	"file_desc_mns": "Persona Dancing Map Files",
+	"file_desc_wtfl": "Kenzan Waterfall Training Files",
+	"file_desc_kara": "OE Karaoke Files",
+	"file_desc_lbd": "OE Rhythm Format Files",
+	"file_desc_audio": "Audio Files",
+	"file_desc_json": "JSON Files",
+	"file_desc_dsc": "Project DIVA decompiled dsc",
+	"file_desc_all": "All Files"
   }
 }

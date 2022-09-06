@@ -433,6 +433,7 @@ class Karaoke:
         data['Notes'] = note_list
         data['Header'] = dict()
         data['Header']['Version'] = 2
+        data['Header']['Magic'] = "NTBK"
         if mode == 'save':
             kbd.write_file(data, file, cutscene_start=float(
                 cutscene_box.get_text()))
@@ -1388,7 +1389,7 @@ def main():
                 # open file
                 elif event.ui_object_id == 'menu_bar.#file_menu_items.#open':
                     input_selection = filedialog.askopenfilename(title=i18n.t("kuma_files.open_kbd_file"), filetypes=[
-                                                                 (i18n.t("kuma_files.file_desc_kbd"), "*.kbd")], initialdir=config['PATHS']['Input'])
+                                                                 (i18n.t("kuma_files.file_desc_kbd"), "*.kbd  *.dbd")], initialdir=config['PATHS']['Input'])
                     if len(input_selection) != 0:
                         if currently_edited:
                             stop_editing(boxes, box_labels,

@@ -6,6 +6,7 @@ To find instructions on how to use the tool, go to the menu bar, pick 'Help' and
 
 ## TODO list
 * Add back translations
+* DBD support 
 
 ## Credits
 https://github.com/SutandoTsukai181/PyBinaryReader

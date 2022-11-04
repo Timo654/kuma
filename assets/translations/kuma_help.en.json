@@ -1,0 +1,30 @@
+{
+  "en": {
+	"how_1": "How to use",
+	"how_2": "KUMA - A karaoke editor for Dragon Engine games.",
+	"how_3": "To begin using the tool, you can add start by loading an existing file from <b>File</b> -> <b>Open</b> or just by adding notes to a new file.",
+	"how_4": "You can choose your preferred <b>controller type</b> and <b>language</b> using the dropdown menus at the top of the screen.",
+	"how_5": "When placing a note, the accuracy is <b>%{ms} milliseconds</b>. You can change the position more accurately in <b>note edit mode.'",
+	"how_6": "You can play songs by loading them from the <b>Music</b> tab and then pressing the <b>Play</b> button in the left corner.",
+	"how_7": "If you want to save, you can save by going to <b>File</b> -> <b>Save</b> or <b>Save as...</b> to either create a new file or overwrite an existing one.",
+	"how_8": "Key binds",
+	"how_9": "<b>Left click</b> - Place and pick up notes.",
+	"how_10": "<b>Right click</b> - Change held note type.",
+	"how_11": "<b>E</b> - Note edit mode. You can accurately change note timings, position, type and more. Pressing E again saves the note.",
+	"how_12": "<b>Arrow keys, Page Up, Page Down</b> - Move the scrollbar.",
+	"how_13": "<b>Delete</b> - Removes currently selected/edited note.",
+	"how_14": "<b>End</b> - Jump to the last note.",
+	"how_15": "<b>Left Ctrl + S</b> - Save.",
+	"how_16": "<b>Left Ctrl + Z</b> - Undo.",
+	"how_17": "<b>Left Ctrl + F</b> - Select a note.",
+	"how_18": "<b>Left Ctrl + C</b> - Copy selected notes.",
+	"how_19": "<b>Left Ctrl + V</b> - Paste copied notes (Vertical position does not change).",
+	"how_20": "<b>Left Ctrl + Left Shift + V</b> - Paste copied notes (Vertical position changes).",
+	"about_1": "A karaoke editor for Dragon Engine games.",
+	"about_2": "Version:",
+	"about_3": "Created by:",
+	"about_4": "Icon by:",
+	"about_5": "Testers:",
+	"about_6": "Translators:"
+  }
+}

@@ -30,6 +30,7 @@
 	"new_file_long": "Are you sure you want to create a new file? Any unsaved changes will be lost.",
 	"open_file_title": "Open file",
 	"open_file_long": "Are you sure you want to load this file?",
+	"overwrite_file": "Are you sure you want to overwrite %{file}?",
 	"close_button_text": "Close",
 	"time_minutes": "%{min} min",
 	"time_seconds": "%{sec} s",

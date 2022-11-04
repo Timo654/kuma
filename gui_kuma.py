@@ -14,7 +14,7 @@ import tkinter as tk
 from tkinter import filedialog
 import json
 import configparser
-#import locale
+import locale
 import i18n
 import mutagen
 import sys
@@ -50,13 +50,11 @@ languages = [key for key in assets['Languages']]
 
 
 def get_default_language():
-    # TODO - re-enable language support when new version of pygame-gui releases
-    # loc = locale.getdefaultlocale()  # get current locale
-    #lang_code = loc[0].split('_')[0]
-    # language = list(assets['Languages'].keys())[list(
-    #    assets['Languages'].values()).index(lang_code)]
-    # return language
-    return "en"
+    loc = locale.getdefaultlocale()  # get current locale
+    lang_code = loc[0].split('_')[0]
+    language = list(assets['Languages'].keys())[list(
+        assets['Languages'].values()).index(lang_code)]
+    return language
 
 
 # read/create settings
@@ -608,28 +606,26 @@ class Karaoke:
         info_window_rect = pygame.Rect(0, 0, 500, 400)
         info_window_rect.center = screen.get_rect().center
         # separated text so it would be easier for translators
-        how_1 = 'How to use'
-        how_2 = 'KUMA - A karaoke editor for Dragon Engine games.'
-        how_3 = 'To begin using the tool, you can add start by loading an existing file from <b>File</b> -> <b>Open</b> or just by adding notes to a new file.'
-        # TODO - and <b>language</b>
-        how_4 = 'You can choose your preferred <b>controller type</b> using the dropdown menus at the top of the screen.'
-        how_5 = 'When placing a note, the accuracy is <b>{ms} milliseconds</b>. You can change the position more accurately in <b>note edit mode.'.format(
-            ms=self.scale)
-        how_6 = 'You can play songs by loading them from the <b>Music</b> tab and then pressing the <b>Play</b> button in the left corner.'
-        how_7 = 'If you want to save, you can save by going to <b>File</b> -> <b>Save</b> or <b>Save as...</b> to either create a new file or overwrite an existing one.'
-        how_8 = 'Key binds'
-        how_9 = '<b>Left click</b> - Place and pick up notes.'
-        how_10 = '<b>Right click</b> - Change held note type.'
-        how_11 = '<b>E</b> - Note edit mode. You can accurately change note timings, position, type and more. Pressing E again saves the note.'
-        how_12 = '<b>Arrow keys, Page Up, Page Down</b> - Move the scrollbar.'
-        how_13 = '<b>Delete</b> - Removes currently selected/edited note.'
-        how_14 = '<b>End</b> - Jump to the last note.'
-        how_15 = '<b>Left Ctrl + S</b> - Save.'
-        how_16 = '<b>Left Ctrl + Z</b> - Undo.'
-        how_17 = '<b>Left Ctrl + F</b> - Select a note.'
-        how_18 = '<b>Left Ctrl + C</b> - Copy selected notes.'
-        how_19 = '<b>Left Ctrl + V</b> - Paste copied notes (Vertical position does not change).'
-        how_20 = '<b>Left Ctrl + Left Shift + V</b> - Paste copied notes (Vertical position changes).'
+        how_1 = i18n.t('kuma_help.how_1')
+        how_2 = i18n.t('kuma_help.how_2')
+        how_3 = i18n.t('kuma_help.how_3')
+        how_4 = i18n.t('kuma_help.how_4')
+        how_5 = i18n.t('kuma_help.how_5', ms=self.scale)
+        how_6 = i18n.t('kuma_help.how_6')
+        how_7 = i18n.t('kuma_help.how_7')
+        how_8 = i18n.t('kuma_help.how_8')
+        how_9 = i18n.t('kuma_help.how_9')
+        how_10 = i18n.t('kuma_help.how_10')
+        how_11 = i18n.t('kuma_help.how_11')
+        how_12 = i18n.t('kuma_help.how_12')
+        how_13 = i18n.t('kuma_help.how_13')
+        how_14 = i18n.t('kuma_help.how_14')
+        how_15 = i18n.t('kuma_help.how_15')
+        how_16 = i18n.t('kuma_help.how_16')
+        how_17 = i18n.t('kuma_help.how_17')
+        how_18 = i18n.t('kuma_help.how_18')
+        how_19 = i18n.t('kuma_help.how_19')
+        how_20 = i18n.t('kuma_help.how_20')
 
         help_window = UIMessageWindow(rect=info_window_rect,
                                       html_message=(
@@ -797,9 +793,9 @@ def get_menu_data():
 
 
 def save_file(open_file, manager, karaoke, cutscene_box):
-    if open_file != None:  # TODO - translate this
+    if open_file != None:
         save = UIConfirmationDialog(
-            rect=pygame.Rect(0, 0, 300, 300), manager=manager, action_long_desc="Are you sure you want to overwrite {}?".format(open_file), window_title='kuma_ui.save_file_title', action_short_name='kuma_ui.confirm_button_text', object_id='#save_overwrite')
+            rect=pygame.Rect(0, 0, 300, 300), manager=manager, action_long_desc="kuma_ui.overwrite_file", action_long_desc_text_kwargs={"file":open_file}, window_title='kuma_ui.save_file_title', action_short_name='kuma_ui.confirm_button_text', object_id='#save_overwrite')
         save.cancel_button.set_text('kuma_ui.cancel_button_text')
         return open_file
     else:
@@ -895,12 +891,11 @@ def main():
                                    relative_rect=pygame.Rect(215, 0, 200, 25),
                                    manager=manager, object_id='#button_picker')
 
-    # TODO - re-enable when new version of pygame_gui releases
-    # language_picker = UIDropDownMenu(options_list=languages,
-    #                                 starting_option=current_language,
-    #                                 relative_rect=pygame.Rect(
-    #                                     440, 0, 150, 25),
-    #                                 manager=manager, object_id='#language_picker')
+    language_picker = UIDropDownMenu(options_list=languages,
+                                     starting_option=current_language,
+                                     relative_rect=pygame.Rect(
+                                         440, 0, 150, 25),
+                                     manager=manager, object_id='#language_picker')
 
     note_picker = UIDropDownMenu(options_list=assets['Button prompts'][current_controller][1],
                                  starting_option=assets['Button prompts'][current_controller][1][0],
@@ -990,11 +985,8 @@ def main():
     song_label = UILabel(pygame.Rect((10, 400), (-1, 22)),
                          "kuma_ui.song_position_label",
                          manager=manager)
-    # TODO - uncomment when pygame-gui 0.6.5 releases
-    #volume_label = UILabel(pygame.Rect((215, 402), (-1, 25)), 'kuma_ui.volume_label', 
-    #                       manager=manager, volume=round(float(config['CONFIG']['VOLUME']) * 100))
-    volume_label = UILabel(pygame.Rect((215, 402), (-1, 25)), f"Volume {round(float(config['CONFIG']['VOLUME']) * 100)}", 
-                           manager=manager)
+    volume_label = UILabel(pygame.Rect((215, 402), (-1, 25)), 'kuma_ui.volume_label', 
+                           manager=manager, text_kwargs={"volume":round(float(config['CONFIG']['VOLUME']) * 100)})
     box_labels = [start_label, end_label, vert_label, start_cue_label, end_cue_label,
                   start_cuesheet_label, end_cuesheet_label, note_button_label, note_type_label]
     for label in box_labels:
@@ -1434,22 +1426,28 @@ def main():
                         None, manager, karaoke, cutscene_box)
                     open_file = output_selection
                 # how to use page
-                elif event.ui_object_id == 'menu_bar.#help_menu_items.#how_to_use':  # TODO - translate
+                elif event.ui_object_id == 'menu_bar.#help_menu_items.#how_to_use':
                     karaoke.show_help_window(manager, screen)
                 # about page
                 elif event.ui_object_id == 'menu_bar.#help_menu_items.#about':  # TODO - translate
                     about_window_rect = pygame.Rect(0, 0, 400, 300)
                     about_window_rect.center = screen.get_rect().center
+                    about_1 = i18n.t("kuma_help.about_1")
+                    about_2 = i18n.t("kuma_help.about_2")
+                    about_3 = i18n.t("kuma_help.about_3")
+                    about_4 = i18n.t("kuma_help.about_4")
+                    about_5 = i18n.t("kuma_help.about_5")
+                    about_6 = i18n.t("kuma_help.about_6")
                     about_window = UIMessageWindow(rect=about_window_rect,
                                                    html_message='<br><b>KUMA</b><br>'
                                                    '---------------<br><br>'
-                                                   '<b>A karaoke editor for Dragon Engine games.<br>'
-                                                   '<b>Version: </b>{ver}<br>'
-                                                   '<b>Created by: </b>{creators}<br>'
-                                                   '<b>Icon by: </b>{mink}<br>'
-                                                   '<b>Testers: </b>{testers}<br>'
-                                                   '<b>Translators: </b>{translators}<br>'.format(
-                                                       ver=VERSION, mink='Mink', creators=CREATORS, testers=TESTERS, translators=TRANSLATORS),
+                                                   '<b>{about_1}<br>'
+                                                   '<b>{about_2} </b>{ver}<br>'
+                                                   '<b>{about_3} </b>{creators}<br>'
+                                                   '<b>{about_4} </b>{mink}<br>'
+                                                   '<b>{about_5} </b>{testers}<br>'
+                                                   '<b>{about_6} </b>{translators}<br>'.format(
+                                                       ver=VERSION, mink='Mink', creators=CREATORS, testers=TESTERS, translators=TRANSLATORS, about_1=about_1, about_2=about_2,about_3=about_3,about_4=about_4,about_5=about_5,about_6=about_6),
                                                    manager=manager,
                                                    window_title='menu_bar.about_text')
                     about_window.dismiss_button.set_text(
@@ -1514,12 +1512,11 @@ def main():
                         button_picker.selected_option))
                     karaoke.load_item_tex(
                         button_picker.selected_option, held_note, note_picker)
-                # TODO - add lang stuff back when pygame-gui updates
                 # language changed
-                # elif event.ui_object_id == '#language_picker':
-                #    config.set("CONFIG", "LANGUAGE", str(
-                #        language_picker.selected_option))
-                #    manager.set_locale(assets['Languages'][event.text])
+                elif event.ui_object_id == '#language_picker':
+                    config.set("CONFIG", "LANGUAGE", str(
+                        language_picker.selected_option))
+                    manager.set_locale(assets['Languages'][event.text])
             # adjust song position
             elif event.type == UI_TEXT_ENTRY_CHANGED and event.ui_object_id == "#song_position":
                 if not pygame.mixer.get_busy():
@@ -1534,11 +1531,8 @@ def main():
                     volume_value = volume_slider.get_current_value() / 100
                     pygame.mixer.music.set_volume(volume_value)
                     config.set("CONFIG", "VOLUME", str(volume_value))
-                    # TODO - uncomment when pygame-gui 0.6.5 releases
-                    #volume_label.set_text(
-                    #    'kuma_ui.volume_label', volume=volume_slider.get_current_value())
                     volume_label.set_text(
-                        f"Volume {volume_slider.get_current_value()}")
+                        'kuma_ui.volume_label', text_kwargs={"volume":volume_slider.get_current_value()})
                 elif event.ui_object_id == '#scrollbar':
                     scrollbar_moved = True
 

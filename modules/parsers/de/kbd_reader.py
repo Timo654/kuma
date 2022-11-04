@@ -1,5 +1,6 @@
 from binary_reader import BinaryReader
 
+# this is very bad and i should rewrite it eventually
 def get_dbd_vert(note_id):
     if note_id == 0:
         return 4
@@ -9,6 +10,14 @@ def get_dbd_vert(note_id):
         return 2
     elif note_id == 3:
         return 0
+    elif note_id == 4: # dpad
+        return 0
+    elif note_id == 5: # blue any
+        return 0
+    elif note_id == 6: # gold any
+        return 0
+    else:
+        print("unknown note id", note_id)
 
 def write_file(data, filename, cutscene_start=0):
     """Writes the kbd from dict to the specified filename.\n
@@ -31,7 +40,7 @@ def write_file(data, filename, cutscene_start=0):
             kbd_n.write_uint32(note['Vertical position'])
         kbd_n.write_uint32(note['Display offset'])
         kbd_n.write_uint32(note['Button type'])
-        kbd_n.write_uint32(note['Note type'])  # 0 regular, 1 hold, 2 rapid
+        kbd_n.write_uint32(note['Note type'])  # 0 regular, 1 hold, 2 rapid/multi-press
         if karaoke:
             kbd_n.write_uint16(note['Start Cue ID'])
             kbd_n.write_uint16(note['Start Cuesheet ID'])

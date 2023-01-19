@@ -1,15 +1,5 @@
 import modules.parsers.oe.kara_reader as kara
-
-
-def get_vert_pos(note):
-    if note == 0:
-        return 4
-    elif note == 1:
-        return 6
-    elif note == 2:
-        return 2
-    elif note == 3:
-        return 0
+from modules.common import Note, Button, get_vert_pos
 
 def convert_button(button):
     if button == 0:

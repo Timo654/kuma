@@ -1,24 +1,15 @@
 import modules.parsers.oe.wtfl_reader as wtfl
-
-
-def get_vert_pos(note):
-    if note == 0:
-        return 4
-    elif note == 1:
-        return 6
-    elif note == 2:
-        return 2
-    elif note == 3:
-        return 0
-
+from modules.common import Button, get_vert_pos
 
 def convert_button(button):
     if button == 0:
-        return 1
+        return Button.Cross
     elif button == 1:
-        return 0
+        return Button.Circle
+    elif button > 4:
+        return Button.Unimplemented
     else:
-        return button
+        return Button(button)
 
 
 def convert_to_kbd(data):
@@ -45,7 +36,7 @@ def convert_to_kbd(data):
             newnote['Start Cuesheet ID'] = 0
             newnote['End Cue ID'] = 0
             newnote['End Cuesheet ID'] = 0
-            if newnote['Button type'] < 4:
+            if newnote['Button type'] != Button.Unimplemented:
                 notes_list.append(newnote)
 
     kbd['Notes'] = notes_list

@@ -1,4 +1,5 @@
 import modules.parsers.other.mns_reader as mns
+from modules.common import Note, Button, get_vert_pos
 # big thanks to TGE for helping with this
 
 
@@ -28,34 +29,23 @@ def sort_notes(note_list):
                 prev_end_pos = note['End position']
                 i += 1
 
-
-def get_vert_pos(note):
-    if note == 0:
-        return 4
-    elif note == 1:
-        return 6
-    elif note == 2:
-        return 2
-    elif note == 3:
-        return 0
-
-
 def convert_button(button):
     if button == 0:  # down
-        return 1
+        return Button.Cross
     elif button == 1:  # cross
-        return 1
+        return Button.Cross
     elif button == 2:  # left
-        return 2
+        return Button.Square
     elif button == 3:  # circle
-        return 0
+        return Button.Circle
     elif button == 4:  # up
-        return 3
+        return Button.Triangle
     elif button == 5:  # triangle
-        return 3
+        return Button.Triangle
     elif button == 8:  # scratch
-        return 1
-
+        return Button.Cross
+    else:
+        return Button.Unimplemented
 
 def convert_to_kbd(data):
     kbd = dict()
@@ -84,17 +74,17 @@ def convert_to_kbd(data):
         if oldnote['Hold duration']:
             hold_length = (((oldnote['Hold duration'] / 8 ) ) * bps) * 1000
             newnote['End position'] = int((total_ms + (hold_length)) * 3)
-            newnote['Note type'] = 1
+            newnote['Note type'] = Note.Hold
         else:
             newnote['End position'] = 0
-            newnote['Note type'] = 0
+            newnote['Note type'] = Note.Regular
         newnote['Button type'] = convert_button(oldnote['Button type'])
         newnote['Vertical position'] = get_vert_pos(newnote['Button type'])
         newnote['Start Cue ID'] = 0
         newnote['Start Cuesheet ID'] = 0
         newnote['End Cue ID'] = 0
         newnote['End Cuesheet ID'] = 0
-        if newnote['Button type'] < 4:
+        if newnote['Button type'] != Button.Unimplemented:
             notes_list.append(newnote)
 
     sort_notes(notes_list)

@@ -5,6 +5,7 @@ from pygame_gui.elements import UIDropDownMenu, UILabel, UIButton, UITextEntryLi
 import modules.parsers.de.kbd_reader as kbd
 import modules.parsers.de.kpm_reader as kpm
 import modules.importers.detect_filetype as detect_filetype
+from modules.common import Note, Button
 from modules.ui.ui_menu_bar import UIMenuBar
 from pathlib import Path
 from math import ceil, floor
@@ -18,6 +19,7 @@ import locale
 import i18n
 import mutagen
 import sys
+
 
 # general info
 VERSION = "v0.9.7"
@@ -235,17 +237,17 @@ class Karaoke:
     def Add_long(self, start_pos, end_pos, vert_pos, note_type, note_id):
         grid_start_pos = self.game_to_pos(start_pos)
         grid_end_pos = self.game_to_pos(end_pos)
-        if note_type == 1: # TODO - use enum
-            long_note_id = 4
-        else: # TODO - use enum
-            long_note_id = 5
+        if note_type == Note.Hold:
+            long_note_id = Button.HoldLine
+        else:
+            long_note_id = Button.RapidLine
         progress_value = 0
         for i in range(grid_start_pos + 1, grid_end_pos):
             progress_value += self.scale
             self.Add(Item(i, vert_pos, long_note_id,
                           note_type, start_pos + progress_value))
         # note type 3 is hold/rapid end, not an actual thing in the game
-        self.Add(Item(grid_end_pos, vert_pos, note_id, 3, end_pos)) # TODO - use enum
+        self.Add(Item(grid_end_pos, vert_pos, note_id, Note.End, end_pos))
 
     # reset items
     def reset(self, file_undo=False):
@@ -344,11 +346,11 @@ class Karaoke:
             prev_list = self.get_list()
         self.reset(undo_kbd)  # reset data
         for note in data['Notes']:
-            if note['Note type'] < 3:  # ignore any note types above 3, because those shouldn't exist # TODO - use enum
+            if note['Note type'] != Note.End:
                 start_pos = self.game_to_pos(note['Start position'])
                 self.Add(Item(start_pos, note['Vertical position'], note['Button type'], note['Note type'],
                               note['Start position'], end_pos=note['End position'], start_cue_id=note['Start Cue ID'], start_cuesheet_id=note['Start Cuesheet ID'], end_cue_id=note['End Cue ID'], end_cuesheet_id=note['End Cuesheet ID']))
-                if note['Note type'] != 0:  # if note is hold or rapid  # TODO - use enum
+                if note['Note type'] != Note.Regular:  # if note is hold or rapid
                     self.Add_long(note['Start position'], note['End position'],
                                   note['Vertical position'], note['Note type'], note['Button type'])
         if undo_kbd:
@@ -400,14 +402,14 @@ class Karaoke:
             y = 0
             while y < len(self.items[x]):
                 if self.items[x][y] != None:
-                    if self.items[x][y].id <= 3 and self.items[x][y].note_type < 3:  # if not End # TODO - use enum
+                    if self.items[x][y].id in [Button.Circle, Button.Cross, Button.Triangle, Button.Square] and self.items[x][y].note_type != Note.End:  # if not End
                         current_note = self.items[x][y]
                         note = dict()
                         note['Start position'] = current_note.start_pos
                         note['End position'] = 0
                         note['Vertical position'] = y
-                        note['Button type'] = current_note.id # TODO - use enum
-                        note['Note type'] = current_note.note_type # TODO - use enum
+                        note['Button type'] = current_note.id 
+                        note['Note type'] = current_note.note_type
                         # doesnt seem to do anything
                         note['Display offset'] = current_note.display_offset
                         note['Start Cue ID'] = current_note.start_cue_id
@@ -418,12 +420,12 @@ class Karaoke:
                             note['End position'] = current_note.end_pos
                         else:
                             if self.items[x+1][y] != None:
-                                if self.items[x+1][y].id > 3: # TODO - use enum
+                                if self.items[x+1][y].id in [Button.RapidLine, Button.HoldLine]:
                                     o = x + 1
                                     note['Note type'] = self.items[o][y].note_type
-                                    while self.items[o][y].id > 3: # TODO - use enum
+                                    while self.items[o][y].id in [Button.RapidLine, Button.HoldLine]:
                                         o += 1
-                                    self.items[o][y].note_type = 3  # End # TODO - use enum
+                                    self.items[o][y].note_type = Note.End  # End
                                     note['End position'] = self.pos_to_game(o)
                                     current_note.end_pos = note['End position']
                         note_list.append(note)
@@ -510,7 +512,7 @@ class Karaoke:
         # end position
         if len(boxes[1].get_text()) > 0:
             if float(boxes[1].get_text()) <= max_pos:
-                if note.note_type != 0: # TODO - use enum
+                if note.note_type != Note.Regular:
                     end_pos = ms_to_game(float(boxes[1].get_text()))
                 else:
                     end_pos = 0
@@ -541,14 +543,17 @@ class Karaoke:
         tex_name = f"{asset_path}/textures/{assets['Button prompts'][button_type][0]}"
         image = pygame.image.load(tex_name).convert_alpha()
         buttons = strip_from_sheet(image, (0, 0), (122, 122), 2, 2)
-        items = [pygame.Surface((122, 122), pygame.SRCALPHA) for _ in range(6)]
-        items[0].blit(buttons[1], (0, 0))  # circle
-        items[1].blit(buttons[3], (0, 0))  # cross
-        items[2].blit(buttons[2], (0, 0))  # square
-        items[3].blit(buttons[0], (0, 0))  # triangle
-        pygame.draw.line(items[4], (0, 109, 198),
+        items = dict()
+        for item in Button.list():
+            items[item] = pygame.Surface((122, 122), pygame.SRCALPHA)
+
+        items[Button.Circle].blit(buttons[1], (0, 0))  # circle
+        items[Button.Cross].blit(buttons[3], (0, 0))  # cross
+        items[Button.Square].blit(buttons[2], (0, 0))  # square
+        items[Button.Triangle].blit(buttons[0], (0, 0))  # triangle
+        pygame.draw.line(items[Button.HoldLine], (0, 109, 198),
                          (0, 61), (144, 61), 61)  # hold
-        pygame.draw.line(items[5], (198, 0, 99),
+        pygame.draw.line(items[Button.RapidLine], (198, 0, 99),
                          (0, 61), (144, 61), 61)  # rapid
 
         for x in range(0, self.col):  # change existing button's texture
@@ -1048,7 +1053,7 @@ def main():
     loaded = False  # is audio file loaded
     audio_start_pos = 0  # audio start position
     key_pressed = None  # none of the arrow keys are pressed right now
-    note_id = 0  # note that you get when you want to add one, first is circle # TODO - use enum
+    button_id = Button.Circle  # note that you get when you want to add one, first is circle
     fill_colour = (44, 52, 58)
     FPS = int(config['CONFIG']['FPS'])
     if int(config["CONFIG"]["FIRST LAUNCH"]):
@@ -1143,11 +1148,11 @@ def main():
                     if held_note == None:
                         pass
                     else:
-                        if note_id < 3:
-                            note_id += 1
+                        if button_id in [Button.Circle, Button.Cross, Button.Triangle, Button.Square]:
+                            button_id += 1
                         else:
-                            note_id = 0
-                    held_note = Item(0, 0, note_id, 0, 0)  # add item
+                            button_id = Button.Circle
+                    held_note = Item(0, 0, button_id, 0, 0)  # add item
                 elif event.button == 1:  # left click
                     prev_list = karaoke.get_list()
                     pos = karaoke.Get_pos(
@@ -1240,7 +1245,7 @@ def main():
                         if karaoke.In_grid(pos[0], pos[1]):
                             if not currently_edited:
                                 if karaoke.items[pos[0]][pos[1]] != None:
-                                    if karaoke.items[pos[0]][pos[1]].id < 4 and karaoke.items[pos[0]][pos[1]].note_type < 3:
+                                    if karaoke.items[pos[0]][pos[1]].id in [Button.Circle, Button.Square, Button.Cross, Button.Triangle] and karaoke.items[pos[0]][pos[1]].note_type != Note.End:
                                         currently_selected.append(
                                             karaoke.items[pos[0]][pos[1]])
                     else:
@@ -1270,7 +1275,7 @@ def main():
                         if karaoke.In_grid(pos[0], pos[1]):
                             if karaoke.items[pos[0]][pos[1]] not in currently_selected:
                                 if karaoke.items[pos[0]][pos[1]] != None:
-                                    if karaoke.items[pos[0]][pos[1]].id < 4 and karaoke.items[pos[0]][pos[1]].note_type < 3:
+                                    if karaoke.items[pos[0]][pos[1]].id in [Button.Circle, Button.Cross, Button.Square, Button.Triangle] and karaoke.items[pos[0]][pos[1]].note_type != Note.End:
                                         currently_edited = karaoke.items[pos[0]][pos[1]]
                                         for dropdown in dropdowns:
                                             dropdown.show()
@@ -1286,7 +1291,7 @@ def main():
                     else:
                         if karaoke.In_grid(pos[0], pos[1]):
                             if karaoke.items[pos[0]][pos[1]] != currently_edited and karaoke.items[pos[0]][pos[1]] != None:
-                                if karaoke.items[pos[0]][pos[1]].id < 4 and karaoke.items[pos[0]][pos[1]].note_type < 3:
+                                if karaoke.items[pos[0]][pos[1]].id in [Button.Circle, Button.Triangle, Button.Square, Button.Cross] and karaoke.items[pos[0]][pos[1]].note_type != Note.End:
                                     karaoke.save_note(
                                         currently_edited, boxes, dropdowns)
                                     currently_edited = karaoke.items[pos[0]][pos[1]]
@@ -1471,7 +1476,7 @@ def main():
                                       boxes, dropdowns)
                 # delete a single note
                 elif event.ui_object_id == '#delete_one':
-                    if currently_edited.note_type != 0:
+                    if currently_edited.note_type != Note.Regular:
                         karaoke.Remove_long(
                             currently_edited.x, currently_edited.y)
                     karaoke.Remove(currently_edited.x, currently_edited.y)
@@ -1480,7 +1485,7 @@ def main():
                 # delete multiple notes
                 elif event.ui_object_id == '#delete_multi':
                     for note in currently_selected:
-                        if note.note_type != 0:
+                        if note.note_type != Note.Regular:
                             karaoke.Remove_long(
                                 note.x, note.y)
                         karaoke.Remove(note.x, note.y)

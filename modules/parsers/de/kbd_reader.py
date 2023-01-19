@@ -1,20 +1,20 @@
 from binary_reader import BinaryReader
-
+from modules.common import Button, Note
 # this is very bad and i should rewrite it eventually
 def get_dbd_vert(note_id):
-    if note_id == 0:
+    if note_id == Button.Circle:
         return 4
-    elif note_id == 1:
+    elif note_id == Button.Cross:
         return 6
-    elif note_id == 2:
+    elif note_id == Button.Square:
         return 2
-    elif note_id == 3:
+    elif note_id == Button.Triangle: 
         return 0
-    elif note_id == 4: # dpad
+    elif note_id == Button.DPad_Button: # dpad
         return 0
-    elif note_id == 5: # blue any
+    elif note_id == Button.GoldAny: # blue any
         return 0
-    elif note_id == 6: # gold any
+    elif note_id == Button.BlueAny: # gold any
         return 0
     else:
         print("unknown note id", note_id)
@@ -34,8 +34,8 @@ def write_file(data, filename, cutscene_start=0):
     kbd_n = BinaryReader(bytearray())
     for i in range(len(data['Notes'])):
         note = data['Notes'][i]
-        kbd_n.write_uint32(note['Start position'])
-        kbd_n.write_uint32(note['End position'])
+        kbd_n.write_uint32(int(note['Start position']))
+        kbd_n.write_uint32(int(note['End position']))
         if karaoke:
             kbd_n.write_uint32(note['Vertical position'])
         kbd_n.write_uint32(note['Display offset'])
@@ -120,10 +120,10 @@ def read_file(input_file):
             note['Vertical position'] = kbd.read_uint32()
         # no clue if it even does anything
         note['Display offset'] = kbd.read_uint32()
-        note['Button type'] = kbd.read_uint32()
+        note['Button type'] = Button(kbd.read_uint32())
         if not karaoke:
             note['Vertical position'] = get_dbd_vert(note['Button type'])
-        note['Note type'] = kbd.read_uint32()  # 0 regular, 1 hold, 2 rapid
+        note['Note type'] = Note(kbd.read_uint32())  # 0 regular, 1 hold, 2 rapid
         if karaoke:
             note['Start Cue ID'] = kbd.read_uint16()  # Audio cheer ID
             # Audio cheer container ID

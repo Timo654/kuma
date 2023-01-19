@@ -1,3 +1,4 @@
+from modules.common import Note, Button, get_vert_pos
 def byPos(note):
     return note["Start position"]
 
@@ -25,40 +26,29 @@ def sort_notes(note_list):
                 i += 1
 
 
-def get_vert_pos(note):
-    if note == 0:
-        return 4
-    elif note == 1:
-        return 6
-    elif note == 2:
-        return 2
-    elif note == 3:
-        return 0
-
-
 def convert_button(button):
     """Converts button to Yakuza ID.\n
     Returns button ID and button type."""
     button = int(button)
     if button == 0:  # triangle
-        return 3, 0
+        return Button.Triangle, Note.Regular
     elif button == 1:  # circle
-        return 0, 0
+        return Button.Circle, Note.Regular
     elif button == 2:  # cross
-        return 1, 0
+        return Button.Cross, Note.Regular
     elif button == 3:  # square
-        return 2, 0
+        return Button.Square, Note.Regular
     elif button == 4:  # triangle hold
-        return 3, 1
+        return Button.Triangle, Note.Hold
     elif button == 5:  # circle hold
-        return 0, 1
+        return Button.Circle, Note.Hold
     elif button == 6:  # cross hold
-        return 1, 1
+        return Button.Cross, Note.Hold
     elif button == 7:  # square hold
-        return 2, 1
+        return Button.Square, Note.Hold
     else:
         # Unimplemented button type
-        return 7, 0
+        return Button.Unimplemented, Note.Regular
 
 # converts project diva time to yakuza time
 
@@ -123,7 +113,7 @@ def convert_to_kbd(data):
             newnote['Start Cuesheet ID'] = 0
             newnote['End Cue ID'] = 0
             newnote['End Cuesheet ID'] = 0
-            if newnote['Button type'] < 4:
+            if newnote['Button type'] != Button.Unimplemented:
                 notes_list.append(newnote)
     sort_notes(notes_list)
     kbd['Notes'] = notes_list

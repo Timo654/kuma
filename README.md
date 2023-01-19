@@ -7,7 +7,8 @@ To find instructions on how to use the tool, go to the menu bar, pick 'Help' and
 ## TODO list
 * Add back translations
 * DBD support 
-* Use enums
+* Change end position to length
+* Path saving seems a little funny
 
 ## Credits
 https://github.com/SutandoTsukai181/PyBinaryReader

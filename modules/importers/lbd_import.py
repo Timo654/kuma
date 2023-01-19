@@ -1,51 +1,40 @@
 import modules.parsers.oe.lbd_reader as lbd
-
+from modules.common import Note, Button, get_vert_pos
 
 def get_note_type(end_pos):
     if end_pos == 0:
-        return 0
+        return Note.Regular
     else:
-        return 1
-
-
-def get_vert_pos(note):
-    if note == 0:
-        return 4
-    elif note == 1:
-        return 6
-    elif note == 2:
-        return 2
-    elif note == 3:
-        return 0
+        return Note.Hold
 
 
 def convert_button(button, version):
     if version > 3:  # Y5, convert arrows to normal buttons
         if button == 9:
-            return 3
+            return Button.Triangle
         elif button == 10:
-            return 1
+            return Button.Cross
         elif button == 11:
-            return 0
+            return Button.Circle
         elif button == 12:
-            return 2
+            return Button.Square
         else:
-            return button
+            return Button(button)
     else:  # Ishin and Y0
         if button == 2:
-            return 3
+            return Button.Triangle
         elif button == 3:
-            return 2
+            return Button.Square
         elif button == 4:
-            return 0
+            return Button.Circle
         elif button == 5:
-            return 1
+            return Button.Cross
         elif button == 6:
-            return 3
+            return Button.Triangle
         elif button == 7:
-            return 2
+            return Button.Square
         else:
-            return button
+            return Button(button)
 
 
 def convert_to_kbd(data):
@@ -74,7 +63,7 @@ def convert_to_kbd(data):
             newnote['Start Cuesheet ID'] = 0
             newnote['End Cue ID'] = 0
             newnote['End Cuesheet ID'] = 0
-            if newnote['Button type'] < 4:
+            if newnote['Button type'] != Button.Unimplemented:
                 notes_list.append(newnote)
 
     kbd['Notes'] = notes_list

@@ -36,7 +36,8 @@
         "images":
         {
             "normal_image": {
-                "path": "assets/textures/play.png"
+                "package": "assets.textures",
+				"resource": "play.png"
             }
         }
     },
@@ -45,7 +46,8 @@
         "images":
         {
             "normal_image": {
-                "path": "assets/textures/pause.png"
+                "package": "assets.textures",
+				"resource": "pause.png"
             }
         }
     },

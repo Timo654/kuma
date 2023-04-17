@@ -1,13 +1,12 @@
 # Small tool for adding used textures to asset.json
 import json
 from pathlib import Path
-asset_file = 'assets.json'
+asset_file = '../assets/assets.json'
 if Path(asset_file).is_file():
     with open(asset_file, 'r', encoding='UTF-8') as json_file:
         assets = json.load(json_file)
 else:
     assets = dict()
-    assets['Assets folder'] = "./assets"
     assets['Sheet texture'] = 'sheet.png'
     assets['Line texture'] = 'line.png'
     assets['Button prompts'] = dict()

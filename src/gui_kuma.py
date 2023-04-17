@@ -19,10 +19,22 @@ import locale
 import i18n
 import mutagen
 import sys
+import os
+
+
+def resource_path(relative_path):
+    """ Get absolute path to resource, works for dev and for PyInstaller """
+    try:
+        # PyInstaller creates a temp folder and stores path in _MEIPASS
+        base_path = sys._MEIPASS
+    except Exception:
+        base_path = os.path.abspath(".")
+
+    return os.path.join(base_path, relative_path)
 
 
 # general info
-VERSION = "v0.9.7"
+VERSION = "v0.9.8"
 CREATORS = 'Timo654'
 TRANSLATORS = 'Timo654, ketrub, Mink, jason098, Capitán Retraso, Kent, Edness, JustAnyone, Tervel, RyuHachii, Foas, Biggelskog'
 TESTERS = "ketrub, KaarelJ98, Ono Michio, Emergence"
@@ -38,13 +50,14 @@ print("""
  `-'     `-'  `-'     `-'  `-'     `-'  `-'     `-'   """ + VERSION + '\n\n')
 
 # loading asset data from file
-asset_file = 'assets.json'
+asset_path = Path(resource_path("./assets"))
+asset_file = asset_path / 'assets.json'
 if Path(asset_file).is_file():
     with open(asset_file, 'r', encoding='UTF-8') as json_file:
         assets = json.load(json_file)
 else:
     raise Exception('Asset data missing')
-asset_path = assets['Assets folder']
+
 controllers = [key for key in assets['Button prompts']]
 languages = [key for key in assets['Languages']]
 
@@ -77,18 +90,18 @@ if not config.has_section("CONFIG"):
     config.set("CONFIG", "FIRST LAUNCH", str(1))
 if not config.has_section("PATHS"):
     config.add_section("PATHS")
-    config.set("PATHS", "Input", f'{str(Path().resolve())}')
-    config.set("PATHS", "Output", f'{str(Path().resolve())}')
+    config.set("PATHS", "Input", str(Path().resolve()))
+    config.set("PATHS", "Output", str(Path().resolve()))
     config.set("PATHS", "KPM_Input",
-               f'{str(Path().resolve())}')
+               str(Path().resolve()))
     config.set("PATHS", "KPM_Output",
-               f'{str(Path().resolve())}')
+               str(Path().resolve()))
     config.set("PATHS", "Import_Input",
-               f'{str(Path().resolve())}')
+               str(Path().resolve()))
     config.set("PATHS", "Export_Output",
-               f'{str(Path().resolve())}')
+               str(Path().resolve()))
     config.set("PATHS", "Music",
-               f'{str(Path().resolve())}')
+               str(Path().resolve()))
 if not config.has_section("ADV. SETTINGS"):
     config.add_section("ADV. SETTINGS")
     config.set("ADV. SETTINGS", "NOTE",
@@ -118,10 +131,10 @@ if name == 'nt':
     ctypes.windll.user32.SetProcessDPIAware()
 # initialize pygame stuff
 pygame.init()
-font = pygame.font.Font("FiraCode-Regular.ttf", 16)
+font = pygame.font.Font(asset_path / "FiraCode-Regular.ttf", 16)
 clock = pygame.time.Clock()
 pygame.display.set_caption('KUMA')
-pygame_icon = pygame.image.load(f"{asset_path}/textures/icon_small.png")
+pygame_icon = pygame.image.load(asset_path / "textures/icon_small.png")
 pygame.display.set_icon(pygame_icon)
 pygame.mixer.music.set_volume(float(config["CONFIG"]["VOLUME"]))
 
@@ -362,10 +375,10 @@ class Karaoke:
         try:
             data = detect_filetype.load_file(file)
             print('File loaded.')
-        except(ValueError):
+        except (ValueError):
             print('Unable to read file.')
             return
-        except(PermissionError):
+        except (PermissionError):
             print('Unable to open file.')
             return
         else:
@@ -377,14 +390,15 @@ class Karaoke:
         try:
             data = kbd.read_file(file)
             print('File loaded.')
-        except(ValueError):
+        except (ValueError):
             print('Unable to read file.')
             return False, None
-        except(PermissionError):
+        except (PermissionError):
             print('Unable to open file.')
             return False, None
         else:
             self.add_notes_from_data(data)
+            # TODO - use pathlib
             kpm_file = f"{str(file.parent)}/{file.stem.split('_')[0]}_param.kpm"
             if Path(kpm_file).exists():
                 kpm_data = load_kpm(kpm_file, cutscene_box)
@@ -408,7 +422,7 @@ class Karaoke:
                         note['Start position'] = current_note.start_pos
                         note['End position'] = 0
                         note['Vertical position'] = y
-                        note['Button type'] = current_note.id 
+                        note['Button type'] = current_note.id
                         note['Note type'] = current_note.note_type
                         # doesnt seem to do anything
                         note['Display offset'] = current_note.display_offset
@@ -425,7 +439,8 @@ class Karaoke:
                                     note['Note type'] = self.items[o][y].note_type
                                     while self.items[o][y].id in [Button.RapidLine, Button.HoldLine]:
                                         o += 1
-                                    self.items[o][y].note_type = Note.End  # End
+                                    # End
+                                    self.items[o][y].note_type = Note.End
                                     note['End position'] = self.pos_to_game(o)
                                     current_note.end_pos = note['End position']
                         note_list.append(note)
@@ -540,7 +555,8 @@ class Karaoke:
     def load_item_tex(self, button_type, held_note, dropdown):
         global items
         # load note textures
-        tex_name = f"{asset_path}/textures/{assets['Button prompts'][button_type][0]}"
+        tex_name = asset_path / \
+            f"textures/{assets['Button prompts'][button_type][0]}"
         image = pygame.image.load(tex_name).convert_alpha()
         buttons = strip_from_sheet(image, (0, 0), (122, 122), 2, 2)
         items = dict()
@@ -674,10 +690,10 @@ def normal_round(n):  # https://stackoverflow.com/questions/33019698/how-to-prop
 def load_kpm(file, cutscene_box, refresh=1):
     try:
         data = kpm.read_file(file)
-    except(ValueError):
+    except (ValueError):
         print('Unable to read file.')
         return None
-    except(PermissionError):
+    except (PermissionError):
         print('Unable to open file.')
         return None
     else:
@@ -760,7 +776,7 @@ def load_song(filename, music_elements):
         song = mutagen.File(filename)
         length = round(song.info.length * 1000)
         print('Song loaded.')
-    except(pygame.error):
+    except (pygame.error):
         for element in music_elements:
             element.hide()
         print('Unable to read file.')
@@ -803,7 +819,7 @@ def get_menu_data():
 def save_file(open_file, manager, karaoke, cutscene_box):
     if open_file != None:
         save = UIConfirmationDialog(
-            rect=pygame.Rect(0, 0, 300, 300), manager=manager, action_long_desc="kuma_ui.overwrite_file", action_long_desc_text_kwargs={"file":open_file}, window_title='kuma_ui.save_file_title', action_short_name='kuma_ui.confirm_button_text', object_id='#save_overwrite')
+            rect=pygame.Rect(0, 0, 300, 300), manager=manager, action_long_desc="kuma_ui.overwrite_file", action_long_desc_text_kwargs={"file": open_file}, window_title='kuma_ui.save_file_title', action_short_name='kuma_ui.confirm_button_text', object_id='#save_overwrite')
         save.cancel_button.set_text('kuma_ui.cancel_button_text')
         return open_file
     else:
@@ -826,7 +842,7 @@ def main():
     # make a tkinter root window for file dialogs
     root = tk.Tk()
     root.withdraw()
-    root.iconbitmap(f'{asset_path}/textures/icon_small.ico')
+    root.iconbitmap(asset_path / "textures/icon_small.ico")
     # load language
     current_language = config['CONFIG']['LANGUAGE']
     if current_language not in languages:
@@ -866,9 +882,9 @@ def main():
             'Surface size is too big! Increase surface or decrease column count!')
 
     # ui manager
-    manager = UIManager(scr_size, theme_path=f'{asset_path}/ui_theme.json',
+    manager = UIManager(scr_size, theme_path=asset_path / "ui_theme.json",
                         starting_language='en',
-                        translation_directory_paths=[f'{asset_path}/translations'])
+                        translation_directory_paths=[asset_path / "translations"])
 
     manager.set_locale(assets['Languages'][current_language])
 
@@ -993,8 +1009,8 @@ def main():
     song_label = UILabel(pygame.Rect((10, 400), (-1, 22)),
                          "kuma_ui.song_position_label",
                          manager=manager)
-    volume_label = UILabel(pygame.Rect((215, 402), (-1, 25)), 'kuma_ui.volume_label', 
-                           manager=manager, text_kwargs={"volume":round(float(config['CONFIG']['VOLUME']) * 100)})
+    volume_label = UILabel(pygame.Rect((215, 402), (-1, 25)), 'kuma_ui.volume_label',
+                           manager=manager, text_kwargs={"volume": round(float(config['CONFIG']['VOLUME']) * 100)})
     box_labels = [start_label, end_label, vert_label, start_cue_label, end_cue_label,
                   start_cuesheet_label, end_cuesheet_label, note_button_label, note_type_label]
     for label in box_labels:
@@ -1004,8 +1020,8 @@ def main():
                           None, note_picker)  # load button textures
 
     # load sheet textures and scale them
-    sheet_tex = f"{asset_path}/textures/{assets['Sheet texture']}"
-    line_tex = f"{asset_path}/textures/{assets['Line texture']}"
+    sheet_tex = asset_path / f"textures/{assets['Sheet texture']}"
+    line_tex = asset_path / f"textures/{assets['Line texture']}"
     sheet_bg = pygame.image.load(sheet_tex).convert()
     line_bg = pygame.image.load(line_tex).convert()
     line_bg = pygame.transform.scale(
@@ -1352,7 +1368,7 @@ def main():
                             try:
                                 pygame.mixer.music.play(
                                     start=(audio_start_pos / 1000))
-                            except(pygame.error):  # Position not implemented for music type
+                            except (pygame.error):  # Position not implemented for music type
                                 print(
                                     'Unable to play the song from the given position, restarting from the beginning.')
                                 audio_start_pos = 0
@@ -1455,7 +1471,7 @@ def main():
                                                    '<b>{about_4} </b>{mink}<br>'
                                                    '<b>{about_5} </b>{testers}<br>'
                                                    '<b>{about_6} </b>{translators}<br>'.format(
-                                                       ver=VERSION, mink='Mink', creators=CREATORS, testers=TESTERS, translators=TRANSLATORS, about_1=about_1, about_2=about_2,about_3=about_3,about_4=about_4,about_5=about_5,about_6=about_6),
+                                                       ver=VERSION, mink='Mink', creators=CREATORS, testers=TESTERS, translators=TRANSLATORS, about_1=about_1, about_2=about_2, about_3=about_3, about_4=about_4, about_5=about_5, about_6=about_6),
                                                    manager=manager,
                                                    window_title='menu_bar.about_text')
                     about_window.dismiss_button.set_text(
@@ -1540,7 +1556,7 @@ def main():
                     pygame.mixer.music.set_volume(volume_value)
                     config.set("CONFIG", "VOLUME", str(volume_value))
                     volume_label.set_text(
-                        'kuma_ui.volume_label', text_kwargs={"volume":volume_slider.get_current_value()})
+                        'kuma_ui.volume_label', text_kwargs={"volume": volume_slider.get_current_value()})
                 elif event.ui_object_id == '#scrollbar':
                     scrollbar_moved = True
 

@@ -118,7 +118,7 @@ if name == 'nt':
     ctypes.windll.user32.SetProcessDPIAware()
 # initialize pygame stuff
 pygame.init()
-font = pygame.font.SysFont("FiraCode", 22)
+font = pygame.font.Font("FiraCode-Regular.ttf", 16)
 clock = pygame.time.Clock()
 pygame.display.set_caption('KUMA')
 pygame_icon = pygame.image.load(f"{asset_path}/textures/icon_small.png")

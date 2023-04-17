@@ -36,14 +36,14 @@ jobs:
           python -m pip install --upgrade pip
           pip install -r requirements.txt
       # Build python script into a stand-alone exe
-      - uses: Nuitka/Nuitka-Action@main
+      - uses: Timo654/Nuitka-Action@main
         with:
           script-name: gui_kuma.py
+          include-plugin-directory: pygame_gui/data
           onefile: true
           enable-plugins: tk-inter
           disable-console: false
           windows-icon-from-ico: icon_small.ico
-          include-plugin-directory: pygame_gui/data
           
       # Uploads artifact
       - name: Upload Artifacts

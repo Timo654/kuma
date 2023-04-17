@@ -40,8 +40,8 @@ jobs:
         with:
           script-name: gui_kuma.py
           onefile: true
-          disable-console: true
-          windows-icon-from-ico: resources/app.ico
+          disable-console: false
+          windows-icon-from-ico: icon_small.ico
           
       # Uploads artifact
       - name: Upload Artifacts

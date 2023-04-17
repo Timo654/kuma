@@ -43,6 +43,7 @@ jobs:
           enable-plugins: tk-inter
           disable-console: false
           windows-icon-from-ico: icon_small.ico
+          include-plugin-directory: pygame_gui/data
           
       # Uploads artifact
       - name: Upload Artifacts

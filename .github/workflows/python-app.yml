@@ -3,9 +3,7 @@ name: Build and release
 on:
   push:
     branches:
-      - master
-    tags:
-      - v*
+      - main
 
 jobs:
 

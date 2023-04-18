@@ -6,7 +6,7 @@ from modules.importers.kara_import import load_kara
 from modules.importers.mns_import import load_mns
 from modules.importers.wtfl_import import load_wtfl
 from modules.importers.dsc_import import load_dsc
-
+from modules.importers.heartbeat_import import load_hb
 
 def load_file(filename):
     filename_str = str(filename)
@@ -16,7 +16,11 @@ def load_file(filename):
         return load_lbd(filename)
     elif filename_str.endswith('json'):
         with open(filename, 'r') as f:
-            return json.loads(f.read())
+            data = json.loads(f.read())
+        if "layers" in data: # Project Heartbeat support
+            return load_hb(data)
+        else:
+            return data
     with open(filename, 'rb') as file:
         br = BinaryReader(file.read())
     magic = br.read_uint32()

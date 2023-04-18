@@ -15,7 +15,7 @@ a = Analysis(['gui_kuma.py'],
              win_private_assemblies=False,
              cipher=block_cipher)
 
-a.datas += Tree('assets', prefix='assets')
+a.datas += Tree('src/assets', prefix='assets')
 
 pyz = PYZ(a.pure, a.zipped_data,
           cipher=block_cipher)

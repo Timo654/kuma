@@ -20,11 +20,9 @@ jobs:
       uses: actions/setup-python@v3
       with:
         python-version: "3.10"
-    - run: pip install -r src/requirements.txt
-    - run: pip install pyinstaller setuptools wheel
+    - run: pip install -r requirements.txt pyinstaller
     - run: pyinstaller src/KUMA.spec
-    - run: python setup.py sdist bdist_wheel
-    - name: Upload exe and wheel
+    - name: Upload exe
       uses: actions/upload-artifact@v3
       with:
         name: KUMA

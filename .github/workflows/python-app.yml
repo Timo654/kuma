@@ -1,25 +1,51 @@
-name: Package Application with Pyinstaller
+name: Build and release
 
 on:
   push:
-    branches: [ main ]
-  pull_request:
-    branches: [ main ]
+    branches:
+      - master
+    tags:
+      - v*
 
 jobs:
+
   build:
-
-    runs-on: ubuntu-latest
-
+    name: Build exe and wheel
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        os: ['windows-latest']
     steps:
-    - uses: actions/checkout@v2
-
-    - name: Package Application
-      uses: JackMcKew/pyinstaller-action-windows@main
+    - uses: actions/checkout@v3
+    - name: Set up Python 3.10
+      uses: actions/setup-python@v3
       with:
-        path: src
-        spec: src/KUMA.spec
-    - uses: actions/upload-artifact@v2
+        python-version: "3.10"
+    - run: pip install -r src/requirements.txt
+    - run: pip install pyinstaller setuptools wheel
+    - run: pyinstaller src/KUMA.spec
+    - run: python setup.py sdist bdist_wheel
+    - name: Upload exe and wheel
+      uses: actions/upload-artifact@v3
       with:
         name: KUMA
-        path: src/dist/windows
+        path: dist/KUMA.exe
+
+  release:
+    if: startsWith(github.event.ref, 'refs/tags/v')
+    needs: build
+    name: Create release with assets
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - name: Download
+        uses: actions/download-artifact@v3
+        with:
+          name: KUMA
+          path: dist
+      - name: Create release
+        uses: ncipollo/release-action@v1
+        with:
+          artifacts: "dist/*"

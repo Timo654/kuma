@@ -4,7 +4,8 @@ on:
   push:
     branches:
       - main
-
+    tags:
+      - v*
 jobs:
 
   build:
@@ -28,7 +29,9 @@ jobs:
         name: KUMA
         path: dist/KUMA.exe
 
+
   release:
+    if: startsWith(github.event.ref, 'refs/tags/v')
     needs: build
     name: Create release with assets
     runs-on: ubuntu-latest
@@ -43,4 +46,4 @@ jobs:
       - name: Create release
         uses: ncipollo/release-action@v1
         with:
-          artifacts: "dist/KUMA.exe"
+          artifacts: "dist/*"

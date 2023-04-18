@@ -2,10 +2,13 @@ name: "build-release"
 
 on:
   push:
+    paths: 
+      - '**.py'
+      - '**.yml'
+      - '**.json'
+      - '**.png'
     branches:
-      - main
-    tags:
-      - v*
+      - "main"
 jobs:
 
   build:
@@ -28,22 +31,13 @@ jobs:
       with:
         name: KUMA
         path: dist/KUMA.exe
-
-
-  release:
-    if: startsWith(github.event.ref, 'refs/tags/v')
-    needs: build
-    name: Create release with assets
-    runs-on: ubuntu-latest
-    permissions:
-      contents: write
-    steps:
-      - name: Download
-        uses: actions/download-artifact@v3
+    
+    - name: "Automatic Release"
+        uses: "marvinpinto/action-automatic-releases@latest"
         with:
-          name: KUMA
-          path: dist
-      - name: Create release
-        uses: ncipollo/release-action@v1
-        with:
-          artifacts: "dist/*"
+          repo_token: "${{ secrets.GITHUB_TOKEN }}"
+          automatic_release_tag: "latest"
+          prerelease: false
+          title: "Latest release"
+          files: |
+            ./dist/KUMA.exe

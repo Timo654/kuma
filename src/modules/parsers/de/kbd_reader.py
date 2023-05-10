@@ -19,6 +19,25 @@ def get_dbd_vert(note_id):
     else:
         print("unknown note id", note_id)
 
+def map_button_to_unk(button_id):
+    if button_id == Button.Circle:
+        return 0
+    elif button_id == Button.Cross:
+        return 1
+    elif button_id == Button.Square:
+        return 3
+    elif button_id == Button.Triangle: 
+        return 2
+    # TODO - verify what the value is for these
+    elif button_id == Button.DPad_Button: # dpad
+        return 0
+    elif button_id == Button.GoldAny: # blue any
+        return 0
+    elif button_id == Button.BlueAny: # gold any
+        return 0
+    else:
+        print("unknown note id", button_id)
+
 def write_file(data, filename, cutscene_start=0):
     """Writes the kbd from dict to the specified filename.\n
     The first parameter is a dict containing info read from kbd,\n
@@ -38,7 +57,9 @@ def write_file(data, filename, cutscene_start=0):
         kbd_n.write_uint32(int(note['End position']))
         if karaoke:
             kbd_n.write_uint32(note['Vertical position'])
-        kbd_n.write_uint32(note['Display offset'])
+            kbd_n.write_uint32(0)
+        else:
+            kbd_n.write_uint32(map_button_to_unk(note['Button type']))
         kbd_n.write_uint32(note['Button type'])
         kbd_n.write_uint32(note['Note type'])  # 0 regular, 1 hold, 2 rapid/multi-press
         if karaoke:
@@ -47,7 +68,7 @@ def write_file(data, filename, cutscene_start=0):
             kbd_n.write_uint16(note['End Cue ID'])
             kbd_n.write_uint16(note['End Cuesheet ID'])
         else:
-            kbd_n.write_uint16(note['Unk2'])
+            kbd_n.write_uint32(note['Unk2'])
 
         if karaoke:
             # counting score

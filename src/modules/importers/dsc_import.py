@@ -1,30 +1,4 @@
-from modules.common import Note, Button, get_vert_pos
-def byPos(note):
-    return note["Start position"]
-
-
-def sort_notes(note_list):
-    note_list.sort(key=byPos)
-    i = 0
-    prev_start_pos = 0
-    prev_end_pos = 0
-    while i < len(note_list):
-        note = note_list[i]
-        if prev_end_pos != 0:
-            if prev_start_pos <= note['Start position'] <= prev_end_pos:
-                note_list.pop(i)
-            else:
-                prev_start_pos = note['Start position']
-                prev_end_pos = note['End position']
-                i += 1
-        else:
-            if note['Start position'] == prev_start_pos:
-                note_list.pop(i)
-            else:
-                prev_start_pos = note['Start position']
-                prev_end_pos = note['End position']
-                i += 1
-
+from modules.common import Note, Button, get_vert_pos, sort_notes
 
 def convert_button(button):
     """Converts button to Yakuza ID.\n

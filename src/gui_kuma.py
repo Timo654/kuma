@@ -398,8 +398,7 @@ class Karaoke:
             return False, None
         else:
             self.add_notes_from_data(data)
-            # TODO - use pathlib
-            kpm_file = f"{str(file.parent)}/{file.stem.split('_')[0]}_param.kpm"
+            kpm_file = file.parent / f"{file.stem.split('_')[0]}_param.kpm"
             if Path(kpm_file).exists():
                 kpm_data = load_kpm(kpm_file, cutscene_box)
                 return True, kpm_data
@@ -430,6 +429,7 @@ class Karaoke:
                         note['Start Cuesheet ID'] = current_note.start_cuesheet_id
                         note['End Cue ID'] = current_note.end_cue_id
                         note['End Cuesheet ID'] = current_note.end_cuesheet_id
+                        note['Unk2'] = 0
                         if current_note.end_pos > 0:
                             note['End position'] = current_note.end_pos
                         else:
@@ -458,6 +458,12 @@ class Karaoke:
             with open(file, 'w') as f:
                 json.dump(data, f, indent=2)
             print("File exported to {}".format(file))
+        elif mode == 'save_dbd':
+            data['Header']['Magic'] = "NTBD"
+            data['Header']['Unk1'] = 100 # TODO - figure out what this is
+            kbd.write_file(data, file, cutscene_start=float(
+                cutscene_box.get_text()))
+            print("File written to {}".format(file))
         else:
             raise ValueError('Unknown kbd save mode!')
 
@@ -585,11 +591,11 @@ class Karaoke:
                         [button_type][1], index=dropdown.options_list.index(dropdown.selected_option))
 
     # paste copied notes
-    def paste(self, currently_copied, worlds, scrollbar_value, mode='boring'):
-        if mode == 'cooler':  # advanced copy paste # TODO - please..
-            cool = True
+    def paste(self, currently_copied, worlds, scrollbar_value, mode='normal'):
+        if mode == 'adjust_y':  # advanced copy paste
+            adjust_y_pos = True
         else:
-            cool = False
+            adjust_y_pos = False
 
         if len(currently_copied) > 0:
             prev_list = self.get_list()
@@ -599,7 +605,7 @@ class Karaoke:
                     (note.start_pos, note.end_pos, note.y, note.id, note.note_type, note.start_cue_id, note.end_cue_id, note.start_cuesheet_id, note.end_cuesheet_id))
             new_notes.sort()
             x_offset = new_notes[0][0]
-            if cool:
+            if adjust_y_pos:
                 y_offset = new_notes[0][2]
             mouse_pos = self.Get_pos(scrollbar_value, worlds[0])
             current_loc = self.pos_to_game(mouse_pos[0])  # where the cursor is
@@ -614,7 +620,7 @@ class Karaoke:
                 grid_start_pos = self.game_to_pos(
                     start_pos)
                 y_pos = note[2]
-                if cool:  # adjust y position
+                if adjust_y_pos:  # adjust y position
                     y_pos += mouse_pos[1] - y_offset
 
                 if self.In_grid(grid_start_pos, y_pos):
@@ -1273,7 +1279,7 @@ def main():
 
                 elif keys[pygame.K_LCTRL] and keys[pygame.K_v] and keys[pygame.K_LSHIFT]:  # paste notes
                     karaoke.paste(currently_copied, worlds,
-                                  scrollbar_value, mode='cooler')
+                                  scrollbar_value, mode='adjust_y')
 
                 elif keys[pygame.K_LCTRL] and keys[pygame.K_v]:  # paste notes
                     karaoke.paste(currently_copied, worlds, scrollbar_value)
@@ -1382,12 +1388,17 @@ def main():
                 # importing maps
                 elif event.ui_object_id == 'menu_bar.#file_menu_items.#export':
                     export_selection = filedialog.asksaveasfilename(
-                        title=i18n.t("kuma_files.export_file_title"), initialdir=config['PATHS']['Export_Output'], defaultextension='.json', filetypes=[(i18n.t("kuma_files.file_desc_json"), "*.json")])
+                        title=i18n.t("kuma_files.export_file_title"), initialdir=config['PATHS']['Export_Output'], defaultextension='.json', filetypes=[(i18n.t("kuma_files.file_desc_json"), "*.json"), (i18n.t("kuma_files.file_desc_dbd"), "*.dbd")])
                     if len(export_selection) != 0:
                         config.set("PATHS", "Export_Output", str(
                             Path(export_selection).parents[0]))
-                        karaoke.write_kbd(
-                            export_selection, cutscene_box, mode='export')
+                        if export_selection.endswith(".dbd"):
+                            karaoke.write_kbd(
+                                export_selection, cutscene_box, mode='save_dbd')
+                        else:
+                            karaoke.write_kbd(
+                                export_selection, cutscene_box, mode='export')
+
                 elif event.ui_object_id == 'menu_bar.#file_menu_items.#import':
                     import_selection = filedialog.askopenfilename(title=i18n.t("kuma_files.import_file_title"), filetypes=[(
                         i18n.t("kuma_files.file_desc_mns"), "*.bin"), (
@@ -1453,7 +1464,7 @@ def main():
                 elif event.ui_object_id == 'menu_bar.#help_menu_items.#how_to_use':
                     karaoke.show_help_window(manager, screen)
                 # about page
-                elif event.ui_object_id == 'menu_bar.#help_menu_items.#about':  # TODO - translate
+                elif event.ui_object_id == 'menu_bar.#help_menu_items.#about':
                     about_window_rect = pygame.Rect(0, 0, 400, 300)
                     about_window_rect.center = screen.get_rect().center
                     about_1 = i18n.t("kuma_help.about_1")

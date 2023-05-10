@@ -1,4 +1,4 @@
 binary-reader
 mutagen
-pygame
+pygame-ce
 pygame-gui

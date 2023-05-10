@@ -66,8 +66,8 @@ class UIMenuBar(UIElement):
         for menu_item_key, menu_item_data in self.menu_item_data.items():
             # create top level menu buttons
             default_font = self.ui_manager.get_theme().get_font_dictionary().get_default_font()
-            _, item_text_rect = default_font.render(
-                translate(menu_item_data['display_name']), (0, 0, 0))
+            item_text_rect = default_font.get_rect(
+                translate(menu_item_data['display_name']))
             button = UIButton(pygame.Rect(top_level_button_x,
                                           0,
                                           -1,

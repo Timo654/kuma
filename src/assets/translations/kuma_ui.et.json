@@ -33,6 +33,8 @@
 	"close_button_text": "Sulge",
 	"time_minutes": "%{min} min",
 	"time_seconds": "%{sec} s",
-	"time_minutes_seconds": "%{min} min %{sec} s"
+	"time_minutes_seconds": "%{min} min %{sec} s",
+	"exit_desc": "Kas olete kindel, et soovite sulgeda programmi? Salvestamata muudatused kaovad.",
+	"exit_title": "Sulge KUMA"
   }
 }

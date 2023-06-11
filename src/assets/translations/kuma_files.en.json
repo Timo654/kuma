@@ -8,6 +8,7 @@
 	"export_file_title": "Export karaoke button data",
 	"open_music_title": "Select a music file",
 	"file_desc_kbd": "Dragon Engine karaoke data",
+	"file_desc_dbd": "(EXPERIMENTAL) Dragon Engine dancing data",
 	"file_desc_kpm": "Karaoke Parameter Files",
 	"file_desc_mns": "Persona Dancing Map Files",
 	"file_desc_wtfl": "Kenzan Waterfall Training Files",

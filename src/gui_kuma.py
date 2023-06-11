@@ -1,5 +1,5 @@
 import pygame
-from pygame_gui import UIManager, UI_BUTTON_START_PRESS, UI_DROP_DOWN_MENU_CHANGED, UI_CONFIRMATION_DIALOG_CONFIRMED, UI_HORIZONTAL_SLIDER_MOVED, UI_TEXT_ENTRY_CHANGED
+from pygame_gui import UIManager, UI_BUTTON_START_PRESS, UI_DROP_DOWN_MENU_CHANGED, UI_CONFIRMATION_DIALOG_CONFIRMED, UI_HORIZONTAL_SLIDER_MOVED, UI_TEXT_ENTRY_CHANGED, UI_WINDOW_CLOSE
 from pygame_gui.windows import UIConfirmationDialog, UIMessageWindow
 from pygame_gui.elements import UIDropDownMenu, UILabel, UIButton, UITextEntryLine, UIHorizontalSlider
 import modules.parsers.de.kbd_reader as kbd
@@ -1065,6 +1065,7 @@ def main():
         save_kpm_button.hide()
     # what the player is holding
     held_note = None
+    exit_dialog = None
     # what the player is currently editing
     currently_edited = None
     currently_selected = list()  # make lists
@@ -1154,13 +1155,19 @@ def main():
         events = pygame.event.get()
         for event in events:
             # quit the app
-            if event.type == pygame.QUIT:
-                with open(settings_file, 'w', encoding='UTF-8') as configfile:  # save config
-                    config.write(configfile)
-                print('(^ _ ^)/')
-                sys.exit()
+            if event.type == pygame.QUIT: 
+                if exit_dialog == None:
+                    with open(settings_file, 'w', encoding='UTF-8') as configfile:  # save config
+                        config.write(configfile)
+                    exit_dialog = UIConfirmationDialog(
+                            rect=pygame.Rect(0, 0, 300, 300), manager=manager, action_long_desc='kuma_ui.exit_desc', window_title='kuma_ui.exit_title', action_short_name='kuma_ui.confirm_button_text', object_id='#exit')
+                    exit_dialog.cancel_button.set_text(
+                            'kuma_ui.cancel_button_text')
+            elif event.type == UI_WINDOW_CLOSE:
+                if event.ui_element == exit_dialog:
+                    exit_dialog = None # to prevent from opening up multiple exit dialogs when one is already open
             # scroll scrollbar
-            if event.type == pygame.MOUSEWHEEL:
+            elif event.type == pygame.MOUSEWHEEL:
                 scrollbar.set_current_value(
                     scrollbar.get_current_value() + 50 * event.y, warn=False)
             # add / move notes
@@ -1192,7 +1199,7 @@ def main():
                     karaoke.add_to_undo_list(prev_list)
 
             # key no longer pressed
-            if event.type == pygame.KEYUP:
+            elif event.type == pygame.KEYUP:
                 if keys[pygame.K_RIGHT] or keys[pygame.K_LEFT] or keys[pygame.K_PAGEDOWN] or keys[pygame.K_PAGEUP]:
                     key_pressed = None  # to stop scrollbars from scrolling
             # key presses
@@ -1489,8 +1496,12 @@ def main():
                         'kuma_ui.close_button_text')
             # more stuff to do after pressing confirm button
             elif event.type == UI_CONFIRMATION_DIALOG_CONFIRMED:
+                if event.ui_object_id == '#exit':
+                    print('(^ _ ^)/')
+                    pygame.quit()
+                    sys.exit()
                 # reset file
-                if event.ui_object_id == '#reset':
+                elif event.ui_object_id == '#reset':
                     karaoke.reset(undo_kbd)
                     currently_selected.clear()  # empty the list
                     if currently_edited:
@@ -1570,7 +1581,6 @@ def main():
                         'kuma_ui.volume_label', text_kwargs={"volume": volume_slider.get_current_value()})
                 elif event.ui_object_id == '#scrollbar':
                     scrollbar_moved = True
-
             # drag and drop support
             elif event.type == pygame.DROPFILE:
                 drag_file = event.file

@@ -34,6 +34,8 @@
 	"close_button_text": "Close",
 	"time_minutes": "%{min} min",
 	"time_seconds": "%{sec} s",
-	"time_minutes_seconds": "%{min} min %{sec} s"
+	"time_minutes_seconds": "%{min} min %{sec} s",
+	"exit_desc": "Are you sure you want to close the program? Any unsaved changes will be lost.",
+	"exit_title": "Close KUMA"
   }
 }

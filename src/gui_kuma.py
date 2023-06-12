@@ -67,8 +67,9 @@ languages = [key for key in assets['Languages']]
 def get_default_language():
     loc = locale.getdefaultlocale()  # get current locale
     lang_code = loc[0].split('_')[0]
-    language = list(assets['Languages'].keys())[list(
-        assets['Languages'].values()).index(lang_code)]
+    if lang_code not in list(assets['Languages'].values()):
+        return "English"
+    language = list(assets['Languages'].keys())[list(assets['Languages'].values()).index(lang_code)]
     return language
 
 

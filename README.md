@@ -1,4 +1,5 @@
 # DE Karaoke Editor - KUMA
+image::media/icon_full.png[KUMA]
 ## How to use?
 # Precompiled builds
 Grab the latest build from [Releases tab](https://github.com/Timo654/kuma/releases/tag/latest).
@@ -19,7 +20,7 @@ This tool has very experimental Lost Judgment dbd export support, and also a way
 
 ## Contributing
 Feel free to make any pull requests, I'll try to review them. The code is somewhat of a mess, though. Filing issues is also appreciated.
-
+image::media/kuma.png[Screenshot of the GUI]
 ## Credits
 https://github.com/SutandoTsukai181/PyBinaryReader
 

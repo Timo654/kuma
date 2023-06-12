@@ -37,7 +37,7 @@ def resource_path(relative_path):
 VERSION = "v0.9.9"
 CREATORS = 'Timo654'
 TRANSLATORS = 'Timo654, ketrub, Mink, jason098, Capitán Retraso, Kent, Edness, JustAnyone, Tervel, RyuHachii, Foas, Biggelskog'
-TESTERS = "ketrub, KaarelJ98, Ono Michio, Emergence"
+TESTERS = "ketrub, KaarelJ98, Ono Michio, Emergence, metman98uk, LawfulRhythm, Kent"
 print("""
    _     _      _     _      _     _      _     _
   (c).-.(c)    (c).-.(c)    (c).-.(c)    (c).-.(c)
@@ -1487,8 +1487,8 @@ def main():
                                                    '<b>{about_1}<br>'
                                                    '<b>{about_2} </b>{ver}<br>'
                                                    '<b>{about_3} </b>{creators}<br>'
-                                                   '<b>{about_4} </b>{mink}<br>'
-                                                   '<b>{about_5} </b>{testers}<br>'
+                                                   '<b>{about_4} </b>{mink}<br><br>'
+                                                   '<b>{about_5} </b>{testers}<br><br>'
                                                    '<b>{about_6} </b>{translators}<br>'.format(
                                                        ver=VERSION, mink='Mink', creators=CREATORS, testers=TESTERS, translators=TRANSLATORS, about_1=about_1, about_2=about_2, about_3=about_3, about_4=about_4, about_5=about_5, about_6=about_6),
                                                    manager=manager,

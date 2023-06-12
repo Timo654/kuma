@@ -34,7 +34,7 @@ def resource_path(relative_path):
 
 
 # general info
-VERSION = "v0.9.8"
+VERSION = "v0.9.9"
 CREATORS = 'Timo654'
 TRANSLATORS = 'Timo654, ketrub, Mink, jason098, Capitán Retraso, Kent, Edness, JustAnyone, Tervel, RyuHachii, Foas, Biggelskog'
 TESTERS = "ketrub, KaarelJ98, Ono Michio, Emergence"
@@ -460,7 +460,7 @@ class Karaoke:
             print("File exported to {}".format(file))
         elif mode == 'save_dbd':
             data['Header']['Magic'] = "NTBD"
-            data['Header']['Unk1'] = 100 # TODO - figure out what this is
+            data['Header']['Unk1'] = 100  # TODO - figure out what this is
             kbd.write_file(data, file, cutscene_start=float(
                 cutscene_box.get_text()))
             print("File written to {}".format(file))
@@ -1155,17 +1155,18 @@ def main():
         events = pygame.event.get()
         for event in events:
             # quit the app
-            if event.type == pygame.QUIT: 
+            if event.type == pygame.QUIT:
                 if exit_dialog == None:
                     with open(settings_file, 'w', encoding='UTF-8') as configfile:  # save config
                         config.write(configfile)
                     exit_dialog = UIConfirmationDialog(
-                            rect=pygame.Rect(0, 0, 300, 300), manager=manager, action_long_desc='kuma_ui.exit_desc', window_title='kuma_ui.exit_title', action_short_name='kuma_ui.confirm_button_text', object_id='#exit')
+                        rect=pygame.Rect(0, 0, 300, 300), manager=manager, action_long_desc='kuma_ui.exit_desc', window_title='kuma_ui.exit_title', action_short_name='kuma_ui.confirm_button_text', object_id='#exit')
                     exit_dialog.cancel_button.set_text(
-                            'kuma_ui.cancel_button_text')
+                        'kuma_ui.cancel_button_text')
             elif event.type == UI_WINDOW_CLOSE:
                 if event.ui_element == exit_dialog:
-                    exit_dialog = None # to prevent from opening up multiple exit dialogs when one is already open
+                    # to prevent from opening up multiple exit dialogs when one is already open
+                    exit_dialog = None
             # scroll scrollbar
             elif event.type == pygame.MOUSEWHEEL:
                 scrollbar.set_current_value(

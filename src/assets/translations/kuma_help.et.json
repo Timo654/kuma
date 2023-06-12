@@ -1,0 +1,30 @@
+{
+  "et": {
+	"how_1": "Kuidas kasutada",
+	"how_2": "KUMA - Karaoke redigeerija Dragon Engine mängudele.",
+	"how_3": "Alustamiseks saad laadida olemasoleva faili valides ülevalt <b>Fail</b> -> <b>Ava</b> või lihtsalt uude faili noote lisades.",
+	"how_4": "Endale sobiva <b>keele</b> ning <b>klahvid</b> saab valida menüü realt.",
+	"how_5": "Noote asetades on täpsus <b>%{ms} millisekundit</b>. Positsiooni saab täpsemini muuta noodi redigeerimisrežiimis.",
+	"how_6": "Laule saab mängida laadides ülevalt <b>Muusika</b> alt mõne laulu ning siis all vasakus nurgas <b>Start</b> nuppu vajutades.",
+	"how_7": "Kui soovid salvestada, saad minna <b>Fail</b> -> <b>Salvesta</b> või <b>Salvesta nimega...</b> ning teha kas uus fail või asendada olemasolev fail.",
+	"how_8": "Nupud",
+	"how_9": "<b>Vasak klõps</b> - Aseta ja võta üles noote.",
+	"how_10": "<b>Parem klõps</b> - Muuda käesoleva noodi tüüpi.",
+	"how_11": "<b>E</b> - Noodi redigeerimine. Siin saab muuta täpselt noodi aegu, positsiooni, tüüpi ja muud. E'd uuesti vajutades saab noodi salvestada.",
+	"how_12": "<b>Nooled, Page Up, Page Down</b> - Liiguta kerimisriba.",
+	"how_13": "<b>Delete</b> - Kustutab hetkel valitud/muudetava noodi.",
+	"how_14": "<b>End</b> - Hüppa viimase noodi juurde.",
+	"how_15": "<b>Vasak Ctrl + S</b> - Salvesta.",
+	"how_16": "<b>Vasak Ctrl + Z</b> - Võta tagasi.",
+	"how_17": "<b>Vasak Ctrl + F</b> - Vali noot.",
+	"how_18": "<b>Vasak Ctrl + C</b> - Kopeeri valitud noodid.",
+	"how_19": "<b>Vasak Ctrl + V</b> - Kleebi kopeeritud noodid (Vertikaalne positsioon ei muutu).",
+	"how_20": "<b>Vasak Ctrl + Vasak Shift + V</b> - Kleebi kopeeritud noodid (Vertikaalne positsioon muutub).",
+	"about_1": "Karaoke redigeerija Dragon Engine mängudele.",
+	"about_2": "Versioon:",
+	"about_3": "Autor:",
+	"about_4": "Programm ikoon:",
+	"about_5": "Testijad:",
+	"about_6": "Tõlkijad:"
+  }
+}

@@ -40,6 +40,8 @@ Feel free to make any pull requests, I'll try to review them. The code is somewh
 ## Custom songs: 
 [Yakuza 6 - Super IDOL](https://youtu.be/3URXJM1HOUs)
 
+[Yakuza Kiwami 2 - It's Been So Long](https://youtu.be/se_ikfHazQI)
+
 # Credits
 https://github.com/SutandoTsukai181/PyBinaryReader
 

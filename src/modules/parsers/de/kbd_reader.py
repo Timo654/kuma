@@ -76,7 +76,7 @@ def write_file(data, filename, cutscene_start=0):
                 max_score += 10
             else:
                 max_score += 30
-            if i > 19:
+            if i > 20:
                 max_score += 5  # combo bonus per note
             if (cutscene_start * 1000) * 3 > note['Start position']:
                 max_cutscene_score = max_score
